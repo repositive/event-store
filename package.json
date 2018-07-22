@@ -1,0 +1,37 @@
+{
+  "name": "@repositive/event-store",
+  "version": "0.0.1",
+  "description": "Event store implementation",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "compile": "tsc",
+    "test": "nyc --reporter lcov ava-ts --verbose",
+    "testDev": "nyc --reporter lcov ava-ts --watch",
+    "lint": "tslint --project tsconfig.json"
+  },
+  "ava": {
+    "sources": [
+      "src/**/*.ts"
+    ]
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/pg": "7.4.10",
+    "@types/ramda": "0.25.35",
+    "ava": "0.25.0",
+    "ava-ts": "0.24.6",
+    "pg": "7.4.3",
+    "ts-node": "7.0.0",
+    "tslint": "5.11.0",
+    "typescript": "2.9.2"
+  },
+  "peerDependencies": {
+    "pg": "7.4.x"
+  },
+  "dependencies": {
+    "funfix": "7.0.1",
+    "ramda": "0.25.0"
+  }
+}
