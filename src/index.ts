@@ -19,7 +19,7 @@ export interface Event<A, D extends EventData, C extends EventContext<A>> {
   context: C;
 }
 
-export type Aggregate<T> = (args: any[]) => Promise<T>;
+export type Aggregate<A extends any[], T> = (...args: A) => Promise<T>;
 type ValidateF<E extends EventData> = (o: any) => o is E;
 type ExecuteF<T, E extends EventData> = (acc: T, ev: E) => T;
 type AggregateMatch<A, T extends EventData> = [ValidateF<T>, ExecuteF<A, T>];
@@ -29,7 +29,12 @@ export interface EventStore {
   readAll(filters: {[k: string]: number | string}): Promise<Array<Event<any, any, any>>>;
   save<D extends EventData, C extends EventContext<any>>(data: D, context: C): Promise<Event<any, D, C>>;
   storeIfNotExisting<E extends Event<any, any, any>>(e: E): Promise<E>;
-  registerAggregate<A extends any[], T>(query: string, accumulator: T, matches: AggregateMatches<T>): Aggregate<T>;
+  registerAggregate<A extends any[], T>(
+    aggregateName: string,
+    query: string,
+    accumulator: T,
+    matches: AggregateMatches<T>,
+  ): Aggregate<A, T>;
 }
 
 const eventsTable = `
@@ -42,8 +47,10 @@ const eventsTable = `
 
 const aggregatesTable = `
   CREATE TABLE IF NOT EXISTS aggregates(
-    id VARCHAR(64) NOT NULL primary key,
-    data JSONB NOT NULL
+    id VARCHAR(64) NOT NULL,
+    aggregate_type VARCHAR NOT NULL,
+    data JSONB NOT NULL,
+    PRIMARY KEY(id, aggregate_type)
   );
 `;
 
@@ -80,13 +87,14 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
     return Promise.resolve(res.rows);
   }
 
-  function registerAggregate<T>(
+  function registerAggregate<A extends any[], T>(
+    aggregateName: string,
     query: string,
     accumulator: T,
     matches: AggregateMatches<T>,
-  ): Aggregate<T> {
+  ): Aggregate<A, T> {
 
-    async function _impl(...args: any[]): Promise<T> {
+    async function _impl(...args: A): Promise<T> {
       // TODO: Use an iterator instead of a full query here
       const results = await pool.query(query, args);
 
