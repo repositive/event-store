@@ -45,8 +45,8 @@ const eventsTable = `
   );
 `;
 
-const aggregatesTable = `
-  CREATE TABLE IF NOT EXISTS aggregates(
+const aggregateCacheTable = `
+  CREATE TABLE IF NOT EXISTS aggregate_cache(
     id VARCHAR(64) NOT NULL,
     aggregate_type VARCHAR NOT NULL,
     data JSONB NOT NULL,
@@ -54,20 +54,20 @@ const aggregatesTable = `
   );
 `;
 
-const upsertAggregates = `
-  INSERT INTO aggregates (id, data)
+const upsertAggregateCache = `
+  INSERT INTO aggregate_cache (id, data)
   VALUES ($1, $2)
   ON CONFLICT (id)
   DO UPDATE SET data = $2;
 `;
 
-const aggregateQuery = `select * from aggregates where id = $1`;
+const aggregateQuery = `select * from aggregate_cache where id = $1`;
 
 export type Emitter = (event: Event<any, any, any>) => void;
 
 export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventStore> {
   await pool.query(eventsTable);
-  await pool.query(aggregatesTable);
+  await pool.query(aggregateCacheTable);
 
   async function readAll(filters: {[k: string]: number | string}) {
     const filterPairs = R.toPairs(filters);
@@ -114,7 +114,7 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
         }, acc);
       }, latestSnapshot.getOrElse(accumulator));
 
-      await pool.query(upsertAggregates, [id, aggregatedResult]);
+      await pool.query(upsertAggregateCache, [id, aggregatedResult]);
 
       return aggregatedResult;
     }
