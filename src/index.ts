@@ -149,7 +149,7 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
     }
   }
 
-  async function save<D extends EventData, C extends EventContext<any>>(data: D, context: C) {
+  async function save<D extends EventData, C extends EventContext<any>>(data: D, context?: C) {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
