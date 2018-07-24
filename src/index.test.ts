@@ -4,4 +4,3 @@ test('Test placeholder', async (t) => {
   /* PLACEHOLDER */
   t.pass();
 });
-
