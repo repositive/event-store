@@ -1,0 +1,29 @@
+version: 2
+
+workflows:
+  version: 2
+  test_and_release:
+    jobs:
+      - test_and_make:
+          filters:
+            branches:
+              ignore:
+                - production
+
+jobs:
+  test_and_make:
+    docker:
+      - image: circleci/node:8.9
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run: sudo npm install -g npm@latest
+      - run: npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+      - run: npm run lint
+      - run: npm run test
+      - run: echo "$(git rev-parse --short HEAD)" > tag.txt
