@@ -127,10 +127,9 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
     try {
       const result = await client.query(`
         INSERT INTO events(id, data, context)
-        values($1, $2, $3) RETURNING *
-        WHERE NOT EMPTY (
-          SELECT id FROM events WHERE id = $1
-        )
+        values($1, $2, $3)
+        ON CONFLICT (id) DO NOTHING
+        RETURNING *
       `,
         [e.id, e.data, e.context]);
 
