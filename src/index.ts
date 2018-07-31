@@ -26,7 +26,6 @@ type AggregateMatch<A, T extends EventData> = [ValidateF<T>, ExecuteF<A, T>];
 type AggregateMatches<T> = Array<AggregateMatch<T, any>>;
 
 export interface EventStore {
-  readAll(filters: {[k: string]: number | string}): Promise<Array<Event<any, any, any>>>;
   save<D extends EventData, C extends EventContext<any>>(data: D, context: C): Promise<Event<any, D, C>>;
   storeIfNotExisting<E extends Event<any, any, any>>(e: E): Promise<E>;
   registerAggregate<A extends any[], T>(
@@ -69,24 +68,6 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
   await pool.query(eventsTable);
   await pool.query(aggregateCacheTable);
 
-  async function readAll(filters: {[k: string]: number | string}) {
-    const filterPairs = R.toPairs(filters);
-    const where = filterPairs.map(([k, v], i) => {
-      return `events.data->>'${k}' = $${i + 1}`;
-    })
-    .join(" AND ");
-    const query = `
-      SELECT * FROM events
-      WHERE ${where}
-      ORDER BY events.time ASC;
-    `;
-    console.log(query);
-    const filterList = filterPairs.map(([k, v]) => v);
-    console.log(filterList);
-    const res = await pool.query(query, filterList);
-    return Promise.resolve(res.rows);
-  }
-
   function registerAggregate<A extends any[], T>(
     aggregateName: string,
     query: string,
@@ -127,10 +108,9 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
     try {
       const result = await client.query(`
         INSERT INTO events(id, data, context)
-        values($1, $2, $3) RETURNING *
-        WHERE NOT EMPTY (
-          SELECT id FROM events WHERE id = $1
-        )
+        values($1, $2, $3)
+        ON CONFLICT (id) DO NOTHING
+        RETURNING *
       `,
         [e.id, e.data, e.context]);
 
@@ -172,7 +152,6 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
   }
 
   return {
-    readAll,
     registerAggregate,
     save,
     storeIfNotExisting,
