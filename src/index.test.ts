@@ -18,15 +18,35 @@ interface User {
   email: string;
 }
 
-interface CreateAccount extends EventData {
-  type: 'CreateAccount';
+interface AccountCreated extends EventData {
+  type: 'AccountCreated';
   user_id: string;
   name: string;
   email: string;
 }
 
-function isCreateAccount(o: any): o is CreateAccount {
-  return o && o.type === 'CreateAccount';
+interface NameChanged extends EventData {
+  type: 'NameChanged';
+  user_id: string;
+  name: string;
+}
+
+interface EmailChanged extends EventData {
+  type: 'EmailChanged';
+  user_id: string;
+  email: string;
+}
+
+function isAccountCreated(o: any): o is AccountCreated {
+  return o && o.type === 'AccountCreated';
+}
+
+function isNameChanged(o: any): o is NameChanged {
+  return o && o.type === 'NameChanged';
+}
+
+function isEmailChanged(o: any): o is EmailChanged {
+  return o && o.type === 'EmailChanged';
 }
 
 const emit = (e: any) => { };
@@ -39,18 +59,17 @@ test('Test placeholder', async (t) => {
     "SELECT * FROM events WHERE data->>'user_id' = $1",
     None,
     [
-      [ isCreateAccount, (acc: any, d: any) => {
-      console.log({ d, acc });
-      return Some({ ...acc.getOrElse({}), user_id: d.user_id, name: d.name, email: d.email })
-    } ],
-      // [ (e: any) => e.type === "NameChange", (acc: any, e: any) => Some({ ...acc, name: e.name }) ],
-      // [ (e: any) => e.type === "EmailChange", (acc: any, e: any) => Some({ ...acc, email: e.email }) ],
+      [ isAccountCreated, (acc: any, d: any) => Some({ ...acc.getOrElse({}), user_id: d.user_id, name: d.name, email: d.email }) ],
+      [ isNameChanged, (acc: any, d: any) => Some({ ...acc.getOrElse({}), name: d.name }) ],
+      [ isEmailChanged, (acc: any, d: any) => Some({ ...acc.getOrElse({}), email: d.email }) ],
     ],
   );
 
   const result = await testAggregate(user_id);
 
-  console.log({ result });
-
-  t.fail();
+  t.deepEqual(result.get(), {
+    name: 'Bobby Bowls',
+    email: 'bobby@bowls.com',
+    user_id,
+  });
 });

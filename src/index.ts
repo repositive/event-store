@@ -87,9 +87,6 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
 
       const latestSnapshot = await pool.query(aggregateQuery, [id])
         .then((aggResult) => Option.of(aggResult.rows[0] ? aggResult.rows[0].data : null));
-      // const latestSnapshot = None;
-
-      console.log({ latestSnapshot })
 
       const aggregatedResult = await results.rows.reduce((acc, row) => {
         return matches.reduce((matchAcc, [validate, execute]) => {
