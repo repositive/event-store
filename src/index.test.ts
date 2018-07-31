@@ -49,7 +49,7 @@ function isEmailChanged(o: any): o is EmailChanged {
   return o && o.type === 'EmailChanged';
 }
 
-const emit = (e: any) => { };
+const emit = (e: any) => undefined;
 
 test('Test placeholder', async (t) => {
   const store = await newEventStore(pool, emit);
@@ -59,7 +59,15 @@ test('Test placeholder', async (t) => {
     "SELECT * FROM events WHERE data->>'user_id' = $1",
     None,
     [
-      [ isAccountCreated, (acc: any, d: any) => Some({ ...acc.getOrElse({}), user_id: d.user_id, name: d.name, email: d.email }) ],
+      [
+        isAccountCreated,
+        (acc: any, d: any) => Some({
+          ...acc.getOrElse({}),
+          user_id: d.user_id,
+          name: d.name,
+          email: d.email,
+        }),
+      ],
       [ isNameChanged, (acc: any, d: any) => Some({ ...acc.getOrElse({}), name: d.name }) ],
       [ isEmailChanged, (acc: any, d: any) => Some({ ...acc.getOrElse({}), email: d.email }) ],
     ],
