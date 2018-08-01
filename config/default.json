@@ -1,6 +1,6 @@
 {
   "db": {
-    "connectionString": "postgres://repositive:repositive@localhost:5432/event-store"
+    "connectionString": "postgres://repositive:repositive@localhost:5433/event-store"
   },
   "log_level": "debug"
 }

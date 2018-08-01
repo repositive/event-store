@@ -1,0 +1,12 @@
+version: '3'
+services:
+  postgres:
+    image: "postgres:9.6"
+    ports:
+      - "5433:5432"
+    volumes:
+      - "./postgres_data:/var/lib/postgresql/data"
+    environment:
+      - POSTGRES_DB=organisations-rs
+      - POSTGRES_USER=repositive
+      - POSTGRES_PASSWORD=repositive
