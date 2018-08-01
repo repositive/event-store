@@ -110,7 +110,7 @@ test("Aggregator correctly forms cache query", async (t) => {
 
   readStub
     .withArgs("PUT BASE QUERY HERE")
-    .rejects("This shouldn't happen");
+    .throws("This shouldn't happen");
 
   readStub
     .withArgs("PUT CACHE SEARCH QUERY")
