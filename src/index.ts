@@ -92,6 +92,8 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
       const latestSnapshot = await pool.query(aggregateCacheQuery, [id])
         .then((aggResult) => Option.of(aggResult.rows[0] ? aggResult.rows[0].data : null));
 
+      const queryTime = Date.now();
+
       const aggregatedResult = await results.rows.reduce((acc, row) => {
         return matches.reduce((matchAcc, [validate, execute]) => {
           if (validate(row.data)) {
@@ -105,7 +107,15 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
         await pool.query(upsertAggregateCache, [id, aggregatedResult.get()]);
       }
 
-      logger.trace('aggregateLatency', { query, args, time: Date.now() - start});
+      logger.trace(
+        'aggregateLatency',
+        {
+          query,
+          args,
+          query_time: queryTime - start,
+          aggregate_time: Date.now() - queryTime,
+          total_time: Date.now() - start,
+        });
 
       return aggregatedResult;
     }
