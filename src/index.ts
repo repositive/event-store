@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 import * as R from 'ramda';
-import { Future, Option } from 'funfix';
+import { Future, Option, None } from 'funfix';
 import { createHash } from 'crypto';
 
 export interface EventData {
@@ -36,22 +36,24 @@ export interface EventStore {
   ): Aggregate<A, T>;
 }
 
-const eventsTable = `
-  CREATE TABLE IF NOT EXISTS events(
-    id UUID DEFAULT uuid_generate_v4() primary key,
-    data JSONB NOT NULL,
-    context JSONB NOT NULL
-  );
-`;
+// const eventsTable = `
+//   CREATE TABLE IF NOT EXISTS events(
+//     id UUID DEFAULT uuid_generate_v4() primary key,
+//     data JSONB NOT NULL,
+//     context JSONB DEFAULT '{}',
+//     time TIMESTAMP DEFAULT now()
+//   );
+// `;
 
-const aggregateCacheTable = `
-  CREATE TABLE IF NOT EXISTS aggregate_cache(
-    id VARCHAR(64) NOT NULL,
-    aggregate_type VARCHAR NOT NULL,
-    data JSONB NOT NULL,
-    PRIMARY KEY(id, aggregate_type)
-  );
-`;
+// const aggregateCacheTable = `
+//   CREATE TABLE IF NOT EXISTS aggregate_cache(
+//     id VARCHAR(64) NOT NULL,
+//     aggregate_type VARCHAR NOT NULL,
+//     data JSONB NOT NULL,
+//     PRIMARY KEY(id, aggregate_type),
+//     time TIMESTAMP DEFAULT now()
+//   );
+// `;
 
 const upsertAggregateCache = `
   INSERT INTO aggregate_cache (id, data)
@@ -60,13 +62,13 @@ const upsertAggregateCache = `
   DO UPDATE SET data = $2;
 `;
 
-const aggregateQuery = `select * from aggregate_cache where id = $1`;
+const aggregateCacheQuery = `select * from aggregate_cache where id = $1`;
 
 export type Emitter = (event: Event<any, any, any>) => void;
 
 export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventStore> {
-  await pool.query(eventsTable);
-  await pool.query(aggregateCacheTable);
+  // await pool.query(eventsTable);
+  // await pool.query(aggregateCacheTable);
 
   function registerAggregate<A extends any[], T>(
     aggregateName: string,
@@ -83,19 +85,21 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
         .update(query + JSON.stringify(args))
         .digest('hex');
 
-      const latestSnapshot = await pool.query(aggregateQuery, [id])
-        .then((aggResult) => Option.of(aggResult.rows[0]));
+      const latestSnapshot = await pool.query(aggregateCacheQuery, [id])
+        .then((aggResult) => Option.of(aggResult.rows[0] ? aggResult.rows[0].data : null));
 
-      const aggregatedResult = await results.rows.reduce((acc, event) => {
+      const aggregatedResult = await results.rows.reduce((acc, row) => {
         return matches.reduce((matchAcc, [validate, execute]) => {
-          if (validate(event)) {
-            return execute(matchAcc, event);
+          if (validate(row.data)) {
+            return execute(matchAcc, row.data);
           }
           return matchAcc;
         }, acc);
-      }, latestSnapshot.getOrElse(accumulator));
+      }, latestSnapshot);
 
-      await pool.query(upsertAggregateCache, [id, aggregatedResult]);
+      if (aggregatedResult.nonEmpty()) {
+        await pool.query(upsertAggregateCache, [id, aggregatedResult.get()]);
+      }
 
       return aggregatedResult;
     }
