@@ -85,15 +85,16 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
         .digest('hex');
 
       const latestSnapshot = await pool.query(aggregateCacheQuery, [id])
-        .then((aggResult) => Option.of(aggResult.rows[0] ? {
-          ...aggResult.rows[0].data,
-          time: aggResult.rows[0].time,
-        } : null),
-        );
+        .then((aggResult) => {
+          return {
+            data: Option.of(R.path(['rows', 0, 'data'], aggResult)),
+            time: Option.of(R.path(['rows', 0, 'time'], aggResult)),
+          };
+        });
 
-      const cached_query = latestSnapshot.nonEmpty() ? `
+      const cached_query = latestSnapshot.time.nonEmpty() ? `
         SELECT * FROM (${query}) as events
-        where events.time > (${latestSnapshot.get().time})
+        where events.time > (${latestSnapshot.time.get()})
         order by events.time asc;
       ` : query;
 
@@ -106,7 +107,7 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
           }
           return matchAcc;
         }, acc);
-      }, latestSnapshot);
+      }, latestSnapshot.data);
 
       if (aggregatedResult.nonEmpty()) {
         await pool.query(upsertAggregateCache, [id, aggregatedResult.get()]);
