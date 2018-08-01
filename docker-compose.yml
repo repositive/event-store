@@ -7,6 +7,19 @@ services:
     volumes:
       - "./postgres_data:/var/lib/postgresql/data"
     environment:
-      - POSTGRES_DB=organisations-rs
+      - POSTGRES_DB=event-store
       - POSTGRES_USER=repositive
       - POSTGRES_PASSWORD=repositive
+
+  integration_tests:
+    command: /bin/sh -c "npm run testIntegration"
+    image: node:10
+    working_dir: /opt
+    environment:
+      - PGUSER=repositive
+      - PGPASSWORD=repositive
+      - PGDATABASE=event-store
+      - PGHOST=postgres
+    volumes:
+      - .:/opt
+
