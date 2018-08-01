@@ -104,3 +104,23 @@ test('Test placeholder', async (t) => {
     user_id,
   });
 });
+
+test("Aggregator correctly forms cache query", async (t) => {
+  const readStub = stub();
+
+  readStub
+    .withArgs("PUT BASE QUERY HERE")
+    .rejects("This shouldn't happen");
+
+  readStub
+    .withArgs("PUT CACHE SEARCH QUERY")
+    .resolves("This is right & should happen");
+
+  readStub
+    .withArgs("PUT THE NESTED SELECT QUERY")
+     .resolves("This bit doesn't matter, we just need to know the query works");
+  // this part should execute exactly once - there should only be one occurance of
+  // this in readStub.args
+
+  t.fail();
+});
