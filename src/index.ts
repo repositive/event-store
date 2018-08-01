@@ -79,14 +79,26 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
 
     async function _impl(...args: A): Promise<T> {
       // TODO: Use an iterator instead of a full query here
-      const results = await pool.query(query, args);
 
       const id = createHash('sha256')
         .update(query + JSON.stringify(args))
         .digest('hex');
 
       const latestSnapshot = await pool.query(aggregateCacheQuery, [id])
-        .then((aggResult) => Option.of(aggResult.rows[0] ? aggResult.rows[0].data : null));
+        .then((aggResult) => {
+          return {
+            data: Option.of(R.path(['rows', 0, 'data'], aggResult)),
+            time: Option.of(R.path(['rows', 0, 'time'], aggResult)),
+          };
+        });
+
+      const cached_query = latestSnapshot.time.nonEmpty() ? `
+        SELECT * FROM (${query}) as events
+        where events.time > (${latestSnapshot.time.get()})
+        order by events.time asc;
+      ` : query;
+
+      const results = await pool.query(query, args);
 
       const aggregatedResult = await results.rows.reduce((acc, row) => {
         return matches.reduce((matchAcc, [validate, execute]) => {
@@ -95,7 +107,7 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
           }
           return matchAcc;
         }, acc);
-      }, latestSnapshot);
+      }, latestSnapshot.data);
 
       if (aggregatedResult.nonEmpty()) {
         await pool.query(upsertAggregateCache, [id, aggregatedResult.get()]);
