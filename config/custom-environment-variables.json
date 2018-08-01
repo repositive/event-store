@@ -1,0 +1,7 @@
+{
+  "db": {
+    "connectionString": "DB_URI",
+    "log": "DB_LOGS_ENABLED"
+  },
+  "log_level": "LOG_LEVEL"
+}

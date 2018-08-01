@@ -3,6 +3,8 @@ import * as R from 'ramda';
 import { Future, Option, None } from 'funfix';
 import { createHash } from 'crypto';
 
+import _logger from './logger';
+
 export interface EventData {
   type: string;
 }
@@ -75,9 +77,11 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
     query: string,
     accumulator: T,
     matches: AggregateMatches<T>,
+    logger: any = _logger,
   ): Aggregate<A, T> {
-
     async function _impl(...args: A): Promise<T> {
+      const start = Date.now();
+
       // TODO: Use an iterator instead of a full query here
 
       const id = createHash('sha256')
@@ -100,6 +104,8 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
 
       const results = await pool.query(query, args);
 
+      const queryTime = Date.now();
+
       const aggregatedResult = await results.rows.reduce((acc, row) => {
         return matches.reduce((matchAcc, [validate, execute]) => {
           if (validate(row.data)) {
@@ -112,6 +118,16 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
       if (aggregatedResult.nonEmpty()) {
         await pool.query(upsertAggregateCache, [id, aggregatedResult.get()]);
       }
+
+      logger.trace(
+        'aggregateLatency',
+        {
+          query,
+          args,
+          query_time: queryTime - start,
+          aggregate_time: Date.now() - queryTime,
+          total_time: Date.now() - start,
+        });
 
       return aggregatedResult;
     }
