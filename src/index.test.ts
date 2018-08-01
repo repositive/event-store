@@ -1,8 +1,9 @@
 import test from 'ava';
-import { Client, Pool } from 'pg';
+import { Client, Pool, QueryConfig, QueryResult } from 'pg';
 import { Future, Option, None, Some } from 'funfix';
+import { stub } from 'sinon';
 
-import { cafebabe as user_id } from './test-helpers';
+import { cafebabe as user_id, getFakePool } from './test-helpers';
 import { newEventStore, Emitter, EventData } from './index';
 
 const pool = new Pool({
@@ -52,11 +53,62 @@ function isEmailChanged(o: any): o is EmailChanged {
 const emit = (e: any) => undefined;
 
 test('Test placeholder', async (t) => {
-  const store = await newEventStore(pool, emit);
+  const readStub = stub();
+
+  readStub
+    .withArgs("SELECT * FROM events WHERE data->>'user_id' = $1 ORDER BY time ASC", [ user_id ])
+    .resolves({
+      rows: [
+        {
+          id : "66927ffa-44ea-4f81-a993-297426c1dc6b",
+          data : {
+            type: "AccountCreated",
+            name: "Bobby Bowls",
+            email: "bobby@bowls.com",
+            user_id,
+          },
+          context : {},
+          time : "2018-07-31 10:49:57.591893",
+        },
+        {
+          id : "1e07408f-f1ac-4dbf-83a2-c3e8dc63802c",
+          data : {
+            type: "NameChanged",
+            name: "Bobby Beans",
+            user_id,
+          },
+          context : {},
+          time : "2018-07-31 10:59:57.591893",
+        },
+        {
+          id : "cdd1c522-5fa1-47ec-80a5-0003f5ae7a73",
+          data : {
+            type: "EmailChanged",
+            email: "bobby@beans.com",
+            user_id,
+          },
+          context : {},
+          time : "2018-07-31 11:09:57.591893",
+        },
+      ],
+      totalCount: 3,
+    });
+
+  readStub
+    .withArgs(
+      'select * from aggregate_cache where id = $1',
+      [ 'b83753e3336aaa7544d02abf12e085a3c95b96b2916acc96b36d5f5652f21723' ],
+    )
+    .resolves({
+      rows: [],
+      totalCount: 0,
+    });
+
+  const store = await newEventStore(getFakePool(readStub), emit);
 
   const testAggregate = store.registerAggregate<[string], Option<User>>(
     'RandoAggregate',
-    "SELECT * FROM events WHERE data->>'user_id' = $1",
+    "SELECT * FROM events WHERE data->>'user_id' = $1 ORDER BY time ASC",
     None,
     [
       [
@@ -76,8 +128,8 @@ test('Test placeholder', async (t) => {
   const result = await testAggregate(user_id);
 
   t.deepEqual(result.get(), {
-    name: 'Bobby Bowls',
-    email: 'bobby@bowls.com',
+    name: 'Bobby Beans',
+    email: 'bobby@beans.com',
     user_id,
   });
 });

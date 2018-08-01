@@ -62,7 +62,7 @@ const upsertAggregateCache = `
   DO UPDATE SET data = $2;
 `;
 
-const aggregateQuery = `select * from aggregate_cache where id = $1`;
+const aggregateCacheQuery = `select * from aggregate_cache where id = $1`;
 
 export type Emitter = (event: Event<any, any, any>) => void;
 
