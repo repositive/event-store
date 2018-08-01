@@ -4,14 +4,14 @@ import { Future, Option, None, Some } from 'funfix';
 import { stub } from 'sinon';
 import * as fs from 'fs';
 
-const client = new Pool();
+import { getDbConnection } from './src/test-helpers';
 
 test('Integration test setup', async (t) => {
   // Create DB structure
-  await client.query(fs.readFileSync("./db.sql", { encoding: 'utf8' }));
+  await getDbConnection().query(fs.readFileSync("./db.sql", { encoding: 'utf8' }));
 
   // Insert sample data
-  await client.query(fs.readFileSync("./integration.sql", { encoding: 'utf8' }));
+  // await client.query(fs.readFileSync("./integration.sql", { encoding: 'utf8' }));
 
   t.pass();
 });

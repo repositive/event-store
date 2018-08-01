@@ -3,7 +3,7 @@ import { Client, Pool, QueryConfig, QueryResult } from 'pg';
 import { Future, Option, None, Some } from 'funfix';
 import { stub } from 'sinon';
 
-import { cafebabe as user_id, getFakePool, fakePoolResult, createEvent } from './test-helpers';
+import { cafebabe as user_id, getFakePool, fakePoolResult, createEvent, fakeEmitter } from './test-helpers';
 import { newEventStore, Emitter, EventData } from './index';
 
 interface User {
@@ -43,8 +43,6 @@ function isEmailChanged(o: any): o is EmailChanged {
   return o && o.type === 'EmailChanged';
 }
 
-const emit = (e: any) => undefined;
-
 test('Test placeholder', async (t) => {
   const readStub = stub();
 
@@ -75,7 +73,7 @@ test('Test placeholder', async (t) => {
     )
     .resolves(fakePoolResult());
 
-  const store = await newEventStore(getFakePool(readStub), emit);
+  const store = await newEventStore(getFakePool(readStub), fakeEmitter);
 
   const testAggregate = store.registerAggregate<[string], Option<User>>(
     'RandoAggregate',

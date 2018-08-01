@@ -46,3 +46,33 @@ export function fakePoolResult(rows: any[] = []): QueryResult {
     fields: [],
   };
 }
+
+export const fakeEmitter = (e: any) => undefined;
+
+// For integration tests
+export function getDbConnection(): Pool {
+  return new Pool();
+}
+
+// For integration tests
+export function insertEvent(event: any, pool: any = getDbConnection()): Promise<any> {
+  return pool
+    .query(
+      `INSERT INTO events (data, context) VALUES ($1, $2) RETURNING *`,
+      [ event.data, event.context ],
+    )
+    .then((res: any) => res.rows[0]);
+}
+
+// For integration tests
+export function truncateAll(pool: any = getDbConnection()): Promise<any> {
+  return Promise.all([
+    pool.query("TRUNCATE TABLE events"),
+    pool.query("TRUNCATE TABLE aggregate_cache"),
+  ]);
+}
+
+// For integration tests
+export async function query(q: string, pool: any = getDbConnection()): Promise<any> {
+  return (await pool.query(q)).rows;
+}
