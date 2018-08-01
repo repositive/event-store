@@ -16,6 +16,8 @@ jobs:
       - image: circleci/node:8.9
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
       - run: sudo npm install -g npm@latest
@@ -27,4 +29,5 @@ jobs:
       - run: npm run lint
       - run: npm run compile
       - run: npm run test
+      - run: docker-compose run integration_tests
       - run: echo "$(git rev-parse --short HEAD)" > tag.txt
