@@ -6,3 +6,5 @@ node_modules
 .DS_Store
 CNV
 postgres_data
+*.swp
+*.lock
