@@ -109,6 +109,7 @@ test('Test placeholder', async (t) => {
 test("Aggregator correctly forms cache query", async (t) => {
   const readStub = stub();
 
+  const iso_time = "2018-07-27 10:19:24.428897";
   readStub
     .withArgs(
       "select * from aggregate_cache where id = $1",
@@ -117,10 +118,10 @@ test("Aggregator correctly forms cache query", async (t) => {
     .resolves(
       fakePoolResult([
          {
-           id: 'uuid',
-           aggregate_type: 'NOT NULL',
+           id: '8871b5e0-2a67-4715-90e6-b4974ad0d6a7',
+           aggregate_type: 'RandoAggregate',
            data: {some: 'stuff'},
-           time: 'iso time',
+           time: iso_time,
          },
         ],
       ),
@@ -159,16 +160,14 @@ test("Aggregator correctly forms cache query", async (t) => {
 
   const result = await testAggregate(user_id);
 
-  console.log("READSTUB ARGS");
-  console.debug(readStub.args);
-
-  const target_query =
-    'SELECT * FROM (SELECT * FROM events WHERE data->>\'user_id\' = $1' +
-    ' ORDER BY time ASC) as events where events.time > (iso time) order by events.time asc;';
-
+  const target_query = `
+        SELECT * FROM (${base_query}) as events
+        where events.time > (${iso_time})
+        order by events.time asc;
+      `;
   // Check that the correct query is executed at least once
   t.truthy(R.find((query) => {
-    return query[0].replace(/\s+/g, ' ').trim() === target_query;
+    return query[0] === target_query;
   })(readStub.args));
 
   // Check that the original query (the query that does not use the cache)
