@@ -1,4 +1,5 @@
 import test from 'ava';
+import * as R from 'ramda';
 import { Client, Pool, QueryConfig, QueryResult } from 'pg';
 import { Future, Option, None, Some } from 'funfix';
 import { stub } from 'sinon';
@@ -109,18 +110,70 @@ test("Aggregator correctly forms cache query", async (t) => {
   const readStub = stub();
 
   readStub
-    .withArgs("PUT BASE QUERY HERE")
-    .throws("This shouldn't happen");
+    .withArgs(
+      "select * from aggregate_cache where id = $1",
+      ['b83753e3336aaa7544d02abf12e085a3c95b96b2916acc96b36d5f5652f21723'],
+    )
+    .resolves(
+      fakePoolResult([
+         {
+           id: 'uuid',
+           aggregate_type: 'NOT NULL',
+           data: {some: 'stuff'},
+           time: 'iso time',
+         },
+        ],
+      ),
+    );
 
   readStub
-    .withArgs("PUT CACHE SEARCH QUERY")
-    .resolves("This is right & should happen");
-
-  readStub
-    .withArgs("PUT THE NESTED SELECT QUERY")
-     .resolves("This bit doesn't matter, we just need to know the query works");
+    .resolves(
+      fakePoolResult(),
+    );
   // this part should execute exactly once - there should only be one occurance of
   // this in readStub.args
 
-  t.fail();
+  const store = await newEventStore(getFakePool(readStub), emit);
+
+  const base_query =
+    "SELECT * FROM events WHERE data->>'user_id' = $1 ORDER BY time ASC";
+
+  const testAggregate = store.registerAggregate<[string], Option<User>>(
+    'RandoAggregate',
+    base_query,
+    None,
+    [
+      [
+        isAccountCreated,
+        (acc: any, d: any) => Some({
+          ...acc.getOrElse({}),
+          user_id: d.user_id,
+          name: d.name,
+          email: d.email,
+        }),
+      ],
+      [ isNameChanged, (acc: any, d: any) => Some({ ...acc.getOrElse({}), name: d.name }) ],
+      [ isEmailChanged, (acc: any, d: any) => Some({ ...acc.getOrElse({}), email: d.email }) ],
+    ],
+  );
+
+  const result = await testAggregate(user_id);
+
+  console.log("READSTUB ARGS");
+  console.debug(readStub.args);
+
+  const target_query =
+    'SELECT * FROM (SELECT * FROM events WHERE data->>\'user_id\' = $1' +
+    ' ORDER BY time ASC) as events where events.time > (iso time) order by events.time asc;';
+
+  // Check that the correct query is executed at least once
+  t.truthy(R.find((query) => {
+    return query[0].replace(/\s+/g, ' ').trim() === target_query;
+  })(readStub.args));
+
+  // Check that the original query (the query that does not use the cache)
+  // is never used
+  t.falsy(R.find((query) => {
+    return query[0] === base_query;
+  })(readStub.args));
 });
