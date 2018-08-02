@@ -102,7 +102,7 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
         order by events.time asc;
       ` : query;
 
-      const results = await pool.query(query, args);
+      const results = await pool.query(cached_query, args);
 
       const queryTime = Date.now();
 
