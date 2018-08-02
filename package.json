@@ -7,6 +7,7 @@
   "scripts": {
     "compile": "tsc",
     "test": "nyc --reporter lcov ava-ts --verbose",
+    "testIntegration": "nyc --reporter lcov ava-ts --verbose ./src/integrationsetup.ts ./src/**/*.integration.ts",
     "testDev": "nyc --reporter lcov ava-ts --watch",
     "lint": "tslint --project tsconfig.json"
   },

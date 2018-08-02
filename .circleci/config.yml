@@ -14,8 +14,15 @@ jobs:
   test_and_make:
     docker:
       - image: circleci/node:8.9
+      - image: postgres:9.6
+        environment:
+          POSTGRES_DB: event-store
+          POSTGRES_USER: repositive
+          POSTGRES_PASSWORD: repositive
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
       - run: sudo npm install -g npm@latest
@@ -27,4 +34,13 @@ jobs:
       - run: npm run lint
       - run: npm run compile
       - run: npm run test
+      - run:
+          name: Integration tests
+          command: npm run testIntegration
+          environment:
+            PGUSER: repositive
+            PGPASSWORD: repositive
+            PGDATABASE: event-store
+            PGHOST: localhost
+
       - run: echo "$(git rev-parse --short HEAD)" > tag.txt
