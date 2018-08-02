@@ -95,10 +95,10 @@ test('It works', async (t) => {
 
   const cache = await query("SELECT * FROM aggregate_cache");
 
-  t.deepEqual(cache.length, 1);
-  t.deepEqual(cache[0].id, 'b83753e3336aaa7544d02abf12e085a3c95b96b2916acc96b36d5f5652f21723');
+  t.is(cache.length, 1);
+  t.is(cache[0].id, 'b83753e3336aaa7544d02abf12e085a3c95b96b2916acc96b36d5f5652f21723');
   t.deepEqual(cache[0].data, expected);
-  t.deepEqual(cache[0].aggregate_type, '');
+  t.is(cache[0].aggregate_type, '');
 
   t.deepEqual(result.get(), expected);
 });

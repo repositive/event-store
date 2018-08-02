@@ -132,7 +132,7 @@ test("Aggregator correctly forms cache query", async (t) => {
   // this part should execute exactly once - there should only be one occurance of
   // this in readStub.args
 
-  const store = await newEventStore(getFakePool(readStub), emit);
+  const store = await newEventStore(getFakePool(readStub), fakeEmitter);
 
   const base_query =
     "SELECT * FROM events WHERE data->>'user_id' = $1 ORDER BY time ASC";
