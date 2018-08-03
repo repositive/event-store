@@ -166,10 +166,11 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
     try {
       await client.query('BEGIN');
 
-      const event = await client.query(`
-        INSERT INTO events(data) values($1)
-        RETURNING *
-      `, [data]).then((res) => res.rows[0]);
+      const event = await client.query(
+        'INSERT INTO events(data, context) values($1) RETURNING *',
+        [data, context],
+      )
+      .then((res) => res.rows[0]);
 
       await client.query(`COMMIT`);
 

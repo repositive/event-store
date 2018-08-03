@@ -4,7 +4,7 @@ import { stub } from 'sinon';
 export const cafebabe = "cafebabe-cafe-babe-cafe-babecafebabe";
 export const id = "d00dd00d-d00d-d00d-d00d-d00dd00dd00d";
 
-const defaultWriteStub = stub()
+const defaultQueryStub = stub()
   .resolves({
     rows: [],
     totalCount: 0,
@@ -14,7 +14,7 @@ export function createEvent(
   type: string,
   data: any,
   context: any = {},
-  time: string = (new Date()).toISOString(),
+  time: string = '2018-01-01 01:01:01',
 ): any {
     return {
       id,
@@ -24,13 +24,16 @@ export function createEvent(
     };
 }
 
-export function getFakePool(readStub: any, writeStub: any = defaultWriteStub) {
+export function getFakePool(queryStub: any = defaultQueryStub) {
   const fakePool = {
     async query(q: string | QueryConfig, values?: any[]): Promise<QueryResult> {
-      return readStub(q, values);
+      return queryStub(q, values);
     },
-    async save(data: any, context?: any) {
-      writeStub(data, context);
+    async connect(): Promise<any> {
+      return this;
+    },
+    release() {
+      return undefined;
     },
   } as any;
 
