@@ -96,11 +96,12 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
           };
         });
 
-      const cached_query = latestSnapshot.time.map((time) => `
-        SELECT * FROM (${query}) as events
-        where events.time > (${time})
-        order by events.time asc;
-      `).getOrElse(query);
+      const cached_query =
+      `
+        select * from (${query}) as events` +
+        latestSnapshot.time.map((time) => ` where events.time > (${time})`).getOrElse('') +
+      `
+        order by events.time asc;`;
 
       const results = await pool.query(cached_query, args);
 

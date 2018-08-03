@@ -46,9 +46,12 @@ function isEmailChanged(o: any): o is EmailChanged {
 
 test('Test placeholder', async (t) => {
   const readStub = stub();
+  const generate_query = (q: string): string => `
+        select * from (${q}) as events
+        order by events.time asc;`;
 
   readStub
-    .withArgs("SELECT * FROM events WHERE data->>'user_id' = $1 ORDER BY time ASC", [ user_id ])
+    .withArgs(generate_query("SELECT * FROM events WHERE data->>'user_id' = $1 ORDER BY time ASC"), [ user_id ])
     .resolves(fakePoolResult([
       createEvent('AccountCreated', {
         name: "Bobby Bowls",
@@ -74,6 +77,9 @@ test('Test placeholder', async (t) => {
     )
     .resolves(fakePoolResult());
 
+  readStub
+    .resolves(fakePoolResult());
+
   const store = await newEventStore(getFakePool(readStub), fakeEmitter);
 
   const testAggregate = store.registerAggregate<[string], Option<User>>(
@@ -96,6 +102,9 @@ test('Test placeholder', async (t) => {
   );
 
   const result = await testAggregate(user_id);
+
+  t.is("\"" + readStub.args[1][0] + "\"",
+    "\"" + generate_query("SELECT * FROM events WHERE data->>'user_id' = $1 ORDER BY time ASC") + "\"");
 
   t.deepEqual(result.get(), {
     name: 'Bobby Beans',
@@ -159,13 +168,14 @@ test("Aggregator correctly forms cache query", async (t) => {
   const result = await testAggregate(user_id);
 
   const target_query = `
-        SELECT * FROM (${base_query}) as events
+        select * from (${base_query}) as events
         where events.time > (${iso_time})
         order by events.time asc;
       `;
+
   // Check that the correct query is executed at least once
   t.truthy(R.find((query) => {
-    return query[0] === target_query;
+    return query[0].replace(/\s+/g, ' ').trim() === target_query.replace(/\s+/g, ' ').trim();
   })(readStub.args));
 
   // Check that the original query (the query that does not use the cache)
