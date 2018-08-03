@@ -10,7 +10,7 @@ import {
   getFakePool,
   fakePoolResult,
   createEvent,
-  fakeEmitter
+  fakeEmitter,
 } from './test-helpers';
 import { newEventStore, Emitter, EventData } from './index';
 
@@ -187,8 +187,6 @@ test('Event emitter', async (t) => {
   const writeStub = stub();
   const data = { type: 'TestEvent', foo: 'bar' };
   const context = { actor: { baz: 'quux' }, time: '2018-01-01T01:01:01' };
-
-  // writeStub.resolves(fakePoolResult([{ blah: true }]));
 
   writeStub
     .withArgs(
