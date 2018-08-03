@@ -2,9 +2,16 @@ import test from 'ava';
 import * as R from 'ramda';
 import { Client, Pool, QueryConfig, QueryResult } from 'pg';
 import { Future, Option, None, Some } from 'funfix';
-import { stub } from 'sinon';
+import { stub, spy, match } from 'sinon';
 
-import { cafebabe as user_id, getFakePool, fakePoolResult, createEvent, fakeEmitter } from './test-helpers';
+import {
+  id,
+  cafebabe as user_id,
+  getFakePool,
+  fakePoolResult,
+  createEvent,
+  fakeEmitter,
+} from './test-helpers';
 import { newEventStore, Emitter, EventData } from './index';
 
 interface User {
@@ -44,7 +51,7 @@ function isEmailChanged(o: any): o is EmailChanged {
   return o && o.type === 'EmailChanged';
 }
 
-test('Test placeholder', async (t) => {
+test('Aggregates', async (t) => {
   const readStub = stub();
   const generate_query = (q: string): string => `
         select * from (${q}) as events
@@ -183,4 +190,32 @@ test("Aggregator correctly forms cache query", async (t) => {
   t.falsy(R.find((query) => {
     return query[0] === base_query;
   })(readStub.args));
+});
+
+test('Event emitter', async (t) => {
+  const emit = spy();
+  const writeStub = stub();
+  const data = { type: 'TestEvent', foo: 'bar' };
+  const context = { actor: { baz: 'quux' }, time: '2018-01-01T01:01:01' };
+
+  writeStub
+    .withArgs(
+      'INSERT INTO events(data, context) values($1) RETURNING *',
+      match.array,
+    )
+    .resolves(fakePoolResult([{ ...createEvent('TestEvent', { foo: 'bar' }), context }]));
+
+  const store = await newEventStore(getFakePool(writeStub), emit);
+
+  await store.save(data, context);
+
+  t.deepEqual(
+    emit.firstCall.args as any,
+    [{
+      id,
+      data: { ...data, type: 'TestEvent' },
+      context,
+      time: '2018-01-01 01:01:01',
+    }] as any,
+  );
 });
