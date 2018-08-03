@@ -54,11 +54,13 @@ function isEmailChanged(o: any): o is EmailChanged {
 test('Aggregates', async (t) => {
   const readStub = stub();
   const generate_query = (q: string): string => `
-        select * from (${q}) as events
-        order by events.time asc;`;
+SELECT * FROM (${q}) AS events
 
+ORDER BY events.time ASC;`;
+
+  const qu = generate_query("SELECT * FROM events WHERE data->>'user_id' = $1 ORDER BY time ASC");
   readStub
-    .withArgs(generate_query("SELECT * FROM events WHERE data->>'user_id' = $1 ORDER BY time ASC"), [ user_id ])
+    .withArgs(qu, [ user_id ])
     .resolves(fakePoolResult([
       createEvent('AccountCreated', {
         name: "Bobby Bowls",
@@ -79,7 +81,7 @@ test('Aggregates', async (t) => {
 
   readStub
     .withArgs(
-      'select * from aggregate_cache where id = $1',
+      'SELECT * from aggregate_cache where id = $1',
       [ 'b83753e3336aaa7544d02abf12e085a3c95b96b2916acc96b36d5f5652f21723' ],
     )
     .resolves(fakePoolResult());
@@ -110,8 +112,7 @@ test('Aggregates', async (t) => {
 
   const result = await testAggregate(user_id);
 
-  t.is("\"" + readStub.args[1][0] + "\"",
-    "\"" + generate_query("SELECT * FROM events WHERE data->>'user_id' = $1 ORDER BY time ASC") + "\"");
+  t.is(readStub.args[1][0], qu);
 
   t.deepEqual(result.get(), {
     name: 'Bobby Beans',
@@ -126,7 +127,7 @@ test("Aggregator correctly forms cache query", async (t) => {
   const iso_time = "2018-07-27 10:19:24.428897";
   readStub
     .withArgs(
-      "select * from aggregate_cache where id = $1",
+      "SELECT * FROM aggregate_cache WHERE id = $1",
       ['b83753e3336aaa7544d02abf12e085a3c95b96b2916acc96b36d5f5652f21723'],
     )
     .resolves(
@@ -175,9 +176,9 @@ test("Aggregator correctly forms cache query", async (t) => {
   const result = await testAggregate(user_id);
 
   const target_query = `
-        select * from (${base_query}) as events
-        where events.time > (${iso_time})
-        order by events.time asc;
+SELECT * FROM (${base_query}) AS events
+WHERE events.time > (${iso_time})
+ORDER BY events.time ASC;
       `;
 
   // Check that the correct query is executed at least once
