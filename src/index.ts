@@ -64,7 +64,7 @@ const upsertAggregateCache = `
   DO UPDATE SET data = $2;
 `;
 
-const aggregateCacheQuery = `select * from aggregate_cache where id = $1`;
+const aggregateCacheQuery = `SELECT * FROM aggregate_cache WHERE id = $1`;
 
 export type Emitter = (event: Event<any, any, any>) => void;
 
@@ -96,11 +96,11 @@ export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventSto
           };
         });
 
-      const cached_query = latestSnapshot.time.map((time) => `
-        SELECT * FROM (${query}) as events
-        where events.time > (${time})
-        order by events.time asc;
-      `).getOrElse(query);
+      const cached_query =
+      `
+SELECT * FROM (${query}) AS events
+${latestSnapshot.time.map((time) => ` WHERE events.time > (${time})`).getOrElse('')}
+ORDER BY events.time ASC;`;
 
       const results = await pool.query(cached_query, args);
 
