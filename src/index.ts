@@ -2,130 +2,132 @@ import { Pool } from 'pg';
 import * as R from 'ramda';
 import { Future, Option, None } from 'funfix';
 import { createHash } from 'crypto';
+import { v4 } from 'uuid';
 
 import _logger from './logger';
+
+async function reduce<I, O>(iter: AsyncIterator<I>, acc: O, f: (acc: O, next: I) => Promise<O>): Promise<O> {
+  let _acc = acc;
+  while (true) {
+    const _next = await iter.next();
+    if (_next.done) {
+      return _acc;
+    } else {
+      _acc = await f(_acc, _next.value);
+    }
+  }
+}
+
+interface EventReplayRequested extends EventData {
+  type: 'EventReplayRequested';
+  event_type: string;
+  since: string; // ISO String
+}
+
+export interface StoreAdapter<Q> {
+  read(query: Q, since?: Option<string>): AsyncIterator<Event<EventData, EventContext<any>>>;
+  write(event: Event<EventData, EventContext<any>>): Promise<void>;
+  lastEventOf<E extends Event<any, any>>(eventType: string): Promise<Option<E>>;
+  readEventSince(eventTYpe: string, since?: Option<string>): AsyncIterator<Event<EventData, EventContext<any>>>;
+}
+
+export interface CacheEntry<T> {
+  time?: string; // ISO String
+  data: T;
+}
+
+export interface CacheAdapter {
+  get<T>(id: string): Promise<Option<CacheEntry<T>>>;
+  set<T extends CacheEntry<any>>(id: string, obj: T): Promise<void>;
+}
+
+export type EventHandler<T extends Event<EventData, EventContext<any>>> = (event: T) => Promise<void>;
+
+export interface EmitterAdapter {
+  subscriptions: Map<string, EventHandler<any>>;
+  emit(event: Event<any, any>): Promise<void>;
+  subscribe<T extends Event<EventData, EventContext<any>>>(name: string, handler: EventHandler<T>): void;
+  unsubscribe(name: string): void;
+}
 
 export interface EventData {
   type: string;
 }
 
-interface EventContext<A> {
+export interface EventContext<A> {
   action?: string;
   actor: A;
   time: string; // ISO TIMESTAMP String
 }
 
-export interface Event<A, D extends EventData, C extends EventContext<A>> {
+export interface Event<D extends EventData, C extends EventContext<any>> {
   id: string;
   data: D;
   context: C;
 }
 
-export type Aggregate<A extends any[], T> = (...args: A) => Promise<T>;
+export type Aggregate<A extends any[], T> = (...args: A) => Promise<Option<T>>;
 type ValidateF<E extends EventData> = (o: any) => o is E;
-type ExecuteF<T, E extends EventData> = (acc: T, ev: E) => T;
+type ExecuteF<T, E extends EventData> = (acc: Option<T>, ev: E) => Promise<Option<T>>;
 type AggregateMatch<A, T extends EventData> = [ValidateF<T>, ExecuteF<A, T>];
 type AggregateMatches<T> = Array<AggregateMatch<T, any>>;
 
-export interface EventStore {
-  save<D extends EventData, C extends EventContext<any>>(data: D, context: C): Promise<Event<any, D, C>>;
-  storeIfNotExisting<E extends Event<any, any, any>>(e: E): Promise<E>;
-  registerAggregate<A extends any[], T>(
+export interface EventStore<Q> {
+  save(event: Event<EventData, EventContext<any>>): Promise<void>;
+  createAggregate<A extends any[], T>(
     aggregateName: string,
-    query: string,
+    query: Q,
     accumulator: T,
     matches: AggregateMatches<T>,
   ): Aggregate<A, T>;
 }
 
-// const eventsTable = `
-//   CREATE TABLE IF NOT EXISTS events(
-//     id UUID DEFAULT uuid_generate_v4() primary key,
-//     data JSONB NOT NULL,
-//     context JSONB DEFAULT '{}',
-//     time TIMESTAMP DEFAULT now()
-//   );
-// `;
+export async function newEventStore<Q>(
+  store: StoreAdapter<Q>,
+  cache: CacheAdapter,
+  emitter: EmitterAdapter,
+): Promise<EventStore<Q>> {
 
-// const aggregateCacheTable = `
-//   CREATE TABLE IF NOT EXISTS aggregate_cache(
-//     id VARCHAR(64) NOT NULL,
-//     aggregate_type VARCHAR NOT NULL,
-//     data JSONB NOT NULL,
-//     PRIMARY KEY(id, aggregate_type),
-//     time TIMESTAMP DEFAULT now()
-//   );
-// `;
-
-const upsertAggregateCache = `
-  INSERT INTO aggregate_cache (id, data)
-  VALUES ($1, $2)
-  ON CONFLICT (id)
-  DO UPDATE SET data = $2;
-`;
-
-const aggregateCacheQuery = `SELECT * FROM aggregate_cache WHERE id = $1`;
-
-export type Emitter = (event: Event<any, any, any>) => void;
-
-export async function newEventStore(pool: Pool, emit: Emitter): Promise<EventStore> {
-  // await pool.query(eventsTable);
-  // await pool.query(aggregateCacheTable);
-
-  function registerAggregate<A extends any[], T>(
+  function createAggregate<AQ extends Q, A extends any[], T>(
     aggregateName: string,
-    query: string,
+    query: AQ,
     accumulator: T,
     matches: AggregateMatches<T>,
     logger: any = _logger,
   ): Aggregate<A, T> {
-    async function _impl(...args: A): Promise<T> {
+    async function _impl(...args: A): Promise<Option<T>> {
       const start = Date.now();
 
-      // TODO: Use an iterator instead of a full query here
-
       const id = createHash('sha256')
-        .update(query + JSON.stringify(args))
+        .update(JSON.stringify(query) + JSON.stringify(args))
         .digest('hex');
 
-      const latestSnapshot = await pool.query(aggregateCacheQuery, [id])
-        .then((aggResult) => {
-          return {
-            data: Option.of(R.path(['rows', 0, 'data'], aggResult)),
-            time: Option.of(R.path(['rows', 0, 'time'], aggResult)),
-          };
-        });
+      const latestSnapshot = await cache.get<T>(id);
 
-      const cached_query =
-      `
-SELECT * FROM (${query}) AS events
-${latestSnapshot.time.map((time) => ` WHERE events.time > (${time})`).getOrElse('')}
-ORDER BY events.time ASC;`;
+      const results = store.read(query, latestSnapshot.flatMap((snapshot) => Option.of(snapshot.time)));
 
-      const results = await pool.query(cached_query, args);
+      const aggregatedAt = new Date();
+      const aggregatedResult = await reduce<Event<EventData, EventContext<any>>, Option<T>>(
+        results,
+        latestSnapshot.map((snapshot) => snapshot.data),
+        async (acc, event) => {
+          return await matches.reduce((matchAcc, [validate, execute]) => {
+            if (validate(event.data)) {
+              return execute(matchAcc, event.data);
+            }
+            return matchAcc;
+          }, acc);
+      });
 
-      const queryTime = Date.now();
-
-      const aggregatedResult = await results.rows.reduce((acc, row) => {
-        return matches.reduce((matchAcc, [validate, execute]) => {
-          if (validate(row.data)) {
-            return execute(matchAcc, row.data);
-          }
-          return matchAcc;
-        }, acc);
-      }, latestSnapshot.data);
-
-      if (aggregatedResult.nonEmpty()) {
-        await pool.query(upsertAggregateCache, [id, aggregatedResult.get()]);
-      }
+      await aggregatedResult.map((result) => cache.set(id, {data: result}));
 
       logger.trace(
         'aggregateLatency',
         {
           query,
           args,
-          query_time: queryTime - start,
-          aggregate_time: Date.now() - queryTime,
+          query_time: aggregatedAt.getTime() - start,
+          aggregate_time: Date.now() - aggregatedAt.getTime(),
           total_time: Date.now() - start,
         });
 
@@ -135,58 +137,41 @@ ORDER BY events.time ASC;`;
     return _impl;
   }
 
-  async function storeIfNotExisting<E extends Event<any, any, any>>(e: E) {
-    const client = await pool.connect();
-    try {
-      const result = await client.query(`
-        INSERT INTO events(id, data, context)
-        values($1, $2, $3)
-        ON CONFLICT (id) DO NOTHING
-        RETURNING *
-      `,
-        [e.id, e.data, e.context]);
-
-      const savedEventOpt = Option.of(R.path(['rows', 0], result));
-
-      savedEventOpt.map(emit);
-
-      await client.query(`COMMIT`);
-
-      return e;
-    } catch (error) {
-      client.query('ROLLBACK');
-      return Promise.reject(error);
-    } finally {
-      client.release();
-    }
+  async function save(event: Event<EventData, EventContext<any>>): Promise<void> {
+    await store.write(event);
+    await emitter.emit(event);
   }
 
-  async function save<D extends EventData, C extends EventContext<any>>(data: D, context?: C) {
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-
-      const event = await client.query(
-        'INSERT INTO events(data, context) values($1) RETURNING *',
-        [data, context],
-      )
-      .then((res) => res.rows[0]);
-
-      await client.query(`COMMIT`);
-
-      emit(event);
-      return Promise.resolve(event);
-    } catch (error) {
-      await client.query('ROLLBACK');
-      return Promise.reject(error);
-    } finally {
-      client.release();
-    }
+  async function listen(pattern: string, handler: EventHandler<any>) {
+    emitter.subscribe(pattern, handler);
+    const last = await store.lastEventOf(pattern);
+    emitter
+      .emit({
+        id: v4(),
+        data: {
+          type: 'EventReplayRequested',
+          event_type: pattern,
+          since: last.map((l) => l.context.time).getOrElse(new Date(0).toISOString()),
+        },
+        context: {
+          actor: {},
+          time: new Date().toISOString(),
+        },
+      });
   }
+
+  emitter.subscribe('EventReplayRequested', async (event: Event<EventReplayRequested, EventContext<any>>) => {
+    const events = store.readEventSince(event.data.event_type, Option.of(event.data.since));
+
+    // Emit all events;
+    reduce(events, None, async (acc, e) => {
+      await emitter.emit(e);
+      return None;
+    });
+  });
 
   return {
-    registerAggregate,
+    createAggregate,
     save,
-    storeIfNotExisting,
   };
 }
