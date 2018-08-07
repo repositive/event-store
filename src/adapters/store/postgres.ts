@@ -17,14 +17,15 @@ const eventsTable = `
   );
 `;
 
-export default function createAdapter(pool: Pool): StoreAdapter<PgQuery> {
+export function createPgStoreAdapter(pool: Pool): StoreAdapter<PgQuery> {
 
   pool.query(eventsTable).catch((error) => {
     throw error;
   });
 
   async function* read<T extends Event<EventData, EventContext<any>>>(
-    query: PgQuery, since: Option<string> = None,
+    query: PgQuery,
+    since: Option<string> = None,
   ): AsyncIterator<T> {
     const cursorId = v4();
     const transaction = await pool.connect();

@@ -9,7 +9,7 @@ export function wait(n: number): Promise<void> {
   });
 }
 
-export default function getAdapter(connectionString: string): EmitterAdapter {
+export function createAQMPEmitterAdapter(connectionString: string): EmitterAdapter {
   let iris: Option<Iris> = None;
   const subscriptions: Map<string, EventHandler<any>> = new Map();
   setupIris({uri: connectionString}).map((_iris) => {

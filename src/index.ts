@@ -4,7 +4,7 @@ import { Future, Option, None } from 'funfix';
 import { createHash } from 'crypto';
 import { v4 } from 'uuid';
 
-import _logger from './logger';
+export * from './adapters';
 
 async function reduce<I, O>(iter: AsyncIterator<I>, acc: O, f: (acc: O, next: I) => Promise<O>): Promise<O> {
   let _acc = acc;
@@ -16,6 +16,20 @@ async function reduce<I, O>(iter: AsyncIterator<I>, acc: O, f: (acc: O, next: I)
       _acc = await f(_acc, _next.value);
     }
   }
+}
+
+export function isEvent<D extends EventData, C extends EventContext<any>>(
+  isData: (o: any) => o is D = (o: any): o is any => true,
+  isContext: (o: any) => o is C = (o: any): o is any => true,
+): (o: any) => o is Event<D, C> {
+  return function(o: any): o is Event<D, C> {
+    return  o &&
+            typeof o.id === 'string' &&
+            o.data &&
+            isData(o.data) &&
+            o.context &&
+            isContext(o.context);
+  };
 }
 
 interface EventReplayRequested extends EventData {
@@ -67,9 +81,9 @@ export interface Event<D extends EventData, C extends EventContext<any>> {
 }
 
 export type Aggregate<A extends any[], T> = (...args: A) => Promise<Option<T>>;
-type ValidateF<E extends EventData> = (o: any) => o is E;
-type ExecuteF<T, E extends EventData> = (acc: Option<T>, ev: E) => Promise<Option<T>>;
-type AggregateMatch<A, T extends EventData> = [ValidateF<T>, ExecuteF<A, T>];
+type ValidateF<E extends Event<any, any>> = (o: any) => o is E;
+type ExecuteF<T, E extends Event<any, any>> = (acc: Option<T>, ev: E) => Promise<Option<T>>;
+type AggregateMatch<A, T extends Event<any, any>> = [ValidateF<T>, ExecuteF<A, T>];
 type AggregateMatches<T> = Array<AggregateMatch<T, any>>;
 
 export interface EventStore<Q> {
@@ -77,23 +91,30 @@ export interface EventStore<Q> {
   createAggregate<A extends any[], T>(
     aggregateName: string,
     query: Q,
-    accumulator: T,
     matches: AggregateMatches<T>,
   ): Aggregate<A, T>;
+}
+
+export interface Logger {
+  trace(...args: any[]): void;
+  debug(...args: any[]): void;
+  log(...args: any[]): void;
+  info(...args: any[]): void;
+  warn(...args: any[]): void;
+  error(...args: any[]): void;
 }
 
 export async function newEventStore<Q>(
   store: StoreAdapter<Q>,
   cache: CacheAdapter,
   emitter: EmitterAdapter,
+  logger: Logger = console,
 ): Promise<EventStore<Q>> {
 
   function createAggregate<AQ extends Q, A extends any[], T>(
     aggregateName: string,
     query: AQ,
-    accumulator: T,
     matches: AggregateMatches<T>,
-    logger: any = _logger,
   ): Aggregate<A, T> {
     async function _impl(...args: A): Promise<Option<T>> {
       const start = Date.now();
@@ -112,8 +133,8 @@ export async function newEventStore<Q>(
         latestSnapshot.map((snapshot) => snapshot.data),
         async (acc, event) => {
           return await matches.reduce((matchAcc, [validate, execute]) => {
-            if (validate(event.data)) {
-              return execute(matchAcc, event.data);
+            if (validate(event)) {
+              return execute(matchAcc, event);
             }
             return matchAcc;
           }, acc);

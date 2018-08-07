@@ -21,7 +21,6 @@
   "devDependencies": {
     "@types/config": "^0.0.34",
     "@types/pg": "7.4.10",
-    "@types/pino": "^4.16.1",
     "@types/ramda": "0.25.35",
     "@types/sinon": "^5.0.1",
     "@types/uuid": "^3.4.3",
@@ -42,7 +41,6 @@
     "@repositive/iris": "^1.0.0-alpha.8",
     "config": "^2.0.1",
     "funfix": "7.0.1",
-    "pino": "^4.17.6",
     "ramda": "0.25.0"
   }
 }

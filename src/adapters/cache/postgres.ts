@@ -18,7 +18,7 @@ const aggregateCacheTable = `
   );
 `;
 
-export default function getAdapter(pool: Pool): CacheAdapter {
+export function createPgCacheAdapter(pool: Pool): CacheAdapter {
 
   pool.query(aggregateCacheTable)
     .catch((error) => {
