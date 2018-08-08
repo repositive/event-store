@@ -9,15 +9,22 @@ export function wait(n: number): Promise<void> {
   });
 }
 
+function wrapHandler(handler: EventHandler<any>) {
+  return function({payload}: {payload?: any}) {
+    return handler(payload);
+  };
+}
+
 export function createAQMPEmitterAdapter(connectionString: string): EmitterAdapter {
   let iris: Option<Iris> = None;
   const subscriptions: Map<string, EventHandler<any>> = new Map();
   setupIris({uri: connectionString}).map((_iris) => {
     iris = Some(_iris);
     for ( const [pattern, handler] of subscriptions.entries()) {
-      _iris.register({pattern, handler});
+      _iris.register({pattern, handler: wrapHandler(handler)});
     }
-  });
+  })
+  .subscribe();
 
   async function emit(event: Event<EventData, EventContext<any>>) {
     await iris

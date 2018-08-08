@@ -8,13 +8,17 @@ export * from './adapters';
 
 async function reduce<I, O>(iter: AsyncIterator<I>, acc: O, f: (acc: O, next: I) => Promise<O>): Promise<O> {
   let _acc = acc;
-  while (true) {
-    const _next = await iter.next();
-    if (_next.done) {
-      return _acc;
-    } else {
-      _acc = await f(_acc, _next.value);
+  try {
+    while (true) {
+      const _next = await iter.next();
+      if (_next.done) {
+        return _acc;
+      } else {
+        _acc = await f(_acc, _next.value);
+      }
     }
+  } catch (error) {
+    return Promise.reject(error);
   }
 }
 
@@ -39,7 +43,7 @@ interface EventReplayRequested extends EventData {
 }
 
 export interface StoreAdapter<Q> {
-  read(query: Q, since?: Option<string>): AsyncIterator<Event<EventData, EventContext<any>>>;
+  read(query: Q, since: Option<string>, ...args: any[]): AsyncIterator<Event<EventData, EventContext<any>>>;
   write(event: Event<EventData, EventContext<any>>): Promise<void>;
   lastEventOf<E extends Event<any, any>>(eventType: string): Promise<Option<E>>;
   readEventSince(eventTYpe: string, since?: Option<string>): AsyncIterator<Event<EventData, EventContext<any>>>;
@@ -98,7 +102,6 @@ export interface EventStore<Q> {
 export interface Logger {
   trace(...args: any[]): void;
   debug(...args: any[]): void;
-  log(...args: any[]): void;
   info(...args: any[]): void;
   warn(...args: any[]): void;
   error(...args: any[]): void;
@@ -123,36 +126,46 @@ export async function newEventStore<Q>(
         .update(JSON.stringify(query) + JSON.stringify(args))
         .digest('hex');
 
-      const latestSnapshot = await cache.get<T>(id);
+      try {
+        const latestSnapshot = await cache.get<T>(id);
 
-      const results = store.read(query, latestSnapshot.flatMap((snapshot) => Option.of(snapshot.time)));
+        logger.trace('cacheSnapshot', latestSnapshot);
+        const results = store.read(query, latestSnapshot.flatMap((snapshot) => Option.of(snapshot.time)), ...args);
 
-      const aggregatedAt = new Date();
-      const aggregatedResult = await reduce<Event<EventData, EventContext<any>>, Option<T>>(
-        results,
-        latestSnapshot.map((snapshot) => snapshot.data),
-        async (acc, event) => {
-          return await matches.reduce((matchAcc, [validate, execute]) => {
-            if (validate(event)) {
-              return execute(matchAcc, event);
-            }
-            return matchAcc;
-          }, acc);
-      });
-
-      await aggregatedResult.map((result) => cache.set(id, {data: result}));
-
-      logger.trace(
-        'aggregateLatency',
-        {
-          query,
-          args,
-          query_time: aggregatedAt.getTime() - start,
-          aggregate_time: Date.now() - aggregatedAt.getTime(),
-          total_time: Date.now() - start,
+        const aggregatedAt = new Date();
+        const aggregatedResult = await reduce<Event<EventData, EventContext<any>>, Option<T>>(
+          results,
+          latestSnapshot.map((snapshot) => snapshot.data),
+          async (acc, event) => {
+            return await matches.reduce((matchAcc, [validate, execute]) => {
+              if (validate(event)) {
+                return execute(matchAcc, event);
+              }
+              return matchAcc;
+            }, acc);
         });
 
-      return aggregatedResult;
+        logger.trace('aggregatedResult', aggregatedResult);
+        await aggregatedResult.map((result) => {
+          logger.trace('save to cache', result);
+          return cache.set(id, {data: result, time: aggregatedAt.toISOString()});
+        });
+
+        logger.trace(
+          'aggregateLatency',
+          {
+            query,
+            args,
+            query_time: aggregatedAt.getTime() - start,
+            aggregate_time: Date.now() - aggregatedAt.getTime(),
+            total_time: Date.now() - start,
+          });
+
+        return aggregatedResult;
+      } catch (error) {
+        logger.error('errorOnReduction', error);
+        return Promise.reject(error);
+      }
     }
 
     return _impl;

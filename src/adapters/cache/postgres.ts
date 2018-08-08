@@ -1,12 +1,12 @@
 import { Pool } from 'pg';
 import { Option, None } from 'funfix';
-import { CacheAdapter, Event, EventData, EventContext, CacheEntry } from '../../.';
+import { CacheAdapter, Event, EventData, EventContext, CacheEntry, Logger } from '../../.';
 
 const upsertAggregateCache = `
   INSERT INTO aggregate_cache (id, data, time)
   VALUES ($1, $2, $3)
   ON CONFLICT (id)
-  DO UPDATE SET data = $2, time = now();
+  DO UPDATE SET data = EXCLUDED.data, time = now();
 `;
 
 const aggregateCacheTable = `
@@ -14,24 +14,29 @@ const aggregateCacheTable = `
     id VARCHAR(64) NOT NULL,
     data JSONB NOT NULL,
     time TIMESTAMP DEFAULT now(),
-    PRIMARY KEY(id, aggregate_type)
+    PRIMARY KEY(id)
   );
 `;
 
-export function createPgCacheAdapter(pool: Pool): CacheAdapter {
+export function createPgCacheAdapter(pool: Pool, logger: Logger = console): CacheAdapter {
 
   pool.query(aggregateCacheTable)
     .catch((error) => {
+      logger.error('Error creating cache table', error);
       throw error;
     });
 
   async function get<T extends CacheEntry<any>>(id: string): Promise<Option<T>> {
-    const result = await pool.query(`SELECT * from aggregate_cache where id = $1`, [id]);
+    const query = {text: `SELECT * from aggregate_cache where id = $1`, values: [id]};
+    logger.trace('execute query', query);
+    const result = await pool.query(query);
+    logger.trace('db response', result);
     return Option.of(result.rows[0]);
   }
 
-  async function set(id: string, entry: CacheEntry<any>): Promise<void> {
-    await pool.query(upsertAggregateCache, [id, entry]);
+  function set(id: string, entry: CacheEntry<any>): Promise<void> {
+    return pool.query(upsertAggregateCache, [id, JSON.stringify(entry.data), entry.time])
+      .then(() => {/**/});
   }
 
   return {
