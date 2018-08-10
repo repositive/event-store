@@ -74,7 +74,7 @@ export interface EventData {
 
 export interface EventContext<A> {
   action?: string;
-  actor: A;
+  subject: A;
   time: string; // ISO TIMESTAMP String
 }
 
