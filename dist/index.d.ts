@@ -43,6 +43,9 @@ declare type AggregateMatches<T> = Array<AggregateMatch<T, any>>;
 export interface EventStore<Q> {
     save(event: Event<EventData, EventContext<any>>): Promise<void>;
     createAggregate<A extends any[], T>(aggregateName: string, query: Q, matches: AggregateMatches<T>): Aggregate<A, T>;
+    listen<T extends string>(pattern: T, handler: EventHandler<Event<{
+        type: T;
+    }, any>>): void;
 }
 export interface Logger {
     trace(...args: any[]): void;
