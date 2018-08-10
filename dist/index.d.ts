@@ -27,7 +27,7 @@ export interface EventData {
 }
 export interface EventContext<A> {
     action?: string;
-    actor: A;
+    subject: A;
     time: string;
 }
 export interface Event<D extends EventData, C extends EventContext<any>> {
@@ -54,4 +54,9 @@ export interface Logger {
     warn(...args: any[]): void;
     error(...args: any[]): void;
 }
-export declare function newEventStore<Q>(store: StoreAdapter<Q>, cache: CacheAdapter, emitter: EmitterAdapter, logger?: Logger): Promise<EventStore<Q>>;
+export interface EventStoreOptions {
+    cache?: CacheAdapter;
+    emitter?: EmitterAdapter;
+    logger?: Logger;
+}
+export declare function newEventStore<Q>(store: StoreAdapter<Q>, _options?: EventStoreOptions): Promise<EventStore<Q>>;
