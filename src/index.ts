@@ -97,6 +97,7 @@ export interface EventStore<Q> {
     query: Q,
     matches: AggregateMatches<T>,
   ): Aggregate<A, T>;
+  listen<T extends string>(pattern: T, handler: EventHandler<Event<{type: T}, any>>): void;
 }
 
 export interface Logger {
@@ -171,7 +172,7 @@ export async function newEventStore<Q>(
     return _impl;
   }
 
-  async function save(event: Event<EventData, EventContext<any>>): Promise<void> {
+  async function save<T extends string>(event: Event<{type: T}, EventContext<any>>): Promise<void> {
     await store.write(event);
     await emitter.emit(event);
   }
@@ -206,6 +207,7 @@ export async function newEventStore<Q>(
 
   return {
     createAggregate,
+    listen,
     save,
   };
 }
