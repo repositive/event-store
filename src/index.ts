@@ -5,6 +5,7 @@ import { createHash } from 'crypto';
 import { v4 } from 'uuid';
 
 export * from './adapters';
+import {createDumbCacheAdapter, createDumbEmitterAdapter} from './adapters';
 
 async function reduce<I, O>(iter: AsyncIterator<I>, acc: O, f: (acc: O, next: I) => Promise<O>): Promise<O> {
   let _acc = acc;
@@ -108,12 +109,24 @@ export interface Logger {
   error(...args: any[]): void;
 }
 
+export interface EventStoreOptions {
+  cache?: CacheAdapter;
+  emitter?: EmitterAdapter;
+  logger?: Logger;
+}
+
 export async function newEventStore<Q>(
   store: StoreAdapter<Q>,
-  cache: CacheAdapter,
-  emitter: EmitterAdapter,
-  logger: Logger = console,
+  _options?: EventStoreOptions,
 ): Promise<EventStore<Q>> {
+
+  const options = _options || {};
+
+  const {
+    cache = createDumbCacheAdapter(),
+    emitter = createDumbEmitterAdapter(),
+    logger = console,
+  } = options;
 
   function createAggregate<AQ extends Q, A extends any[], T>(
     aggregateName: string,
