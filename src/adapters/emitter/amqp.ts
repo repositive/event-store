@@ -1,4 +1,4 @@
-import { EmitterAdapter, Event, EventData, EventContext, EventHandler } from '../../.';
+import { EmitterAdapter, Event, EventData, EventContext, EventHandler, Logger } from '../../.';
 import { Option, Some, None } from 'funfix';
 import setupIris from '@repositive/iris';
 import { Iris } from '@repositive/iris';
@@ -15,10 +15,10 @@ function wrapHandler(handler: EventHandler<any>) {
   };
 }
 
-export function createAQMPEmitterAdapter(connectionString: string): EmitterAdapter {
+export function createAQMPEmitterAdapter(connectionString: string, logger: Logger = console): EmitterAdapter {
   let iris: Option<Iris> = None;
   const subscriptions: Map<string, EventHandler<any>> = new Map();
-  setupIris({uri: connectionString}).map((_iris) => {
+  setupIris({uri: connectionString, logger}).map((_iris) => {
     iris = Some(_iris);
     for ( const [pattern, handler] of subscriptions.entries()) {
       _iris.register({pattern, handler: wrapHandler(handler)});
