@@ -27,19 +27,16 @@
     "ava": "0.25.0",
     "ava-ts": "0.24.6",
     "nyc": "^12.0.2",
-    "pg": "7.4.3",
     "sinon": "^6.1.4",
     "ts-node": "7.0.0",
     "tslint": "5.11.0",
     "typescript": "3.1.0-dev.20180721",
     "uuid": "^3.3.2"
   },
-  "peerDependencies": {
-    "pg": "7.4.x"
-  },
   "dependencies": {
     "@repositive/iris": "^1.0.0-alpha.8",
     "config": "^2.0.1",
+    "pg": "7.4.3",
     "funfix": "7.0.1",
     "ramda": "0.25.0"
   }
