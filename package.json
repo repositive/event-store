@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "compile": "tsc",
+    "compile": "rm -fr dist && tsc",
     "test": "nyc --reporter lcov ava-ts --verbose",
     "testIntegration": "nyc --reporter lcov ava-ts --verbose ./src/integrationsetup.ts ./src/**/*.integration.ts",
     "testDev": "nyc --reporter lcov ava-ts --watch",
