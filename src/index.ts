@@ -160,9 +160,23 @@ export async function newEventStore<Q>(
         });
 
         logger.trace('aggregatedResult', aggregatedResult);
+
         await aggregatedResult.map((result) => {
-          logger.trace('save to cache', result);
-          return cache.set(id, {data: result, time: aggregatedAt.toISOString()});
+          const snapshotHash = latestSnapshot.map((snapshot) => {
+            return createHash('sha256')
+              .update(JSON.stringify(snapshot.data))
+              .digest('hex');
+          });
+
+          return snapshotHash.map((existingHash) => {
+            const toCacheHash = createHash('sha256')
+              .update(JSON.stringify(result))
+              .digest('hex');
+            if (existingHash !== toCacheHash) {
+              logger.trace('save to cache', result);
+              return cache.set(id, {data: result, time: aggregatedAt.toISOString()});
+            }
+          });
         });
 
         logger.trace(

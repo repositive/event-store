@@ -2,18 +2,16 @@ import { Pool } from 'pg';
 import { Option, None } from 'funfix';
 import { CacheAdapter, Event, EventData, EventContext, CacheEntry, Logger } from '../../.';
 
-const upsertAggregateCache = `
+const insertAggregateCache = `
   INSERT INTO aggregate_cache (id, data, time)
   VALUES ($1, $2, $3)
-  ON CONFLICT (id)
-  DO UPDATE SET data = EXCLUDED.data, time = now();
 `;
 
 const aggregateCacheTable = `
   CREATE TABLE IF NOT EXISTS aggregate_cache(
     id VARCHAR(64) NOT NULL,
     data JSONB NOT NULL,
-    time TIMESTAMP DEFAULT now(),
+    time VARCHAR(24),
     PRIMARY KEY(id)
   );
 `;
@@ -35,7 +33,7 @@ export function createPgCacheAdapter(pool: Pool, logger: Logger = console): Cach
   }
 
   function set(id: string, entry: CacheEntry<any>): Promise<void> {
-    return pool.query(upsertAggregateCache, [id, JSON.stringify(entry.data), entry.time])
+    return pool.query(insertAggregateCache, [id, JSON.stringify(entry.data), entry.time])
       .then(() => {/**/});
   }
 
