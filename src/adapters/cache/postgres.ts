@@ -5,6 +5,8 @@ import { CacheAdapter, Event, EventData, EventContext, CacheEntry, Logger } from
 const insertAggregateCache = `
   INSERT INTO aggregate_cache (id, data, time)
   VALUES ($1, $2, $3)
+  ON CONFLICT (id)
+  DO UPDATE SET data = EXCLUDED.data, time = EXCLUDED.time;
 `;
 
 const aggregateCacheTable = `
