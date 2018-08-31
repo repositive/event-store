@@ -23,6 +23,33 @@ async function reduce<I, O>(iter: AsyncIterator<I>, acc: O, f: (acc: O, next: I)
   }
 }
 
+async function reduceWhile<I, O>(
+  whileTrue: (event: any) => boolean,
+  iter: AsyncIterator<I>,
+  acc: O,
+  f: (acc: O, next: I) => Promise<O>,
+): Promise<O> {
+  let _acc = acc;
+  try {
+    let cont = true;
+    while (cont) {
+      const _next = await iter.next();
+      if (_next.done) {
+        return _acc;
+      } else {
+        if (whileTrue(_next.value)) {
+          _acc = await f(_acc, _next.value);
+        } else {
+          cont = false;
+        }
+      }
+    }
+    return _acc;
+  } catch (error) {
+    return Promise.reject(error);
+  }
+}
+
 export function isEvent<D extends EventData, C extends EventContext<any>>(
   isData: (o: any) => o is D = (o: any): o is any => true,
   isContext: (o: any) => o is C = (o: any): o is any => true,
@@ -86,6 +113,9 @@ export interface Event<D extends EventData, C extends EventContext<any>> {
 }
 
 export type Aggregate<A extends any[], T> = (...args: A) => Promise<Option<T>>;
+export type AggregateWhile<A extends any[], T> = (...args: A) =>
+  Promise<(whileTrue: (event: any) => boolean, guid: string) => Promise<Option<T>>>;
+
 type ValidateF<E extends Event<any, any>> = (o: any) => o is E;
 type ExecuteF<T, E extends Event<any, any>> = (acc: Option<T>, ev: E) => Promise<Option<T>>;
 type AggregateMatch<A, T extends Event<any, any>> = [ValidateF<T>, ExecuteF<A, T>];
@@ -98,6 +128,11 @@ export interface EventStore<Q> {
     query: Q,
     matches: AggregateMatches<T>,
   ): Aggregate<A, T>;
+  createAggregateWhile<A extends any[], T>(
+    aggregateName: string,
+    query: Q,
+    matches: AggregateMatches<T>,
+  ): AggregateWhile<A, T>;
   listen<T extends string>(pattern: T, handler: EventHandler<Event<{type: T}, any>>): void;
 }
 
@@ -199,6 +234,83 @@ export async function newEventStore<Q>(
     return _impl;
   }
 
+  function createAggregateWhile<AQ extends Q, A extends any[], T>(
+    aggregateName: string,
+    query: AQ,
+    matches: AggregateMatches<T>,
+  ): AggregateWhile<A, T> {
+
+    return async function _impl(...args: A) {
+      return async function(whileTrue: (event: any) => boolean, guid: string) {
+
+        const start = Date.now();
+
+        const id = createHash('sha256')
+          .update(JSON.stringify(query) + JSON.stringify(args) + JSON.stringify(whileTrue) + JSON.stringify(guid))
+          .digest('hex');
+
+        try {
+          const latestSnapshot = await cache.get<T>(id);
+
+          logger.trace('cacheSnapshot', latestSnapshot);
+          const results = store.read(query, latestSnapshot.flatMap((snapshot) => Option.of(snapshot.time)), ...args);
+
+          const aggregatedAt = new Date();
+
+          const aggregatedResult = await reduceWhile<Event<EventData, EventContext<any>>, Option<T>>(
+            whileTrue,
+            results,
+            latestSnapshot.map((snapshot) => snapshot.data),
+            async (acc, event) => {
+
+              return await matches.reduce((matchAcc, [validate, execute]) => {
+                if (validate(event)) {
+                  return execute(matchAcc, event);
+                }
+                return matchAcc;
+              }, acc);
+
+            });
+
+          logger.trace('aggregatedResult', aggregatedResult);
+
+          await aggregatedResult.map((result: any) => {
+            const snapshotHash = latestSnapshot
+              .map((snapshot) => {
+                return createHash('sha256')
+                  .update(JSON.stringify(snapshot.data))
+                  .digest('hex');
+              })
+              .getOrElse('');
+
+            const toCacheHash = createHash('sha256')
+              .update(JSON.stringify(result))
+              .digest('hex');
+            if (snapshotHash !== toCacheHash) {
+              logger.trace('save to cache', result);
+              return cache.set(id, { data: result, time: aggregatedAt.toISOString() });
+            }
+          });
+
+          logger.trace(
+            'aggregateLatency',
+            {
+              query,
+              args,
+              query_time: aggregatedAt.getTime() - start,
+              aggregate_time: Date.now() - aggregatedAt.getTime(),
+              total_time: Date.now() - start,
+            });
+
+          return aggregatedResult;
+        } catch (error) {
+          logger.error('errorOnReduction', error);
+          return Promise.reject(error);
+        }
+      };
+    };
+  }
+
   async function save<T extends string>(event: Event<{type: T}, EventContext<any>>): Promise<void> {
     await store.write(event);
     await emitter.emit(event);
@@ -234,6 +346,7 @@ export async function newEventStore<Q>(
 
   return {
     createAggregate,
+    createAggregateWhile,
     listen,
     save,
   };
