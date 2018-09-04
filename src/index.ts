@@ -113,13 +113,16 @@ export interface Event<D extends EventData, C extends EventContext<any>> {
 }
 
 export type Aggregate<A extends any[], T> = (...args: A) => Promise<Option<T>>;
-export type AggregateWhile<A extends any[], T> = (...args: A) =>
-  Promise<(whileTrue: (event: any) => boolean, guid: string) => Promise<Option<T>>>;
+export type AggregateWhile<A extends any[], T> = (...args: A) => Promise<whileTrue<string, T>>;
 
 type ValidateF<E extends Event<any, any>> = (o: any) => o is E;
 type ExecuteF<T, E extends Event<any, any>> = (acc: Option<T>, ev: E) => Promise<Option<T>>;
 type AggregateMatch<A, T extends Event<any, any>> = [ValidateF<T>, ExecuteF<A, T>];
 type AggregateMatches<T> = Array<AggregateMatch<T, any>>;
+type whileTrue<K, T> = (args: {
+   boolClause: (event: Event<any, any>) => boolean,
+   boolClauseArgs: K,
+  }) => Promise<Option<T>>;
 
 export interface EventStore<Q> {
   save(event: Event<EventData, EventContext<any>>): Promise<void>;
@@ -241,12 +244,19 @@ export async function newEventStore<Q>(
   ): AggregateWhile<A, T> {
 
     return async function _impl(...args: A) {
-      return async function(whileTrue: (event: any) => boolean, guid: string) {
+      return async function({
+        boolClause,
+        boolClauseArgs,
+      }: {
+        boolClause: (event: any) => boolean,
+        boolClauseArgs?: string,
+      }) {
 
         const start = Date.now();
 
         const id = createHash('sha256')
-          .update(JSON.stringify(query) + JSON.stringify(args) + JSON.stringify(whileTrue) + JSON.stringify(guid))
+          .update(JSON.stringify(query) + JSON.stringify(args) +
+            JSON.stringify(boolClause) + JSON.stringify(boolClauseArgs))
           .digest('hex');
 
         try {
@@ -258,7 +268,7 @@ export async function newEventStore<Q>(
           const aggregatedAt = new Date();
 
           const aggregatedResult = await reduceWhile<Event<EventData, EventContext<any>>, Option<T>>(
-            whileTrue,
+            boolClause,
             results,
             latestSnapshot.map((snapshot) => snapshot.data),
             async (acc, event) => {
