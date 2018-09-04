@@ -24,7 +24,7 @@ async function reduce<I, O>(iter: AsyncIterator<I>, acc: O, f: (acc: O, next: I)
 }
 
 async function reduceWhile<I, O>(
-  whileTrue: (event: any) => boolean,
+  whileTrue: (event: I) => boolean,
   iter: AsyncIterator<I>,
   acc: O,
   f: (acc: O, next: I) => Promise<O>,
@@ -113,13 +113,13 @@ export interface Event<D extends EventData, C extends EventContext<any>> {
 }
 
 export type Aggregate<A extends any[], T> = (...args: A) => Promise<Option<T>>;
-export type AggregateWhile<A extends any[], T> = (...args: A) => Promise<whileTrue<string, T>>;
+export type AggregateWhile<A extends any[], T> = (...args: A) => Promise<WhileTrue<string, T>>;
 
 type ValidateF<E extends Event<any, any>> = (o: any) => o is E;
 type ExecuteF<T, E extends Event<any, any>> = (acc: Option<T>, ev: E) => Promise<Option<T>>;
 type AggregateMatch<A, T extends Event<any, any>> = [ValidateF<T>, ExecuteF<A, T>];
 type AggregateMatches<T> = Array<AggregateMatch<T, any>>;
-type whileTrue<K, T> = (args: {
+type WhileTrue<K, T> = (args: {
    boolClause: (event: Event<any, any>) => boolean,
    boolClauseArgs: K,
   }) => Promise<Option<T>>;
