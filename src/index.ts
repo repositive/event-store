@@ -112,14 +112,14 @@ export interface Event<D extends EventData, C extends EventContext<any>> {
   context: C;
 }
 
-export type Aggregate<A extends any[], T> = (...args: A) => Promise<Option<T>>;
-export type AggregateWhile<A extends any[], T> = (...args: A) => Promise<WhileTrue<string, T>>;
+export type Aggregate<A extends any[], T> = (...args: any[]) => Promise<Option<T>>;
+export type AggregateWhile<A extends any[], T> = (...args: any[]) => Promise<WhileTrue<string, T>>;
 
-type ValidateF<E extends Event<any, any>> = (o: any) => o is E;
-type ExecuteF<T, E extends Event<any, any>> = (acc: Option<T>, ev: E) => Promise<Option<T>>;
-type AggregateMatch<A, T extends Event<any, any>> = [ValidateF<T>, ExecuteF<A, T>];
-type AggregateMatches<T> = Array<AggregateMatch<T, any>>;
-type WhileTrue<K, T> = (args: {
+export type ValidateF<E extends Event<any, any>> = (o: any) => o is E;
+export type ExecuteF<T, E extends Event<any, any>> = (acc: Option<T>, ev: E) => Promise<Option<T>>;
+export type AggregateMatch<A, T extends Event<any, any>> = [ValidateF<T>, ExecuteF<A, T>];
+export type AggregateMatches<T> = Array<AggregateMatch<T, any>>;
+export type WhileTrue<K, T> = (args: {
    boolClause: (event: Event<any, any>) => boolean,
    boolClauseArgs: K,
   }) => Promise<Option<T>>;
@@ -171,7 +171,7 @@ export async function newEventStore<Q>(
     query: AQ,
     matches: AggregateMatches<T>,
   ): Aggregate<A, T> {
-    async function _impl(...args: A): Promise<Option<T>> {
+    async function _impl(...args: any[]): Promise<Option<T>> {
       const start = Date.now();
 
       const id = createHash('sha256')
@@ -243,7 +243,7 @@ export async function newEventStore<Q>(
     matches: AggregateMatches<T>,
   ): AggregateWhile<A, T> {
 
-    return async function _impl(...args: A) {
+    return async function _impl(...args: any[]) {
       return async function({
         boolClause,
         boolClauseArgs,
