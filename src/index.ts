@@ -192,7 +192,7 @@ export async function newEventStore<Q>(
         return aggregatedResult;
       } catch (error) {
         logger.error('errorOnReduction', error);
-        return Promise.reject(error);
+        return None;
       }
     }
 
