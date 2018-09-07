@@ -137,7 +137,7 @@ export async function newEventStore<Q>(
       const start = Date.now();
 
       const id = createHash('sha256')
-        .update(JSON.stringify(query) + JSON.stringify(args))
+        .update(aggregateName + JSON.stringify(query) + JSON.stringify(args))
         .digest('hex');
 
       try {
