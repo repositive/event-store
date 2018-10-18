@@ -1,5 +1,12 @@
 import { Option } from 'funfix';
 export * from './adapters';
+export declare function reduce<I, O>(iter: AsyncIterator<I>, acc: O, f: (acc: O, next: I) => Promise<O>): Promise<O>;
+export declare type Aggregator<T> = (acc: Option<T>, event: Event<EventData, any>) => Promise<Option<T>>;
+/**
+ *  Compose a list of maching functions into an aggregator
+ *
+ */
+export declare function composeAggregator<T>(matches: AggregateMatches<T>): Aggregator<T>;
 export declare function isEvent<D extends EventData, C extends EventContext<any>>(isData?: (o: any) => o is D, isContext?: (o: any) => o is C): (o: any) => o is Event<D, C>;
 export interface StoreAdapter<Q> {
     read(query: Q, since: Option<string>, ...args: any[]): AsyncIterator<Event<EventData, EventContext<any>>>;
@@ -36,10 +43,10 @@ export interface Event<D extends EventData, C extends EventContext<any>> {
     context: C;
 }
 export declare type Aggregate<A extends any[], T> = (...args: A) => Promise<Option<T>>;
-declare type ValidateF<E extends Event<any, any>> = (o: any) => o is E;
-declare type ExecuteF<T, E extends Event<any, any>> = (acc: Option<T>, ev: E) => Promise<Option<T>>;
-declare type AggregateMatch<A, T extends Event<any, any>> = [ValidateF<T>, ExecuteF<A, T>];
-declare type AggregateMatches<T> = Array<AggregateMatch<T, any>>;
+export declare type ValidateF<E extends Event<any, any>> = (o: any) => o is E;
+export declare type ExecuteF<T, E extends Event<any, any>> = (acc: Option<T>, ev: E) => Promise<Option<T>>;
+export declare type AggregateMatch<A, T extends Event<any, any>> = [ValidateF<T>, ExecuteF<A, T>];
+export declare type AggregateMatches<T> = Array<AggregateMatch<T, any>>;
 export interface EventStore<Q> {
     save(event: Event<EventData, EventContext<any>>): Promise<void>;
     createAggregate<A extends any[], T>(aggregateName: string, query: Q, matches: AggregateMatches<T>): Aggregate<A, T>;
