@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "compile": "rm -fr dist && tsc",
-    "test": "nyc --reporter lcov ava-ts --verbose",
+    "test": "nyc --all --reporter lcov ava-ts --verbose",
     "testIntegration": "nyc --reporter lcov ava-ts --verbose ./src/integrationsetup.ts ./src/**/*.integration.ts",
     "testDev": "nyc --reporter lcov ava-ts --watch",
     "lint": "tslint --project tsconfig.json"
@@ -16,11 +16,24 @@
       "src/**/*.ts"
     ]
   },
+  "nyc": {
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "exclude": [
+      "coverage",
+      "dist",
+      "**/*.test.ts",
+      "**/*.d.ts"
+    ]
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/config": "^0.0.34",
     "@types/pg": "7.4.10",
+    "@types/pino": "5.6.1",
     "@types/ramda": "0.25.35",
     "@types/sinon": "^5.0.1",
     "@types/uuid": "^3.4.3",
@@ -28,6 +41,7 @@
     "ava-ts": "0.24.6",
     "nyc": "^12.0.2",
     "pg": "7.4.3",
+    "pino": "5.8.0",
     "sinon": "^6.1.4",
     "ts-node": "7.0.0",
     "tslint": "5.11.0",
