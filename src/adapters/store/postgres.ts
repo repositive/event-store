@@ -77,7 +77,7 @@ export function createPgStoreAdapter(pool: Pool, logger: Logger = console): Stor
     .catch((err) => {
       if (err instanceof Error) {
         // duplicate key value violates unique constraint "events_pkey"
-        if (err.message.includes('unique')) {
+        if (err.message.includes('violates unique constraint')) {
           return Left(new DuplicateError());
         }
         return Left(err);
