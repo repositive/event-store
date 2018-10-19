@@ -1,7 +1,7 @@
 import { Pool } from 'pg';
 import { v4 } from 'uuid';
-import { StoreAdapter, Event, EventData, EventContext } from '../../.';
-import { Option, None} from 'funfix';
+import { StoreAdapter, DuplicateError, Event, EventData, EventContext } from '../../.';
+import { Option, None, Either, Left, Right} from 'funfix';
 import { Logger } from '../../.';
 
 export interface PgQuery {
@@ -63,11 +63,28 @@ export function createPgStoreAdapter(pool: Pool, logger: Logger = console): Stor
     }
   }
 
-  async function write(event: Event<EventData, EventContext<any>>) {
+  /**
+   *  This will return an either Left(DuplicateError), Left(PgError) or Right(void);
+   *
+   *
+   */
+  async function write(event: Event<EventData, EventContext<any>>): Promise<Either<DuplicateError | Error, void>> {
     return pool.query(
       'INSERT INTO events(id, data, context) values ($1, $2, $3)',
       [event.id, event.data, event.context],
-    ).then(() => {/**/});
+    )
+    .then(() => Right(undefined))
+    .catch((err) => {
+      if (err instanceof Error) {
+        // duplicate key value violates unique constraint "events_pkey"
+        if (err.message.includes('unique')) {
+          return Left(new DuplicateError());
+        }
+        return Left(err);
+      } else {
+        return Left(new Error(err));
+      }
+    });
   }
 
   async function lastEventOf<E extends Event<any, any>>(eventType: string): Promise<Option<E>> {

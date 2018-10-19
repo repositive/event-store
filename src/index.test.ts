@@ -1,7 +1,7 @@
 import test from 'ava';
-import {reduce, newEventStore, AggregateMatches, composeAggregator, EventData} from '.';
+import {reduce, DuplicateError, newEventStore, AggregateMatches, composeAggregator, EventData} from '.';
 import { stub } from 'sinon';
-import { Some, None } from 'funfix';
+import { Some, None, Left, Right } from 'funfix';
 import { v4 as uuid } from 'uuid';
 import * as pino from 'pino';
 
@@ -130,4 +130,67 @@ test('createAggregate throws when the internal aggregate crashes', async (t) => 
       t.fail('Unexpected error');
     }
   }
+});
+
+test('save emits if everything is fine', async (t) => {
+  const writeStub = stub();
+  writeStub.resolves(Right(undefined));
+  const store: any = {
+    write: writeStub,
+  };
+  const emitStub = stub();
+  emitStub.resolves();
+  const emitter: any = { emit: emitStub, subscribe: () => Promise.resolve() };
+
+  const es = await newEventStore(store, {logger, emitter});
+
+  await es.save({id: '', data: {type: 'test'}, context: {time:  '', subject: {}}});
+
+  t.deepEqual(writeStub.callCount, 1);
+
+  t.deepEqual(emitStub.callCount, 1);
+});
+
+test('save does not emit on errors', async (t) => {
+  const writeStub = stub();
+  writeStub.resolves(Left(new Error('Boom')));
+  const store: any = {
+    write: writeStub,
+  };
+  const emitStub = stub();
+  emitStub.resolves();
+  const emitter: any = { emit: emitStub, subscribe: () => Promise.resolve() };
+
+  const es = await newEventStore(store, {logger, emitter});
+
+  try {
+    await es.save({id: '', data: {type: 'test'}, context: {time:  '', subject: {}}});
+    t.fail('On write errors save should reject');
+  } catch (err) {
+    if (err instanceof Error) {
+      t.deepEqual(err.message, 'Boom');
+      t.deepEqual(writeStub.callCount, 1);
+      t.deepEqual(emitStub.callCount, 0);
+    } else {
+      t.fail('The catch object should be an error');
+    }
+  }
+
+});
+
+test('save does not emit on duplicates', async (t) => {
+  const writeStub = stub();
+  writeStub.resolves(Left(new DuplicateError()));
+  const store: any = {
+    write: writeStub,
+  };
+  const emitStub = stub();
+  emitStub.resolves();
+  const emitter: any = { emit: emitStub, subscribe: () => Promise.resolve() };
+
+  const es = await newEventStore(store, {logger, emitter});
+
+  await es.save({id: '', data: {type: 'test'}, context: {time:  '', subject: {}}});
+  t.deepEqual(writeStub.callCount, 1);
+  t.deepEqual(emitStub.callCount, 0);
 });
