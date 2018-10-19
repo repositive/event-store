@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 import * as R from 'ramda';
-import { Future, Option, None } from 'funfix';
+import { Future, Option, None, Either, Left, Right } from 'funfix';
 import { createHash } from 'crypto';
 import { v4 } from 'uuid';
 
@@ -58,9 +58,10 @@ interface EventReplayRequested extends EventData {
   since: string; // ISO String
 }
 
+export class DuplicateError extends Error {}
 export interface StoreAdapter<Q> {
   read(query: Q, since: Option<string>, ...args: any[]): AsyncIterator<Event<EventData, EventContext<any>>>;
-  write(event: Event<EventData, EventContext<any>>): Promise<void>;
+  write(event: Event<EventData, EventContext<any>>): Promise<Either<DuplicateError, void>>;
   lastEventOf<E extends Event<any, any>>(eventType: string): Promise<Option<E>>;
   readEventSince(eventTYpe: string, since?: Option<string>): AsyncIterator<Event<EventData, EventContext<any>>>;
 }
@@ -206,8 +207,20 @@ export async function newEventStore<Q>(
   }
 
   async function save<T extends string>(event: Event<{type: T}, EventContext<any>>): Promise<void> {
-    await store.write(event);
-    await emitter.emit(event);
+    await store.write(event).then((result) => {
+      return result.map(() => {
+        // If there are no errors saving, emit the event
+        return emitter.emit(event);
+      })
+      .getOrElseL(() => {
+        return result.swap().map((error) => {
+          if (error instanceof DuplicateError) {
+            return Promise.resolve();
+          }
+          return Promise.reject(error);
+        }).get();
+      });
+    });
   }
 
   async function listen(pattern: string, handler: EventHandler<any>) {
