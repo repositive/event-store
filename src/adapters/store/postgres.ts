@@ -64,7 +64,7 @@ export function createPgStoreAdapter(pool: Pool, logger: Logger = console): Stor
   }
 
   /**
-   *  This will return an either Left(DuplicateError), Left(PgError) or Right(void);
+   *  This will return an either Left(DuplicateError), Left(Error) or Right(void);
    *
    *
    */
