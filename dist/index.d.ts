@@ -1,4 +1,4 @@
-import { Option } from 'funfix';
+import { Option, Either } from 'funfix';
 export * from './adapters';
 export declare function reduce<I, O>(iter: AsyncIterator<I>, acc: O, f: (acc: O, next: I) => Promise<O>): Promise<O>;
 export declare type Aggregator<T> = (acc: Option<T>, event: Event<EventData, any>) => Promise<Option<T>>;
@@ -8,9 +8,11 @@ export declare type Aggregator<T> = (acc: Option<T>, event: Event<EventData, any
  */
 export declare function composeAggregator<T>(matches: AggregateMatches<T>): Aggregator<T>;
 export declare function isEvent<D extends EventData, C extends EventContext<any>>(isData?: (o: any) => o is D, isContext?: (o: any) => o is C): (o: any) => o is Event<D, C>;
+export declare class DuplicateError extends Error {
+}
 export interface StoreAdapter<Q> {
     read(query: Q, since: Option<string>, ...args: any[]): AsyncIterator<Event<EventData, EventContext<any>>>;
-    write(event: Event<EventData, EventContext<any>>): Promise<void>;
+    write(event: Event<EventData, EventContext<any>>): Promise<Either<DuplicateError, void>>;
     lastEventOf<E extends Event<any, any>>(eventType: string): Promise<Option<E>>;
     readEventSince(eventTYpe: string, since?: Option<string>): AsyncIterator<Event<EventData, EventContext<any>>>;
 }
