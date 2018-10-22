@@ -4,8 +4,10 @@ export function createDumbEmitterAdapter(): EmitterAdapter {
 
   const subscriptions = new Map();
 
-  async function emit(event: any) {
+  async function emit(event: any): Promise<void> {
     /* I DO NOT DO ANYTHING */
+
+    return Promise.resolve();
   }
 
   function subscribe(pattern: string, handler: EventHandler<any>) {
