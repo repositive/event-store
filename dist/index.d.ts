@@ -1,4 +1,5 @@
 import { Option, Either } from 'funfix';
+export { createEvent, createContext } from './helpers';
 export * from './adapters';
 export declare function reduce<I, O>(iter: AsyncIterator<I>, acc: O, f: (acc: O, next: I) => Promise<O>): Promise<O>;
 export declare type Aggregator<T> = (acc: Option<T>, event: Event<EventData, any>) => Promise<Option<T>>;
