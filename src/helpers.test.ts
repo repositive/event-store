@@ -3,7 +3,7 @@ import { id } from './test-helpers';
 import { createEvent, createContext, EventData, EventContext, Event } from '.';
 
 test('creates an event with default fields filled', (t) => {
-  const evt = createEvent('ns', 'Type', { foo: 'bar' } as any);
+  const evt = createEvent('ns', 'Type', { foo: 'bar' });
 
   const expected = {
     id,
@@ -29,7 +29,7 @@ test('creates an event with a given context', (t) => {
   const evt = createEvent(
     'ns',
     'Type',
-    { foo: 'bar' } as any,
+    { foo: 'bar' },
     { subject: { bar: 'baz' }, time: '2018-01-02 03-04-05' },
     () => id,
   );
@@ -55,7 +55,7 @@ test('creates a context with subject and no action', (t) => {
   const evt = createEvent(
     'ns',
     'Type',
-    { foo: 'bar' } as any,
+    { foo: 'bar' },
     createContext({ bar: 'baz' }),
     () => id,
   );
@@ -68,7 +68,7 @@ test('creates a context with subject and an action', (t) => {
   const evt = createEvent(
     'ns',
     'Type',
-    { foo: 'bar' } as any,
+    { foo: 'bar' },
     createContext({ bar: 'baz' }, 'someRandomAction', () => '2018-01-02 03-04-05'),
     () => id,
   );
