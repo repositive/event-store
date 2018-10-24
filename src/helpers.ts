@@ -8,15 +8,15 @@ function defaultContext(): EventContext<{}> {
   };
 }
 
-export function createEvent<D extends EventData>(
+export function createEvent(
   event_namespace: string,
   event_type: string,
-  data: D,
+  data: object,
   context: EventContext<any> = defaultContext(),
   _uuid: () => string = v4,
 ): Event<EventData, EventContext<any>> {
   const d = {
-    ...(data as object),
+    ...data,
     type: `${event_namespace}.${event_type}`,
     event_type,
     event_namespace,
