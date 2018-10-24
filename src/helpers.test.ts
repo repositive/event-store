@@ -3,11 +3,7 @@ import { id } from './test-helpers';
 import { createEvent, createContext, EventData, EventContext, Event } from '.';
 
 test('creates an event with default fields filled', (t) => {
-  const evt = createEvent(
-    { event_type: 'Type', event_namespace: 'ns', data: { foo: 'bar' } as any },
-    () => id,
-    () => '2018-01-02 03-04-05',
-  );
+  const evt = createEvent('ns', 'Type', { foo: 'bar' } as any);
 
   const expected = {
     id,
@@ -23,19 +19,19 @@ test('creates an event with default fields filled', (t) => {
     },
   };
 
-  t.deepEqual(evt, expected);
+  t.deepEqual(evt.data, expected.data);
+  t.deepEqual(evt.context.subject, expected.context.subject);
+  t.is(typeof evt.context.time, 'string');
+  t.true(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(evt.id));
 });
 
 test('creates an event with a given context', (t) => {
   const evt = createEvent(
-    {
-      event_type: 'Type',
-      event_namespace: 'ns',
-      data: { foo: 'bar' } as any,
-      context: { subject: { bar: 'baz' }, time: new Date().toISOString() },
-    },
+    'ns',
+    'Type',
+    { foo: 'bar' } as any,
+    { subject: { bar: 'baz' }, time: '2018-01-02 03-04-05' },
     () => id,
-    () => '2018-01-02 03-04-05',
   );
 
   const expected = {
@@ -57,14 +53,11 @@ test('creates an event with a given context', (t) => {
 
 test('creates a context with subject and no action', (t) => {
   const evt = createEvent(
-    {
-      event_type: 'Type',
-      event_namespace: 'ns',
-      data: { foo: 'bar' } as any,
-      context: createContext({ bar: 'baz' }),
-    },
+    'ns',
+    'Type',
+    { foo: 'bar' } as any,
+    createContext({ bar: 'baz' }),
     () => id,
-    () => '2018-01-02 03-04-05',
   );
 
   t.is(evt.context.action, undefined);
@@ -73,14 +66,11 @@ test('creates a context with subject and no action', (t) => {
 
 test('creates a context with subject and an action', (t) => {
   const evt = createEvent(
-    {
-      event_type: 'Type',
-      event_namespace: 'ns',
-      data: { foo: 'bar' } as any,
-      context: createContext({ bar: 'baz' }, 'someRandomAction', () => '2018-01-02 03-04-05'),
-    },
+    'ns',
+    'Type',
+    { foo: 'bar' } as any,
+    createContext({ bar: 'baz' }, 'someRandomAction', () => '2018-01-02 03-04-05'),
     () => id,
-    () => '2018-01-02 03-04-05',
   );
 
   const expected = {

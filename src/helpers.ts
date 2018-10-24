@@ -9,19 +9,11 @@ function defaultContext(): EventContext<{}> {
 }
 
 export function createEvent<D extends EventData>(
-  {
-    event_type,
-    event_namespace,
-    data,
-    context = defaultContext(),
-  }: {
-    event_type: string;
-    event_namespace: string;
-    data: D;
-    context?: EventContext<any>;
-  },
+  event_namespace: string,
+  event_type: string,
+  data: D,
+  context: EventContext<any> = defaultContext(),
   _uuid: () => string = v4,
-  _time: () => string = () => new Date().toISOString(),
 ): Event<EventData, EventContext<any>> {
   const d = {
     ...(data as object),
@@ -30,15 +22,9 @@ export function createEvent<D extends EventData>(
     event_namespace,
   };
 
-  // Allow overriding of time value for testing purposes
-  const c: EventContext<any> = {
-    ...context,
-    time: _time(),
-  };
-
   return {
     data: d,
-    context: c,
+    context,
     id: _uuid(),
   };
 }
