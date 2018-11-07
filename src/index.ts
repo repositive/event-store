@@ -3,6 +3,7 @@ import * as R from 'ramda';
 import { Future, Option, None, Either, Left, Right } from 'funfix';
 import { createHash } from 'crypto';
 import { v4 } from 'uuid';
+export { createEvent, createContext } from './helpers';
 
 export * from './adapters';
 import {createDumbCacheAdapter, createDumbEmitterAdapter} from './adapters';
