@@ -98,9 +98,9 @@ export function createPgStoreAdapter(pool: Pool, logger: Logger = console): Stor
     return read(
       {
         text: `select * from events where data->>'type' = $1`,
-        values: [eventType],
       },
       since,
+      eventType,
     );
   }
 
