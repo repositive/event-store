@@ -3,6 +3,11 @@ import { Option, Some, None } from 'funfix';
 import setupIris from '@repositive/iris';
 import { Iris } from '@repositive/iris';
 
+export interface IrisOptions {
+  uri?: string;
+  namespace: string;
+}
+
 export function wait(n: number): Promise<void> {
   return new Promise((resolve, reject) => {
     setTimeout(() => resolve, n);
@@ -15,10 +20,10 @@ function wrapHandler(handler: EventHandler<any>) {
   };
 }
 
-export function createAQMPEmitterAdapter(connectionString: string, logger: Logger = console): EmitterAdapter {
+export function createAQMPEmitterAdapter(irisOpts: IrisOptions, logger: Logger = console): EmitterAdapter {
   let iris: Option<Iris> = None;
   const subscriptions: Map<string, EventHandler<any>> = new Map();
-  setupIris({uri: connectionString, logger}).map((_iris) => {
+  setupIris({ ...irisOpts, logger}).map((_iris) => {
     iris = Some(_iris);
     for ( const [pattern, handler] of subscriptions.entries()) {
       _iris.register({pattern, handler: wrapHandler(handler)});
