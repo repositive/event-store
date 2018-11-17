@@ -56,6 +56,8 @@ export function isEvent<D extends EventData, C extends EventContext<any>>(
 interface EventReplayRequested extends EventData {
   type: 'EventReplayRequested';
   event_type: string;
+  requested_event_type: string;
+  requested_event_namespace: string;
   since: string; // ISO String
 }
 
