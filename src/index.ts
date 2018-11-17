@@ -55,7 +55,7 @@ export function isEvent<D extends EventData, C extends EventContext<any>>(
 interface EventReplayRequested extends EventData {
   type: '_eventstore.EventReplayRequested';
   event_namespace: '_eventstore';
-  event_type: string;
+  event_type: 'EventReplayRequested';
   requested_event_type: string;
   requested_event_namespace: string;
   since: string; // ISO String
@@ -257,7 +257,7 @@ export async function newEventStore<Q>(
       id: v4(),
       data: {
         type: '_eventstore.EventReplayRequested',
-        event_type: pattern,
+        event_type: 'EventReplayRequested',
         event_namespace: '_eventstore',
         requested_event_namespace: event_namespace,
         requested_event_type: event_type,
@@ -279,10 +279,6 @@ export async function newEventStore<Q>(
       return None;
     });
   }
-
-  // DEPRECATED: This should listen for `eventstore.EventReplayRequested`
-  // TODO: Delete this listener
-  emitter.subscribe('EventReplayRequested', handleEventReplay);
 
   emitter.subscribe('_eventstore.EventReplayRequested', handleEventReplay);
 
