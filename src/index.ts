@@ -54,7 +54,7 @@ export function isEvent<D extends EventData, C extends EventContext<any>>(
 }
 
 interface EventReplayRequested extends EventData {
-  type: 'EventReplayRequested';
+  type: 'eventstore.EventReplayRequested';
   event_type: string;
   requested_event_type: string;
   requested_event_namespace: string;
@@ -117,7 +117,7 @@ export interface EventStore<Q> {
     query: Q,
     matches: AggregateMatches<T>,
   ): Aggregate<A, T>;
-  listen<T extends string>(pattern: T, handler: EventHandler<Event<{type: T}, any>>): void;
+  listen<T extends string>(event_namespace: string, event_type: string, handler: EventHandler<Event<{type: T}, any>>): void;
 }
 
 export interface Logger {
@@ -237,7 +237,7 @@ export async function newEventStore<Q>(
       .emit({
         id: v4(),
         data: {
-          type: 'EventReplayRequested',
+          type: 'eventstore.EventReplayRequested',
           event_type: pattern,
           requested_event_namespace: event_namespace,
           requested_event_type: event_type,
@@ -250,7 +250,19 @@ export async function newEventStore<Q>(
       });
   }
 
+  // DEPRECATED: This should listen for `eventstore.EventReplayRequested`
+  // TODO: Delete this listener
   emitter.subscribe('EventReplayRequested', async (event: Event<EventReplayRequested, EventContext<any>>) => {
+    const events = store.readEventSince(event.data.event_type, Option.of(event.data.since));
+
+    // Emit all events;
+    reduce(events, None, async (acc, e) => {
+      await emitter.emit(e);
+      return None;
+    });
+  });
+
+  emitter.subscribe('eventstore.EventReplayRequested', async (event: Event<EventReplayRequested, EventContext<any>>) => {
     const events = store.readEventSince(event.data.event_type, Option.of(event.data.since));
 
     // Emit all events;
