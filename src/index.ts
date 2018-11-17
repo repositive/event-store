@@ -226,15 +226,21 @@ export async function newEventStore<Q>(
     });
   }
 
-  async function listen(pattern: string, handler: EventHandler<any>) {
+  async function listen(event_namespace: string, event_type: string, handler: EventHandler<any>) {
+    const pattern = [ event_namespace, event_type ].join('.');
+
     emitter.subscribe(pattern, handler);
+
     const last = await store.lastEventOf(pattern);
+
     emitter
       .emit({
         id: v4(),
         data: {
           type: 'EventReplayRequested',
           event_type: pattern,
+          requested_event_namespace: event_namespace,
+          requested_event_type: event_type,
           since: last.map((l) => l.context.time).getOrElse(new Date(0).toISOString()),
         },
         context: {
