@@ -270,33 +270,21 @@ export async function newEventStore<Q>(
     });
   }
 
+  async function handleEventReplay(event: Event<EventReplayRequested, EventContext<any>>) {
+    const events = store.readEventSince(event.data.event_type, Option.of(event.data.since));
+
+    // Emit all events;
+    reduce(events, None, async (acc, e) => {
+      await emitter.emit(e);
+      return None;
+    });
+  }
+
   // DEPRECATED: This should listen for `eventstore.EventReplayRequested`
   // TODO: Delete this listener
-  emitter.subscribe(
-    'EventReplayRequested',
-    async (event: Event<EventReplayRequested, EventContext<any>>) => {
-      const events = store.readEventSince(event.data.event_type, Option.of(event.data.since));
+  emitter.subscribe('EventReplayRequested', handleEventReplay);
 
-      // Emit all events;
-      reduce(events, None, async (acc, e) => {
-        await emitter.emit(e);
-        return None;
-      });
-    },
-  );
-
-  emitter.subscribe(
-    '_eventstore.EventReplayRequested',
-    async (event: Event<EventReplayRequested, EventContext<any>>) => {
-      const events = store.readEventSince(event.data.event_type, Option.of(event.data.since));
-
-      // Emit all events;
-      reduce(events, None, async (acc, e) => {
-        await emitter.emit(e);
-        return None;
-      });
-    },
-  );
+  emitter.subscribe('_eventstore.EventReplayRequested', handleEventReplay);
 
   return {
     createAggregate,
