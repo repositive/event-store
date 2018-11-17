@@ -54,7 +54,8 @@ export function isEvent<D extends EventData, C extends EventContext<any>>(
 }
 
 interface EventReplayRequested extends EventData {
-  type: 'eventstore.EventReplayRequested';
+  type: '_eventstore.EventReplayRequested';
+  event_namespace: '_eventstore';
   event_type: string;
   requested_event_type: string;
   requested_event_namespace: string;
@@ -237,8 +238,9 @@ export async function newEventStore<Q>(
       .emit({
         id: v4(),
         data: {
-          type: 'eventstore.EventReplayRequested',
+          type: '_eventstore.EventReplayRequested',
           event_type: pattern,
+          event_namespace: '_eventstore',
           requested_event_namespace: event_namespace,
           requested_event_type: event_type,
           since: last.map((l) => l.context.time).getOrElse(new Date(0).toISOString()),
@@ -262,7 +264,7 @@ export async function newEventStore<Q>(
     });
   });
 
-  emitter.subscribe('eventstore.EventReplayRequested', async (event: Event<EventReplayRequested, EventContext<any>>) => {
+  emitter.subscribe('_eventstore.EventReplayRequested', async (event: Event<EventReplayRequested, EventContext<any>>) => {
     const events = store.readEventSince(event.data.event_type, Option.of(event.data.since));
 
     // Emit all events;
