@@ -63,8 +63,7 @@ export interface EventReplayRequested extends EventData {
 
 export class DuplicateError extends Error {}
 export interface StoreAdapter<Q> {
-  read(query: Q, since: Option<string>, ...args: any[]):
-    AsyncIterator<Event<EventData, EventContext<any>>>;
+  read(query: Q, since: Option<string>, ...args: any[]): AsyncIterator<Event<EventData, EventContext<any>>>;
   write(event: Event<EventData, EventContext<any>>): Promise<Either<DuplicateError, void>>;
   lastEventOf<E extends Event<any, any>>(eventType: string): Promise<Option<E>>;
   readEventSince(
@@ -270,7 +269,10 @@ export async function newEventStore<Q>(
     });
   }
 
-  emitter.subscribe('_eventstore.EventReplayRequested', createEventReplayHandler({ store, emitter }));
+  emitter.subscribe(
+    '_eventstore.EventReplayRequested',
+    createEventReplayHandler({ store, emitter }),
+  );
 
   return {
     createAggregate,
@@ -279,14 +281,23 @@ export async function newEventStore<Q>(
   };
 }
 
-export function createEventReplayHandler({ store, emitter }: { store: StoreAdapter<any>, emitter: EmitterAdapter }) {
+export function createEventReplayHandler({
+  store,
+  emitter,
+}: {
+  store: StoreAdapter<any>;
+  emitter: EmitterAdapter;
+}) {
   return async function handleEventReplay(event: Event<EventReplayRequested, EventContext<any>>) {
-    const events = store.readEventSince([ event.data.requested_event_namespace, event.data.requested_event_type ].join('.'), Option.of(event.data.since));
+    const events = store.readEventSince(
+      [event.data.requested_event_namespace, event.data.requested_event_type].join('.'),
+      Option.of(event.data.since),
+    );
 
     // Emit all events;
     reduce(events, None, async (acc, e) => {
       await emitter.emit(e);
       return None;
     });
-  }
+  };
 }

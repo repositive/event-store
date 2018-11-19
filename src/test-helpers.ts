@@ -94,7 +94,7 @@ export function createFakeIterator(result: any[]) {
       } else {
         return { value: result[idx - 1], done: false };
       }
-    }
+    },
   };
 }
 
@@ -114,7 +114,7 @@ export async function getFakeStoreAdapter({
     };
 
   const storeAdapter = {
-    read: (query: any, time: any, ...args: any[]) => {
+    read: (readQuery: any, time: any, ...args: any[]) => {
       let idx = 0;
       const result = readStub(...args);
 
@@ -131,15 +131,15 @@ export async function getFakeStoreAdapter({
           } else {
             return { value: result[idx - 1], done: false };
           }
-        }
+        },
       };
     },
     write: (event: Event<EventData, EventContext<any>>): Promise<any> => {
       return writer(event).then(() => Right(undefined));
     },
     lastEventOf: (): any => ({}),
-    readEventSince: readSinceStub
+    readEventSince: readSinceStub,
   };
 
-  return storeAdapter
+  return storeAdapter;
 }
