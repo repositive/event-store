@@ -38,8 +38,10 @@ export function createAQMPEmitterAdapter(irisOpts: IrisOptions, logger: Logger =
   }
 
   function subscribe(pattern: string, handler: EventHandler<any>) {
+    const _handler = wrapHandler(handler);
+
     iris.map((i) => {
-      i.register({pattern, handler});
+      i.register({pattern, handler: _handler});
     });
     subscriptions.set(pattern, handler);
   }
