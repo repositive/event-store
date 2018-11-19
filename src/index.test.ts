@@ -1,9 +1,10 @@
 import test from 'ava';
-import {reduce, DuplicateError, newEventStore, AggregateMatches, composeAggregator, EventData} from '.';
-import { stub } from 'sinon';
+import {reduce, DuplicateError, newEventStore, AggregateMatches, Event, EventContext, composeAggregator, EventData, createEventReplayHandler, StoreAdapter, EmitterAdapter, EventReplayRequested} from '.';
+import { stub, spy } from 'sinon';
 import { Some, None, Left, Right } from 'funfix';
 import { v4 as uuid } from 'uuid';
 import * as pino from 'pino';
+import { id, getFakeStoreAdapter, createFakeIterator } from './test-helpers';
 
 const logger = pino();
 logger.level = 'fatal';
@@ -194,3 +195,34 @@ test('save does not emit on duplicates', async (t) => {
   t.deepEqual(writeStub.callCount, 1);
   t.deepEqual(emitStub.callCount, 0);
 });
+
+test('replay handler reads correct events', async (t) => {
+  const readSpy = stub().returns(createFakeIterator([]));
+  const since = new Date().toISOString();
+  const emit = spy();
+
+  const store = await getFakeStoreAdapter({ readSinceStub: readSpy });
+
+  const emitter = {
+    emit: emit as any
+  } as EmitterAdapter;
+
+  const replayHandler = createEventReplayHandler({ store, emitter });
+
+  let evt: Event<EventReplayRequested, EventContext<any>> = {
+    id,
+    data: {
+      type: '_eventstore.EventReplayRequested',
+      event_namespace: '_eventstore',
+      event_type: 'EventReplayRequested',
+      requested_event_namespace: 'ns',
+      requested_event_type: 'SomeType',
+      since
+    },
+    context: { subject: {}, time: '' }
+  };
+
+  replayHandler(evt);
+
+  t.truthy(readSpy.calledWithExactly('ns.SomeType', Some(since)));
+})
