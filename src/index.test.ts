@@ -1,9 +1,23 @@
 import test from 'ava';
-import {reduce, DuplicateError, newEventStore, AggregateMatches, composeAggregator, EventData} from '.';
-import { stub } from 'sinon';
+import {
+  reduce,
+  DuplicateError,
+  newEventStore,
+  AggregateMatches,
+  Event,
+  EventContext,
+  composeAggregator,
+  EventData,
+  createEventReplayHandler,
+  StoreAdapter,
+  EmitterAdapter,
+  EventReplayRequested,
+} from '.';
+import { stub, spy } from 'sinon';
 import { Some, None, Left, Right } from 'funfix';
 import { v4 as uuid } from 'uuid';
 import * as pino from 'pino';
+import { id, getFakeStoreAdapter, createFakeIterator } from './test-helpers';
 
 const logger = pino();
 logger.level = 'fatal';
@@ -23,12 +37,10 @@ function toAsyncIter<T>(input: T[]): AsyncIterator<T> {
 }
 
 function newEvent(data: EventData) {
-  const id = uuid();
-
   return {
     id,
     data,
-    context:  {
+    context: {
       time: new Date().toISOString(),
     },
   };
@@ -38,14 +50,12 @@ test('Test composeAggregator one match', async (t) => {
   const validate: any = stub();
   validate.returns(true);
   const logic: any = stub();
-  logic.resolves(Some("test"));
-  const matches: AggregateMatches<string> = [
-    [validate, logic],
-  ];
+  logic.resolves(Some('test'));
+  const matches: AggregateMatches<string> = [[validate, logic]];
 
   const aggregator = composeAggregator(matches);
   t.deepEqual(typeof aggregator, 'function');
-  t.deepEqual(await aggregator(None, newEvent({type: 'test'})), Some('test'));
+  t.deepEqual(await aggregator(None, newEvent({ type: 'test' })), Some('test'));
 });
 
 test('Test composeAggregator no matches', async (t) => {
@@ -53,21 +63,19 @@ test('Test composeAggregator no matches', async (t) => {
 
   const aggregator = composeAggregator(matches);
   t.deepEqual(typeof aggregator, 'function');
-  t.deepEqual(await aggregator(None, newEvent({type: 'test'})), None);
+  t.deepEqual(await aggregator(None, newEvent({ type: 'test' })), None);
 });
 
 test('Test composeAggregator one no matching match', async (t) => {
   const validate: any = stub();
   validate.returns(false);
   const logic: any = stub();
-  logic.resolves(Some("test"));
-  const matches: AggregateMatches<string> = [
-    [validate, logic],
-  ];
+  logic.resolves(Some('test'));
+  const matches: AggregateMatches<string> = [[validate, logic]];
 
   const aggregator = composeAggregator(matches);
   t.deepEqual(typeof aggregator, 'function');
-  t.deepEqual(await aggregator(None, newEvent({type: 'test'})), None);
+  t.deepEqual(await aggregator(None, newEvent({ type: 'test' })), None);
 });
 
 test('Iter reducer', async (t) => {
@@ -96,7 +104,7 @@ test('createAggregate returns none when no cache and no events', async (t) => {
 
   readStub.returns(toAsyncIter([]));
 
-  const es = await newEventStore(store, {logger});
+  const es = await newEventStore(store, { logger });
 
   const matches: any = [[() => true, () => 'test']];
   const agg = es.createAggregate('Test', '*', matches);
@@ -104,7 +112,6 @@ test('createAggregate returns none when no cache and no events', async (t) => {
 });
 
 test('createAggregate throws when the internal aggregate crashes', async (t) => {
-
   const readStub = stub();
   const store: any = {
     read: readStub,
@@ -112,7 +119,7 @@ test('createAggregate throws when the internal aggregate crashes', async (t) => 
 
   readStub.returns(toAsyncIter([1]));
 
-  const es = await newEventStore(store, {logger});
+  const es = await newEventStore(store, { logger });
 
   const scrochedAggregation = () => {
     throw new Error('Scronched');
@@ -142,9 +149,9 @@ test('save emits if everything is fine', async (t) => {
   emitStub.resolves();
   const emitter: any = { emit: emitStub, subscribe: () => Promise.resolve() };
 
-  const es = await newEventStore(store, {logger, emitter});
+  const es = await newEventStore(store, { logger, emitter });
 
-  await es.save({id: '', data: {type: 'test'}, context: {time:  '', subject: {}}});
+  await es.save({ id: '', data: { type: 'test' }, context: { time: '', subject: {} } });
 
   t.deepEqual(writeStub.callCount, 1);
 
@@ -161,10 +168,10 @@ test('save does not emit on errors', async (t) => {
   emitStub.resolves();
   const emitter: any = { emit: emitStub, subscribe: () => Promise.resolve() };
 
-  const es = await newEventStore(store, {logger, emitter});
+  const es = await newEventStore(store, { logger, emitter });
 
   try {
-    await es.save({id: '', data: {type: 'test'}, context: {time:  '', subject: {}}});
+    await es.save({ id: '', data: { type: 'test' }, context: { time: '', subject: {} } });
     t.fail('On write errors save should reject');
   } catch (err) {
     if (err instanceof Error) {
@@ -175,7 +182,6 @@ test('save does not emit on errors', async (t) => {
       t.fail('The catch object should be an error');
     }
   }
-
 });
 
 test('save does not emit on duplicates', async (t) => {
@@ -188,9 +194,40 @@ test('save does not emit on duplicates', async (t) => {
   emitStub.resolves();
   const emitter: any = { emit: emitStub, subscribe: () => Promise.resolve() };
 
-  const es = await newEventStore(store, {logger, emitter});
+  const es = await newEventStore(store, { logger, emitter });
 
-  await es.save({id: '', data: {type: 'test'}, context: {time:  '', subject: {}}});
+  await es.save({ id: '', data: { type: 'test' }, context: { time: '', subject: {} } });
   t.deepEqual(writeStub.callCount, 1);
   t.deepEqual(emitStub.callCount, 0);
+});
+
+test('replay handler reads correct events', async (t) => {
+  const readSpy = stub().returns(createFakeIterator([]));
+  const since = new Date().toISOString();
+  const emit = spy();
+
+  const store = await getFakeStoreAdapter({ readSinceStub: readSpy });
+
+  const emitter = {
+    emit: emit as any,
+  } as EmitterAdapter;
+
+  const replayHandler = createEventReplayHandler({ store, emitter });
+
+  const evt: Event<EventReplayRequested, EventContext<any>> = {
+    id,
+    data: {
+      type: '_eventstore.EventReplayRequested',
+      event_namespace: '_eventstore',
+      event_type: 'EventReplayRequested',
+      requested_event_namespace: 'ns',
+      requested_event_type: 'SomeType',
+      since,
+    },
+    context: { subject: {}, time: '' },
+  };
+
+  replayHandler(evt);
+
+  t.truthy(readSpy.calledWithExactly('ns.SomeType', Some(since)));
 });

@@ -52,7 +52,7 @@ export function isEvent<D extends EventData, C extends EventContext<any>>(
   };
 }
 
-interface EventReplayRequested extends EventData {
+export interface EventReplayRequested extends EventData {
   type: '_eventstore.EventReplayRequested';
   event_namespace: '_eventstore';
   event_type: 'EventReplayRequested';
@@ -63,8 +63,7 @@ interface EventReplayRequested extends EventData {
 
 export class DuplicateError extends Error {}
 export interface StoreAdapter<Q> {
-  read(query: Q, since: Option<string>, ...args: any[]):
-    AsyncIterator<Event<EventData, EventContext<any>>>;
+  read(query: Q, since: Option<string>, ...args: any[]): AsyncIterator<Event<EventData, EventContext<any>>>;
   write(event: Event<EventData, EventContext<any>>): Promise<Either<DuplicateError, void>>;
   lastEventOf<E extends Event<any, any>>(eventType: string): Promise<Option<E>>;
   readEventSince(
@@ -270,21 +269,35 @@ export async function newEventStore<Q>(
     });
   }
 
-  async function handleEventReplay(event: Event<EventReplayRequested, EventContext<any>>) {
-    const events = store.readEventSince(event.data.event_type, Option.of(event.data.since));
+  emitter.subscribe(
+    '_eventstore.EventReplayRequested',
+    createEventReplayHandler({ store, emitter }),
+  );
+
+  return {
+    createAggregate,
+    listen,
+    save,
+  };
+}
+
+export function createEventReplayHandler({
+  store,
+  emitter,
+}: {
+  store: StoreAdapter<any>;
+  emitter: EmitterAdapter;
+}) {
+  return async function handleEventReplay(event: Event<EventReplayRequested, EventContext<any>>) {
+    const events = store.readEventSince(
+      [event.data.requested_event_namespace, event.data.requested_event_type].join('.'),
+      Option.of(event.data.since),
+    );
 
     // Emit all events;
     reduce(events, None, async (acc, e) => {
       await emitter.emit(e);
       return None;
     });
-  }
-
-  emitter.subscribe('_eventstore.EventReplayRequested', handleEventReplay);
-
-  return {
-    createAggregate,
-    listen,
-    save,
   };
 }
