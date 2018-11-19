@@ -9,3 +9,11 @@ export declare function getDbConnection(): Pool;
 export declare function insertEvent(event: any, pool?: any): Promise<any>;
 export declare function truncateAll(pool?: any): Promise<any>;
 export declare function query(q: string, pool?: any): Promise<any>;
+export declare function createFakeIterator(result: any[]): {
+    next: () => any;
+};
+export declare function getFakeStoreAdapter({ readStub, readSinceStub, saveStub, }: {
+    readStub?: any;
+    readSinceStub: any;
+    saveStub?: (evt: any) => Promise<undefined>;
+}): Promise<any>;

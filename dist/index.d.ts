@@ -9,6 +9,14 @@ export declare type Aggregator<T> = (acc: Option<T>, event: Event<EventData, any
  */
 export declare function composeAggregator<T>(matches: AggregateMatches<T>): Aggregator<T>;
 export declare function isEvent<D extends EventData, C extends EventContext<any>>(isData?: (o: any) => o is D, isContext?: (o: any) => o is C): (o: any) => o is Event<D, C>;
+export interface EventReplayRequested extends EventData {
+    type: '_eventstore.EventReplayRequested';
+    event_namespace: '_eventstore';
+    event_type: 'EventReplayRequested';
+    requested_event_type: string;
+    requested_event_namespace: string;
+    since: string;
+}
 export declare class DuplicateError extends Error {
 }
 export interface StoreAdapter<Q> {
@@ -70,3 +78,7 @@ export interface EventStoreOptions {
     logger?: Logger;
 }
 export declare function newEventStore<Q>(store: StoreAdapter<Q>, _options?: EventStoreOptions): Promise<EventStore<Q>>;
+export declare function createEventReplayHandler({ store, emitter, }: {
+    store: StoreAdapter<any>;
+    emitter: EmitterAdapter;
+}): (event: Event<EventReplayRequested, EventContext<any>>) => Promise<void>;
