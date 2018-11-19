@@ -52,7 +52,7 @@ export function isEvent<D extends EventData, C extends EventContext<any>>(
   };
 }
 
-interface EventReplayRequested extends EventData {
+export interface EventReplayRequested extends EventData {
   type: '_eventstore.EventReplayRequested';
   event_namespace: '_eventstore';
   event_type: 'EventReplayRequested';
@@ -270,8 +270,18 @@ export async function newEventStore<Q>(
     });
   }
 
-  async function handleEventReplay(event: Event<EventReplayRequested, EventContext<any>>) {
-    const events = store.readEventSince(event.data.event_type, Option.of(event.data.since));
+  emitter.subscribe('_eventstore.EventReplayRequested', createEventReplayHandler({ store, emitter }));
+
+  return {
+    createAggregate,
+    listen,
+    save,
+  };
+}
+
+export function createEventReplayHandler({ store, emitter }: { store: StoreAdapter<any>, emitter: EmitterAdapter }) {
+  return async function handleEventReplay(event: Event<EventReplayRequested, EventContext<any>>) {
+    const events = store.readEventSince([ event.data.requested_event_namespace, event.data.requested_event_type ].join('.'), Option.of(event.data.since));
 
     // Emit all events;
     reduce(events, None, async (acc, e) => {
@@ -279,12 +289,4 @@ export async function newEventStore<Q>(
       return None;
     });
   }
-
-  emitter.subscribe('_eventstore.EventReplayRequested', handleEventReplay);
-
-  return {
-    createAggregate,
-    listen,
-    save,
-  };
 }
