@@ -1,7 +1,7 @@
 import { Client, Pool, QueryConfig, QueryResult } from 'pg';
 import { stub } from 'sinon';
 import { Event, EventData, EventContext } from '.';
-import { Right } from 'funfix';
+import { Right, None } from 'funfix';
 
 export const cafebabe = "cafebabe-cafe-babe-cafe-babecafebabe";
 export const id = "d00dd00d-d00d-d00d-d00d-d00dd00dd00d";
@@ -102,10 +102,14 @@ export async function getFakeStoreAdapter({
   readStub,
   readSinceStub,
   saveStub,
+  lastEventOf,
+  exists,
 }: {
   readStub?: any,
-  readSinceStub: any,
+  readSinceStub?: any,
   saveStub?: (evt: any) => Promise<undefined>,
+  lastEventOf?: (pattern: string) => Promise<Event<any, any>>,
+  exists?: (id: string) => Promise<boolean>,
 }): Promise<any> {
   const writer =
     saveStub ||
@@ -137,8 +141,9 @@ export async function getFakeStoreAdapter({
     write: (event: Event<EventData, EventContext<any>>): Promise<any> => {
       return writer(event).then(() => Right(undefined));
     },
-    lastEventOf: (): any => ({}),
-    readEventSince: readSinceStub,
+    lastEventOf: lastEventOf || ((): any => None),
+    exists: exists || (() => Promise.resolve(true)),
+    readEventSince: readSinceStub || (() => createFakeIterator([])),
   };
 
   return storeAdapter;

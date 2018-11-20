@@ -66,6 +66,7 @@ export interface StoreAdapter<Q> {
   read(query: Q, since: Option<string>, ...args: any[]): AsyncIterator<Event<EventData, EventContext<any>>>;
   write(event: Event<EventData, EventContext<any>>): Promise<Either<DuplicateError, void>>;
   lastEventOf<E extends Event<any, any>>(eventType: string): Promise<Option<E>>;
+  exists(id: string): Promise<boolean>;
   readEventSince(
     eventTYpe: string,
     since?: Option<string>,
@@ -84,16 +85,18 @@ export interface CacheAdapter {
 
 export type EventHandler<T extends Event<EventData, EventContext<any>>> = (
   event: T,
+) => Promise<Either<undefined, undefined>>;
+
+export type EmitterHandler<T extends Event<EventData, EventContext<any>>> = (
+  event: T,
 ) => Promise<void>;
 
 export interface EmitterAdapter {
-  subscriptions: Map<string, EventHandler<any>>;
   emit(event: Event<any, any>): Promise<void>;
   subscribe<T extends Event<EventData, EventContext<any>>>(
     name: string,
-    handler: EventHandler<T>,
+    handler: EmitterHandler<T>,
   ): void;
-  unsubscribe(name: string): void;
 }
 
 export interface EventData {
@@ -248,7 +251,21 @@ export async function newEventStore<Q>(
   async function listen(event_namespace: string, event_type: string, handler: EventHandler<any>) {
     const pattern = [event_namespace, event_type].join('.');
 
-    emitter.subscribe(pattern, handler);
+    const _handler = async (event: Event<any, any>) => {
+      try {
+        const exists = await store.exists(event.id);
+        if (!exists) {
+          const result = await handler(event);
+          await result.map(() => {
+            return store.write(event);
+          }).get();
+        }
+      } catch (err) {
+        logger.error(err);
+      }
+    };
+
+    emitter.subscribe(pattern, _handler);
 
     const last = await store.lastEventOf(pattern);
 

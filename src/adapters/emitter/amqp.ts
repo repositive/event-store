@@ -1,4 +1,4 @@
-import { EmitterAdapter, Event, EventData, EventContext, EventHandler, Logger } from '../../.';
+import { EmitterAdapter, Event, EventData, EventContext, EmitterHandler, Logger } from '../../.';
 import { Option, Some, None } from 'funfix';
 import setupIris from '@repositive/iris';
 import { Iris } from '@repositive/iris';
@@ -14,7 +14,7 @@ export function wait(n: number): Promise<void> {
   });
 }
 
-function wrapHandler(handler: EventHandler<any>) {
+function wrapHandler(handler: EmitterHandler<any>) {
   return function({payload}: {payload?: any}) {
     return handler(payload);
   };
@@ -22,7 +22,7 @@ function wrapHandler(handler: EventHandler<any>) {
 
 export function createAQMPEmitterAdapter(irisOpts: IrisOptions, logger: Logger = console): EmitterAdapter {
   let iris: Option<Iris> = None;
-  const subscriptions: Map<string, EventHandler<any>> = new Map();
+  const subscriptions: Map<string, EmitterHandler<any>> = new Map();
   setupIris({ ...irisOpts, logger}).map((_iris) => {
     iris = Some(_iris);
     for ( const [pattern, handler] of subscriptions.entries()) {
@@ -37,7 +37,7 @@ export function createAQMPEmitterAdapter(irisOpts: IrisOptions, logger: Logger =
       .getOrElseL(() => wait(1000).then(() => emit(event)));
   }
 
-  function subscribe(pattern: string, handler: EventHandler<any>) {
+  function subscribe(pattern: string, handler: EmitterHandler<any>) {
     const _handler = wrapHandler(handler);
 
     iris.map((i) => {
@@ -46,14 +46,8 @@ export function createAQMPEmitterAdapter(irisOpts: IrisOptions, logger: Logger =
     subscriptions.set(pattern, handler);
   }
 
-  async function unsubscribe(pattern: string) {
-    subscriptions.delete(pattern);
-  }
-
   return {
     emit,
     subscribe,
-    unsubscribe,
-    subscriptions,
   };
 }

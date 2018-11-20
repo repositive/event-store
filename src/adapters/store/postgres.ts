@@ -94,6 +94,13 @@ export function createPgStoreAdapter(pool: Pool, logger: Logger = console): Stor
     ).then((results) => Option.of(results.rows[0]));
   }
 
+  async function exists(id: string) {
+    return pool.query(
+      `select * from events where id = $1`,
+      [id],
+    ).then((results) => results.rows[0]);
+  }
+
   function readEventSince(eventType: string, since: Option<string> = None): AsyncIterator<Event<any, any>> {
     return read(
       {
@@ -109,5 +116,6 @@ export function createPgStoreAdapter(pool: Pool, logger: Logger = console): Stor
     write,
     lastEventOf,
     readEventSince,
+    exists,
   };
 }
