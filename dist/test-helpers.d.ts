@@ -1,4 +1,5 @@
 import { Pool, QueryResult } from 'pg';
+import { Event } from '.';
 export declare const cafebabe = "cafebabe-cafe-babe-cafe-babecafebabe";
 export declare const id = "d00dd00d-d00d-d00d-d00d-d00dd00dd00d";
 export declare function createEvent(type: string, data: any, context?: any, time?: string): any;
@@ -12,8 +13,10 @@ export declare function query(q: string, pool?: any): Promise<any>;
 export declare function createFakeIterator(result: any[]): {
     next: () => any;
 };
-export declare function getFakeStoreAdapter({ readStub, readSinceStub, saveStub, }: {
+export declare function getFakeStoreAdapter({ readStub, readSinceStub, saveStub, lastEventOf, exists, }: {
     readStub?: any;
-    readSinceStub: any;
+    readSinceStub?: any;
     saveStub?: (evt: any) => Promise<undefined>;
+    lastEventOf?: (pattern: string) => Promise<Event<any, any>>;
+    exists?: (id: string) => Promise<boolean>;
 }): Promise<any>;

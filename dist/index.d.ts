@@ -23,6 +23,7 @@ export interface StoreAdapter<Q> {
     read(query: Q, since: Option<string>, ...args: any[]): AsyncIterator<Event<EventData, EventContext<any>>>;
     write(event: Event<EventData, EventContext<any>>): Promise<Either<DuplicateError, void>>;
     lastEventOf<E extends Event<any, any>>(eventType: string): Promise<Option<E>>;
+    exists(id: string): Promise<boolean>;
     readEventSince(eventTYpe: string, since?: Option<string>): AsyncIterator<Event<EventData, EventContext<any>>>;
 }
 export interface CacheEntry<T> {
@@ -33,12 +34,11 @@ export interface CacheAdapter {
     get<T>(id: string): Promise<Option<CacheEntry<T>>>;
     set<T extends CacheEntry<any>>(id: string, obj: T): Promise<void>;
 }
-export declare type EventHandler<T extends Event<EventData, EventContext<any>>> = (event: T) => Promise<void>;
+export declare type EventHandler<T extends Event<EventData, EventContext<any>>> = (event: T) => Promise<Either<undefined, undefined>>;
+export declare type EmitterHandler<T extends Event<EventData, EventContext<any>>> = (event: T) => Promise<void>;
 export interface EmitterAdapter {
-    subscriptions: Map<string, EventHandler<any>>;
     emit(event: Event<any, any>): Promise<void>;
-    subscribe<T extends Event<EventData, EventContext<any>>>(name: string, handler: EventHandler<T>): void;
-    unsubscribe(name: string): void;
+    subscribe<T extends Event<EventData, EventContext<any>>>(name: string, handler: EmitterHandler<T>): void;
 }
 export interface EventData {
     type: string;
