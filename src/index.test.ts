@@ -12,6 +12,7 @@ import {
   StoreAdapter,
   EmitterAdapter,
   EventReplayRequested,
+  createEvent,
 } from '.';
 import { stub, spy } from 'sinon';
 import { Some, None, Left, Right } from 'funfix';
@@ -230,4 +231,161 @@ test('replay handler reads correct events', async (t) => {
   replayHandler(evt);
 
   t.truthy(readSpy.calledWithExactly('ns.SomeType', Some(since)));
+});
+
+test('listen emits EventReplayRequested without existing events', async (t) => {
+  const handler = stub();
+  const emit = spy();
+  const subscribe = spy();
+
+  const store = await getFakeStoreAdapter({});
+
+  const emitter = {
+    emit: emit as any,
+    subscribe: subscribe as any,
+  } as EmitterAdapter;
+
+  const es = await newEventStore(store, { logger, emitter });
+
+  const namespc = 't';
+  const evtype = 'event_type';
+
+  await es.listen(namespc, evtype, handler);
+
+  const event = emit.firstCall.args[0];
+
+  t.deepEqual(event.data.type, `_eventstore.EventReplayRequested`);
+  t.deepEqual(event.data.requested_event_namespace, namespc);
+  t.deepEqual(event.data.requested_event_type, evtype);
+  t.deepEqual(event.data.since, new Date(0).toISOString());
+});
+
+test('listen emits EventReplayRequested with existing events', async (t) => {
+  const handler = stub();
+  const emit = spy();
+  const subscribe = spy();
+
+  const lastEventOf: any = stub();
+  const existingEvent = createEvent('test', 'Existing', {});
+  lastEventOf.resolves(Some(existingEvent));
+
+  const store = await getFakeStoreAdapter({lastEventOf});
+
+  const emitter = {
+    emit: emit as any,
+    subscribe: subscribe as any,
+  } as EmitterAdapter;
+
+  const es = await newEventStore(store, { logger, emitter });
+
+  const namespc = 't';
+  const evtype = 'event_type';
+
+  await es.listen(namespc, evtype, handler);
+
+  const event = emit.firstCall.args[0];
+
+  t.deepEqual(event.data.type, `_eventstore.EventReplayRequested`);
+  t.deepEqual(event.data.requested_event_namespace, namespc);
+  t.deepEqual(event.data.requested_event_type, evtype);
+  t.deepEqual(event.data.since, existingEvent.context.time);
+});
+
+test('listen calls handler if event doesnt exist and saves after its execution', async (t) => {
+  const handler = stub();
+  handler.resolves(Right(undefined));
+  const emit = spy();
+  const subscribe = spy();
+
+  const exists = stub().resolves(false);
+  const saveStub = stub();
+  const store = await getFakeStoreAdapter({exists, saveStub});
+
+  const emitter = {
+    emit: emit as any,
+    subscribe: subscribe as any,
+  } as EmitterAdapter;
+
+  const es = await newEventStore(store, { logger, emitter });
+
+  const namespc = 't';
+  const evtype = 'event_type';
+
+  await es.listen(namespc, evtype, handler);
+
+  t.deepEqual(subscribe.secondCall.args[0], `${namespc}.${evtype}`);
+  const wrapped_handler = subscribe.secondCall.args[1];
+
+  const event = createEvent('test', 'event', {});
+  await wrapped_handler(event);
+
+  t.true(exists.calledWith(event.id));
+  t.true(handler.calledOnce);
+  t.true(saveStub.calledWith(event));
+});
+
+test('listen calls does not save event if handler fails', async (t) => {
+  const handler = stub();
+  handler.resolves(Left(undefined));
+  const emit = spy();
+  const subscribe = spy();
+
+  const exists = stub().resolves(false);
+  const saveStub = stub();
+  const store = await getFakeStoreAdapter({exists, saveStub});
+
+  const emitter = {
+    emit: emit as any,
+    subscribe: subscribe as any,
+  } as EmitterAdapter;
+
+  const es = await newEventStore(store, { logger, emitter });
+
+  const namespc = 't';
+  const evtype = 'event_type';
+
+  await es.listen(namespc, evtype, handler);
+
+  t.deepEqual(subscribe.secondCall.args[0], `${namespc}.${evtype}`);
+  const wrapped_handler = subscribe.secondCall.args[1];
+
+  const event = createEvent('test', 'event', {});
+  await wrapped_handler(event);
+
+  t.true(exists.calledWith(event.id));
+  t.true(handler.calledOnce);
+  t.true(saveStub.notCalled);
+});
+
+test('listen does not call handler if event already exists and does not save event', async (t) => {
+  const handler = stub();
+  handler.resolves(Right(undefined));
+  const emit = spy();
+  const subscribe = spy();
+
+  const exists = stub().resolves(true);
+  const saveStub = stub();
+  const store = await getFakeStoreAdapter({exists, saveStub});
+
+  const emitter = {
+    emit: emit as any,
+    subscribe: subscribe as any,
+  } as EmitterAdapter;
+
+  const es = await newEventStore(store, { logger, emitter });
+
+  const namespc = 't';
+  const evtype = 'event_type';
+
+  await es.listen(namespc, evtype, handler);
+
+  t.deepEqual(subscribe.secondCall.args[0], `${namespc}.${evtype}`);
+  const wrapped_handler = subscribe.secondCall.args[1];
+
+  const event = createEvent('test', 'event', {});
+  await wrapped_handler(event);
+
+  t.true(exists.calledWith(event.id));
+  t.true(handler.notCalled);
+  t.true(saveStub.notCalled);
 });
