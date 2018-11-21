@@ -1,4 +1,4 @@
-import { EmitterAdapter, EventHandler } from '../../';
+import { EmitterAdapter, EmitterHandler } from '../../';
 
 export function createDumbEmitterAdapter(): EmitterAdapter {
 
@@ -8,7 +8,7 @@ export function createDumbEmitterAdapter(): EmitterAdapter {
     /* I DO NOT DO ANYTHING */
   }
 
-  function subscribe(pattern: string, handler: EventHandler<any>) {
+  function subscribe(pattern: string, handler: EmitterHandler<any>) {
     /* I DO NOT DO ANYTHING */
   }
 
@@ -19,7 +19,5 @@ export function createDumbEmitterAdapter(): EmitterAdapter {
   return {
     emit,
     subscribe,
-    unsubscribe,
-    subscriptions,
   };
 }
