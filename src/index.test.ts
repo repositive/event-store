@@ -298,7 +298,7 @@ test('listen calls handler if event doesnt exist and saves after its execution',
   const subscribe = spy();
 
   const exists = stub().resolves(false);
-  const saveStub = stub();
+  const saveStub = stub().resolves();
   const store = await getFakeStoreAdapter({exists, saveStub});
 
   const emitter = {

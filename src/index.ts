@@ -252,16 +252,12 @@ export async function newEventStore<Q>(
     const pattern = [event_namespace, event_type].join('.');
 
     const _handler = async (event: Event<any, any>) => {
-      try {
-        const exists = await store.exists(event.id);
-        if (!exists) {
-          const result = await handler(event);
-          await result.map(() => {
-            return store.write(event);
-          }).get();
-        }
-      } catch (err) {
-        logger.error(err);
+      const exists = await store.exists(event.id);
+      if (!exists) {
+        const result = await handler(event);
+        await result.map(() => {
+          return store.write(event);
+        }).getOrElse(Promise.resolve());
       }
     };
 
