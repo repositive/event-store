@@ -46,7 +46,7 @@ test('Test composeAggregator one match', async (t) => {
 
   const aggregator = composeAggregator(matches);
   t.deepEqual(typeof aggregator, 'function');
-  t.deepEqual(await aggregator(None, createEvent('test', 'test', {})), Some('test'));
+  t.deepEqual(await aggregator(None, createEvent('test_namespace', 'EventTestType', {})), Some('test'));
 });
 
 test('Test composeAggregator no matches', async (t) => {
@@ -54,7 +54,7 @@ test('Test composeAggregator no matches', async (t) => {
 
   const aggregator = composeAggregator(matches);
   t.deepEqual(typeof aggregator, 'function');
-  t.deepEqual(await aggregator(None, createEvent('test', 'test', {})), None);
+  t.deepEqual(await aggregator(None, createEvent('test_namespace', 'EventTestType', {})), None);
 });
 
 test('Test composeAggregator one no matching match', async (t) => {
@@ -66,7 +66,7 @@ test('Test composeAggregator one no matching match', async (t) => {
 
   const aggregator = composeAggregator(matches);
   t.deepEqual(typeof aggregator, 'function');
-  t.deepEqual(await aggregator(None, createEvent('test', 'test', {})), None);
+  t.deepEqual(await aggregator(None, createEvent('test_namespace', 'EventTestType', {})), None);
 });
 
 test('Iter reducer', async (t) => {
@@ -142,7 +142,7 @@ test('save emits if everything is fine', async (t) => {
 
   const es = await newEventStore(store, { logger, emitter });
 
-  await es.save(createEvent('test', 'test', {}));
+  await es.save(createEvent('test_namespace', 'EventTestType', {}));
 
   t.deepEqual(writeStub.callCount, 1);
 
@@ -162,7 +162,7 @@ test('save does not emit on errors', async (t) => {
   const es = await newEventStore(store, { logger, emitter });
 
   try {
-    await es.save(createEvent('test', 'test', {}));
+    await es.save(createEvent('test_namespace', 'EventTestType', {}));
     t.fail('On write errors save should reject');
   } catch (err) {
     if (err instanceof Error) {
@@ -187,7 +187,7 @@ test('save does not emit on duplicates', async (t) => {
 
   const es = await newEventStore(store, { logger, emitter });
 
-  await es.save(createEvent('test', 'test', {}));
+  await es.save(createEvent('test_namespace', 'EventTestType', {}));
   t.deepEqual(writeStub.callCount, 1);
   t.deepEqual(emitStub.callCount, 0);
 });
