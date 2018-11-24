@@ -152,7 +152,7 @@ export class EventStore<Q> {
 
     const last = await this.store.lastEventOf(pattern);
 
-    this.emitter.emit({
+    await this.emitter.emit({
       id: v4(),
       data: {
         type: '_eventstore.EventReplayRequested',
@@ -168,7 +168,6 @@ export class EventStore<Q> {
       },
     });
 
-    // tes
   }
 }
 
