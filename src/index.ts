@@ -43,8 +43,8 @@ export async function newEventStore<Q>(
   const options = _options || {};
   const { logger = console } = options;
   logger.warn(`
-    DEPRECATED WARNING!\n
-    The newEventStore function is deprecated and will be remove in a future version of the store.\n
+    DEPRECATED WARNING!
+    The newEventStore function is deprecated and will be remove in a future version of the store.
     Use the EventStore class instead.
   `);
   return new EventStore(store, _options);
