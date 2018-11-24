@@ -41,13 +41,24 @@ export function createContext(
   };
 }
 
+export function isEventData<D extends EventData>(o: any, is?: (o: any) => o is D): o is D {
+  const _is = is || ((_: any) => true);
+  return o && typeof o.event_namespace === 'string' && typeof o.event_type === 'string' && _is(o);
+}
+
+export function isEventContext<S, C extends EventContext<S>>(o: any, is?: (o: any) => o is C): o is C {
+  const _is = is || ((_: any) => true);
+  return o && typeof o.time === 'string' && _is(o);
+}
+
 export function isEvent<D extends EventData, C extends EventContext<any>>(
-  isData: (o: any) => o is D = (o: any): o is any => true,
-  isContext: (o: any) => o is C = (o: any): o is any => true,
+  isData?: (o: any) => o is D,
+  isContext?: (o: any) => o is C,
 ): (o: any) => o is Event<D, C> {
   return function(o: any): o is Event<D, C> {
-    return (
-      o && typeof o.id === 'string' && o.data && isData(o.data) && o.context && isContext(o.context)
-    );
+    return o &&
+    typeof o.id === 'string' &&
+    o.data && isEventData(o.data, isData) &&
+    o.context && isEventContext(o.context, isContext);
   };
 }

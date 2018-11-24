@@ -1,6 +1,6 @@
 import { test } from 'ava';
 import { id } from './test-helpers';
-import { createEvent, createContext, EventData, EventContext, Event } from '.';
+import { createEvent, createContext, EventData, EventContext, Event, isEvent } from '.';
 
 test('creates an event with default fields filled', (t) => {
   const evt = createEvent('ns', 'Type', { foo: 'bar' });
@@ -80,4 +80,10 @@ test('creates a context with subject and an action', (t) => {
   };
 
   t.deepEqual(evt.context, expected);
+});
+
+test('createEvent passes is Event', (t) => {
+  const ev = createEvent('ns', 'Type', {});
+
+  t.truthy(isEvent()(ev));
 });
