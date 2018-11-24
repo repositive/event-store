@@ -37,16 +37,6 @@ function toAsyncIter<T>(input: T[]): AsyncIterator<T> {
   };
 }
 
-function newEvent(data: EventData) {
-  return {
-    id,
-    data,
-    context: {
-      time: new Date().toISOString(),
-    },
-  };
-}
-
 test('Test composeAggregator one match', async (t) => {
   const validate: any = stub();
   validate.returns(true);
@@ -56,7 +46,7 @@ test('Test composeAggregator one match', async (t) => {
 
   const aggregator = composeAggregator(matches);
   t.deepEqual(typeof aggregator, 'function');
-  t.deepEqual(await aggregator(None, newEvent({ type: 'test' })), Some('test'));
+  t.deepEqual(await aggregator(None, createEvent('test', 'test', {})), Some('test'));
 });
 
 test('Test composeAggregator no matches', async (t) => {
@@ -64,7 +54,7 @@ test('Test composeAggregator no matches', async (t) => {
 
   const aggregator = composeAggregator(matches);
   t.deepEqual(typeof aggregator, 'function');
-  t.deepEqual(await aggregator(None, newEvent({ type: 'test' })), None);
+  t.deepEqual(await aggregator(None, createEvent('test', 'test', {})), None);
 });
 
 test('Test composeAggregator one no matching match', async (t) => {
@@ -76,7 +66,7 @@ test('Test composeAggregator one no matching match', async (t) => {
 
   const aggregator = composeAggregator(matches);
   t.deepEqual(typeof aggregator, 'function');
-  t.deepEqual(await aggregator(None, newEvent({ type: 'test' })), None);
+  t.deepEqual(await aggregator(None, createEvent('test', 'test', {})), None);
 });
 
 test('Iter reducer', async (t) => {
@@ -152,7 +142,7 @@ test('save emits if everything is fine', async (t) => {
 
   const es = await newEventStore(store, { logger, emitter });
 
-  await es.save({ id: '', data: { type: 'test' }, context: { time: '', subject: {} } });
+  await es.save(createEvent('test', 'test', {}));
 
   t.deepEqual(writeStub.callCount, 1);
 
@@ -172,7 +162,7 @@ test('save does not emit on errors', async (t) => {
   const es = await newEventStore(store, { logger, emitter });
 
   try {
-    await es.save({ id: '', data: { type: 'test' }, context: { time: '', subject: {} } });
+    await es.save(createEvent('test', 'test', {}));
     t.fail('On write errors save should reject');
   } catch (err) {
     if (err instanceof Error) {
@@ -197,7 +187,7 @@ test('save does not emit on duplicates', async (t) => {
 
   const es = await newEventStore(store, { logger, emitter });
 
-  await es.save({ id: '', data: { type: 'test' }, context: { time: '', subject: {} } });
+  await es.save(createEvent('test', 'test', {}));
   t.deepEqual(writeStub.callCount, 1);
   t.deepEqual(emitStub.callCount, 0);
 });

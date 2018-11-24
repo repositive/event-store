@@ -40,3 +40,14 @@ export function createContext(
     time: _time(),
   };
 }
+
+export function isEvent<D extends EventData, C extends EventContext<any>>(
+  isData: (o: any) => o is D = (o: any): o is any => true,
+  isContext: (o: any) => o is C = (o: any): o is any => true,
+): (o: any) => o is Event<D, C> {
+  return function(o: any): o is Event<D, C> {
+    return (
+      o && typeof o.id === 'string' && o.data && isData(o.data) && o.context && isContext(o.context)
+    );
+  };
+}
