@@ -52,7 +52,7 @@ export function isEventContext<S, C extends EventContext<S>>(o: any, is?: (o: an
 }
 
 export function isEvent<D extends EventData, C extends EventContext<any>>(
-  isData?: (o: any) => o is D,
+  isData: (o: any) => o is D,
   isContext?: (o: any) => o is C,
 ): (o: any) => o is Event<D, C> {
   return function(o: any): o is Event<D, C> {

@@ -85,5 +85,5 @@ test('creates a context with subject and an action', (t) => {
 test('createEvent passes is Event', (t) => {
   const ev = createEvent('ns', 'Type', {});
 
-  t.truthy(isEvent()(ev));
+  t.truthy(isEvent((o: any): o is any => !!o)(ev));
 });
