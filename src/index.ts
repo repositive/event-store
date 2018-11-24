@@ -1,106 +1,19 @@
 import { Pool } from 'pg';
 import * as R from 'ramda';
+import { StoreAdapter } from './adapters';
 import { Future, Option, None, Either, Left, Right } from 'funfix';
-import { createHash } from 'crypto';
-import { v4 } from 'uuid';
-export { createEvent, createContext } from './helpers';
-
+import { EventStore, EventStoreOptions } from './event-store';
+export { isEvent, createEvent, createContext } from './helpers';
+export * from './event-store';
 export * from './adapters';
 import { createDumbCacheAdapter, createDumbEmitterAdapter } from './adapters';
 
-export async function reduce<I, O>(
-  iter: AsyncIterator<I>,
-  acc: O,
-  f: (acc: O, next: I) => Promise<O>,
-): Promise<O> {
-  let _acc = acc;
-  while (true) {
-    const _next = await iter.next();
-    if (_next.done) {
-      return _acc;
-    } else {
-      _acc = await f(_acc, _next.value);
-    }
-  }
-}
-
 export type Aggregator<T> = (acc: Option<T>, event: Event<EventData, any>) => Promise<Option<T>>;
-
-/**
- *  Compose a list of maching functions into an aggregator
- *
- */
-export function composeAggregator<T>(matches: AggregateMatches<T>): Aggregator<T> {
-  return async (acc: Option<T>, event: Event<EventData, any>) => {
-    return matches.reduce((matchAcc, [validate, execute]) => {
-      if (validate(event)) {
-        return execute(matchAcc, event);
-      }
-      return matchAcc;
-    }, acc);
-  };
-}
-
-export function isEvent<D extends EventData, C extends EventContext<any>>(
-  isData: (o: any) => o is D = (o: any): o is any => true,
-  isContext: (o: any) => o is C = (o: any): o is any => true,
-): (o: any) => o is Event<D, C> {
-  return function(o: any): o is Event<D, C> {
-    return (
-      o && typeof o.id === 'string' && o.data && isData(o.data) && o.context && isContext(o.context)
-    );
-  };
-}
-
-export interface EventReplayRequested extends EventData {
-  type: '_eventstore.EventReplayRequested';
-  event_namespace: '_eventstore';
-  event_type: 'EventReplayRequested';
-  requested_event_type: string;
-  requested_event_namespace: string;
-  since: string; // ISO String
-}
-
-export class DuplicateError extends Error {}
-export interface StoreAdapter<Q> {
-  read(query: Q, since: Option<string>, ...args: any[]): AsyncIterator<Event<EventData, EventContext<any>>>;
-  write(event: Event<EventData, EventContext<any>>): Promise<Either<DuplicateError, void>>;
-  lastEventOf<E extends Event<any, any>>(eventType: string): Promise<Option<E>>;
-  exists(id: string): Promise<boolean>;
-  readEventSince(
-    eventTYpe: string,
-    since?: Option<string>,
-  ): AsyncIterator<Event<EventData, EventContext<any>>>;
-}
-
-export interface CacheEntry<T> {
-  time?: string; // ISO String
-  data: T;
-}
-
-export interface CacheAdapter {
-  get<T>(id: string): Promise<Option<CacheEntry<T>>>;
-  set<T extends CacheEntry<any>>(id: string, obj: T): Promise<void>;
-}
-
-export type EventHandler<T extends Event<EventData, EventContext<any>>> = (
-  event: T,
-) => Promise<Either<undefined, undefined>>;
-
-export type EmitterHandler<T extends Event<EventData, EventContext<any>>> = (
-  event: T,
-) => Promise<void>;
-
-export interface EmitterAdapter {
-  emit(event: Event<any, any>): Promise<void>;
-  subscribe<T extends Event<EventData, EventContext<any>>>(
-    name: string,
-    handler: EmitterHandler<T>,
-  ): void;
-}
 
 export interface EventData {
   type: string;
+  event_namespace: string;
+  event_type: string;
 }
 
 export interface EventContext<A> {
@@ -115,26 +28,6 @@ export interface Event<D extends EventData, C extends EventContext<any>> {
   context: C;
 }
 
-export type Aggregate<A extends any[], T> = (...args: A) => Promise<Option<T>>;
-export type ValidateF<E extends Event<any, any>> = (o: any) => o is E;
-export type ExecuteF<T, E extends Event<any, any>> = (acc: Option<T>, ev: E) => Promise<Option<T>>;
-export type AggregateMatch<A, T extends Event<any, any>> = [ValidateF<T>, ExecuteF<A, T>];
-export type AggregateMatches<T> = Array<AggregateMatch<T, any>>;
-
-export interface EventStore<Q> {
-  save(event: Event<EventData, EventContext<any>>): Promise<void>;
-  createAggregate<A extends any[], T>(
-    aggregateName: string,
-    query: Q,
-    matches: AggregateMatches<T>,
-  ): Aggregate<A, T>;
-  listen<T extends string>(
-    event_namespace: string,
-    event_type: string,
-    handler: EventHandler<Event<{ type: T }, any>>,
-  ): void;
-}
-
 export interface Logger {
   trace(...args: any[]): void;
   debug(...args: any[]): void;
@@ -143,174 +36,16 @@ export interface Logger {
   error(...args: any[]): void;
 }
 
-export interface EventStoreOptions {
-  cache?: CacheAdapter;
-  emitter?: EmitterAdapter;
-  logger?: Logger;
-}
-
 export async function newEventStore<Q>(
   store: StoreAdapter<Q>,
   _options?: EventStoreOptions,
 ): Promise<EventStore<Q>> {
   const options = _options || {};
-
-  const {
-    cache = createDumbCacheAdapter(),
-    emitter = createDumbEmitterAdapter(),
-    logger = console,
-  } = options;
-
-  function createAggregate<AQ extends Q, A extends any[], T>(
-    aggregateName: string,
-    query: AQ,
-    matches: AggregateMatches<T>,
-  ): Aggregate<A, T> {
-    async function _impl(...args: A): Promise<Option<T>> {
-      const start = Date.now();
-
-      const id = createHash('sha256')
-        .update(aggregateName + JSON.stringify(query) + JSON.stringify(args))
-        .digest('hex');
-
-      const latestSnapshot = await cache.get<T>(id);
-
-      logger.trace('cacheSnapshot', latestSnapshot);
-      const results = store.read(
-        query,
-        latestSnapshot.flatMap((snapshot) => Option.of(snapshot.time)),
-        ...args,
-      );
-
-      const aggregatedAt = new Date();
-      const aggregator = composeAggregator(matches);
-
-      const aggregatedResult = await reduce<Event<EventData, EventContext<any>>, Option<T>>(
-        results,
-        latestSnapshot.map((snapshot) => snapshot.data),
-        aggregator,
-      );
-
-      logger.trace('aggregatedResult', aggregatedResult);
-
-      await aggregatedResult.map((result) => {
-        const snapshotHash = latestSnapshot
-          .map((snapshot) => {
-            return createHash('sha256')
-              .update(JSON.stringify(snapshot.data))
-              .digest('hex');
-          })
-          .getOrElse('');
-
-        const toCacheHash = createHash('sha256')
-          .update(JSON.stringify(result))
-          .digest('hex');
-        if (snapshotHash !== toCacheHash) {
-          logger.trace('save to cache', result);
-          return cache.set(id, { data: result, time: aggregatedAt.toISOString() });
-        }
-      });
-
-      logger.trace('aggregateLatency', {
-        query,
-        args,
-        query_time: aggregatedAt.getTime() - start,
-        aggregate_time: Date.now() - aggregatedAt.getTime(),
-        total_time: Date.now() - start,
-      });
-
-      return aggregatedResult;
-    }
-
-    return _impl;
-  }
-
-  async function save<T extends string>(
-    event: Event<{ type: T }, EventContext<any>>,
-  ): Promise<void> {
-    await store.write(event).then((result) => {
-      return result
-        .map(() => {
-          // If there are no errors saving, emit the event
-          return emitter.emit(event);
-        })
-        .getOrElseL(() => {
-          return result
-            .swap()
-            .map((error) => {
-              if (error instanceof DuplicateError) {
-                return Promise.resolve();
-              }
-              return Promise.reject(error);
-            })
-            .get();
-        });
-    });
-  }
-
-  async function listen(event_namespace: string, event_type: string, handler: EventHandler<any>) {
-    const pattern = [event_namespace, event_type].join('.');
-
-    const _handler = async (event: Event<any, any>) => {
-      const exists = await store.exists(event.id);
-      if (!exists) {
-        const result = await handler(event);
-        await result.map(() => {
-          return store.write(event);
-        }).getOrElse(Promise.resolve());
-      }
-    };
-
-    emitter.subscribe(pattern, _handler);
-
-    const last = await store.lastEventOf(pattern);
-
-    emitter.emit({
-      id: v4(),
-      data: {
-        type: '_eventstore.EventReplayRequested',
-        event_type: 'EventReplayRequested',
-        event_namespace: '_eventstore',
-        requested_event_namespace: event_namespace,
-        requested_event_type: event_type,
-        since: last.map((l) => l.context.time).getOrElse(new Date(0).toISOString()),
-      },
-      context: {
-        actor: {},
-        time: new Date().toISOString(),
-      },
-    });
-  }
-
-  emitter.subscribe(
-    '_eventstore.EventReplayRequested',
-    createEventReplayHandler({ store, emitter }),
-  );
-
-  return {
-    createAggregate,
-    listen,
-    save,
-  };
-}
-
-export function createEventReplayHandler({
-  store,
-  emitter,
-}: {
-  store: StoreAdapter<any>;
-  emitter: EmitterAdapter;
-}) {
-  return async function handleEventReplay(event: Event<EventReplayRequested, EventContext<any>>) {
-    const events = store.readEventSince(
-      [event.data.requested_event_namespace, event.data.requested_event_type].join('.'),
-      Option.of(event.data.since),
-    );
-
-    // Emit all events;
-    reduce(events, None, async (acc, e) => {
-      await emitter.emit(e);
-      return None;
-    });
-  };
+  const { logger = console } = options;
+  logger.warn(`
+    DEPRECATED WARNING!
+    The newEventStore function is deprecated and will be remove in a future version of the store.
+    Use the EventStore class instead.
+  `);
+  return new EventStore(store, _options);
 }

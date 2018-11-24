@@ -12,20 +12,6 @@ const defaultQueryStub = stub()
     totalCount: 0,
   });
 
-export function createEvent(
-  type: string,
-  data: any,
-  context: any = {},
-  time: string = '2018-01-01 01:01:01',
-): any {
-    return {
-      id,
-      data: { ...data, type },
-      context,
-      time,
-    };
-}
-
 export function getFakePool(queryStub: any = defaultQueryStub) {
   const fakePool = {
     async query(q: string | QueryConfig, values?: any[]): Promise<QueryResult> {
