@@ -29,10 +29,9 @@ export interface EmitterAdapter {
   ): void;
 }
 
-export class DuplicateError extends Error {}
 export interface StoreAdapter<Q> {
   read(query: Q, since: Option<string>, ...args: any[]): AsyncIterator<Event<EventData, EventContext<any>>>;
-  write(event: Event<EventData, EventContext<any>>): Promise<Either<DuplicateError, void>>;
+  write(data: Event<any, any> | Array<Event<any, any>>): Promise<Either<Error, void>>;
   lastEventOf<E extends Event<any, any>>(eventType: string): Promise<Option<E>>;
   exists(id: string): Promise<boolean>;
   readEventSince(

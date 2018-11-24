@@ -1,7 +1,6 @@
 import test from 'ava';
 import {
   reduce,
-  DuplicateError,
   newEventStore,
   AggregateMatches,
   Event,
@@ -173,23 +172,6 @@ test('save does not emit on errors', async (t) => {
       t.fail('The catch object should be an error');
     }
   }
-});
-
-test('save does not emit on duplicates', async (t) => {
-  const writeStub = stub();
-  writeStub.resolves(Left(new DuplicateError()));
-  const store: any = {
-    write: writeStub,
-  };
-  const emitStub = stub();
-  emitStub.resolves();
-  const emitter: any = { emit: emitStub, subscribe: () => Promise.resolve() };
-
-  const es = await newEventStore(store, { logger, emitter });
-
-  await es.save(createEvent('test_namespace', 'EventTestType', {}));
-  t.deepEqual(writeStub.callCount, 1);
-  t.deepEqual(emitStub.callCount, 0);
 });
 
 test('replay handler reads correct events', async (t) => {

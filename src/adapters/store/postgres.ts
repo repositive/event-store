@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 import { v4 } from 'uuid';
-import { StoreAdapter, DuplicateError, Event, EventData, EventContext } from '../../.';
+import { StoreAdapter, Event, EventData, EventContext } from '../../.';
 import { Option, None, Either, Left, Right} from 'funfix';
 import { Logger } from '../../.';
 
@@ -64,27 +64,32 @@ export function createPgStoreAdapter(pool: Pool, logger: Logger = console): Stor
   }
 
   /**
-   *  This will return an either Left(DuplicateError), Left(Error) or Right(void);
-   *
-   *
+   * Write one or more events to the underlaying store
+   * The write operation is executed in a transaction, if one of the writes fail non of the events will be saved.
+   * This will return an either Left(Error) or Right(void);
    */
-  async function write(event: Event<EventData, EventContext<any>>): Promise<Either<DuplicateError | Error, void>> {
-    return pool.query(
-      'INSERT INTO events(id, data, context) values ($1, $2, $3)',
-      [event.id, event.data, event.context],
-    )
-    .then(() => Right(undefined))
-    .catch((err) => {
+  async function write(data: Event<any, any> | Array<Event<any, any>>): Promise<Either<Error, void>> {
+    const transaction = await pool.connect();
+    const _data = Array.isArray(data) ? data : [data];
+    try {
+      const results = await Promise.all(_data.map((event) => {
+        return pool.query(
+          'INSERT INTO events(id, data, context) values ($1, $2, $3) ON CONFLICT DO NOTHING',
+          [event.id, event.data, event.context],
+        );
+      }));
+      return Right(undefined);
+      await transaction.query('COMMIT');
+    } catch (err) {
+      logger.error('error on write transaction', err);
       if (err instanceof Error) {
-        // duplicate key value violates unique constraint "events_pkey"
-        if (err.message.includes('violates unique constraint')) {
-          return Left(new DuplicateError());
-        }
         return Left(err);
       } else {
         return Left(new Error(err));
       }
-    });
+    } finally {
+      transaction.release();
+    }
   }
 
   async function lastEventOf<E extends Event<any, any>>(eventType: string): Promise<Option<E>> {

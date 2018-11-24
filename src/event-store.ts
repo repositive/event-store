@@ -3,7 +3,6 @@ import {
   EventData,
   EventContext,
   StoreAdapter,
-  DuplicateError,
   CacheAdapter,
   EmitterAdapter,
   Logger,
@@ -50,20 +49,34 @@ export class EventStore<Q> {
     );
   }
 
-  public async save(event: Event<EventData, EventContext<any>>): Promise<void> {
-    await this.store.write(event).then((result) => {
+  /**
+   *  Saves and emits one or multiple events.
+   *
+   *  If an array is provided and the StoreAdapter supports ACID
+   *    all the events will be written in a single transaction.
+   *    This means that if any of the writes fail none of the events
+   *    will be written to the underlayng layer. This behavior is useful
+   *    when trying to flush multiple related events.
+   *    TODO: Provide real world example
+   *
+   *  If the event already exists in the store it will only be emitted.
+   *    This design decission ensures a coherent behaviour as if the operation succeds the
+   *    event will always be present in the store and emitted. No special cases.
+   */
+  public async save(
+    data: Event<EventData, EventContext<any>> | Array<Event<EventData, EventContext<any>>>,
+  ): Promise<void> {
+    const _data = Array.isArray(data) ? data : [data];
+    await this.store.write(_data).then((result) => {
       return result
         .map(() => {
           // If there are no errors saving, emit the event
-          return this.emitter.emit(event);
+          return Promise.all(_data.map((event) => this.emitter.emit(event)));
         })
         .getOrElseL(() => {
           return result
             .swap()
             .map((error) => {
-              if (error instanceof DuplicateError) {
-                return Promise.resolve();
-              }
               return Promise.reject(error);
             })
             .get();
