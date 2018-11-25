@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 import { v4 } from 'uuid';
-import { StoreAdapter, Event, EventData, EventContext } from '../../.';
+import { StoreAdapter, Event, EventData, EventContext, ReadOptions } from '../../.';
 import { Option, None, Either, Left, Right} from 'funfix';
 import { Logger } from '../../.';
 
@@ -25,17 +25,30 @@ export function createPgStoreAdapter(pool: Pool, logger: Logger = console): Stor
 
   async function* read<T extends Event<EventData, EventContext<any>>>(
     query: PgQuery,
-    since: Option<string> = None,
+    options: ReadOptions,
     // tslint:disable-next-line trailing-comma
     ...args: any[]
   ): AsyncIterator<T> {
     const cursorId = `"${v4()}"`;
     const transaction = await pool.connect();
-    const fmtTime = since.map((t: any) => t instanceof Date ? t.toISOString() : t);
-    const where_time = fmtTime.map((t) => `WHERE events.context->>'time' > '${t}'`).getOrElse('');
+
+    // Appends the value to the array only if the value is not an empty string;
+    function appendToArray(arr: string[], value: string) {
+      if (value) {
+        return [...arr, value];
+      }
+      return arr;
+    }
+
+    const fmtFrom = options.from ? `events.context->>'time' > '${options.from}'` : '';
+    const fmtTo = options.to ? `events.context->>'time' < '${options.to}'` : '';
+    const time_filters  = appendToArray(appendToArray([], fmtFrom), fmtTo).join(' AND ');
+
+    const where = `WHERE ${time_filters}`;
+
     const cached_query = `
       SELECT * FROM (${query.text}) AS events
-      ${where_time}
+      ${where}
       ORDER BY events.context->>'time' ASC
     `;
     try {
@@ -111,7 +124,9 @@ export function createPgStoreAdapter(pool: Pool, logger: Logger = console): Stor
       {
         text: `select * from events where data->>'type' = $1`,
       },
-      since,
+      {
+        from: since.getOrElse(undefined),
+      },
       eventType,
     );
   }

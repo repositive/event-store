@@ -29,8 +29,13 @@ export interface EmitterAdapter {
   ): void;
 }
 
+export interface ReadOptions {
+  from?: string;
+  to?: string;
+}
+
 export interface StoreAdapter<Q> {
-  read(query: Q, since: Option<string>, ...args: any[]): AsyncIterator<Event<EventData, EventContext<any>>>;
+  read(query: Q, options: ReadOptions, ...args: any[]): AsyncIterator<Event<EventData, EventContext<any>>>;
   write(data: Event<any, any> | Array<Event<any, any>>): Promise<Either<Error, void>>;
   lastEventOf<E extends Event<any, any>>(eventType: string): Promise<Option<E>>;
   exists(id: string): Promise<boolean>;

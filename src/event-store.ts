@@ -99,9 +99,10 @@ export class EventStore<Q> {
       const latestSnapshot = await this.cache.get<T>(id);
 
       this.logger.trace('cacheSnapshot', latestSnapshot);
+      const from = latestSnapshot.map((snapshot) => snapshot.time).getOrElse(undefined);
       const results = this.store.read(
         query,
-        latestSnapshot.flatMap((snapshot) => Option.of(snapshot.time)),
+        { from },
         ...args,
       );
 
