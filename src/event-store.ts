@@ -31,6 +31,12 @@ export interface EventStoreOptions {
   logger?: Logger;
 }
 
+interface AggregateRoot<Q, T> {
+  name: string;
+  query: Q;
+  matches: AggregateMatches<T>;
+}
+
 export class EventStore<Q> {
   private store: StoreAdapter<Q>;
   private cache: CacheAdapter;
@@ -84,16 +90,28 @@ export class EventStore<Q> {
     });
   }
 
-  public createAggregate<A extends any[], T>(
-    aggregateName: string,
-    query: Q,
-    matches: AggregateMatches<T>,
-  ): Aggregate<A, T> {
+  /**
+   *  This method setups aggregates using an AggregateRoot as
+   *    its definition.
+   *
+   *  An AggregateRoot defines the meaning of the aggregate,
+   *    the relation of its parts and how they fit toguether.
+   *
+   *  The Aggregate type returned is a function with a reference
+   *    to the event-store instance in its closure, allowing you
+   *    to treat it as a high order function. Beware though, the
+   *    generated aggregate is subject to side effects and its results
+   *    may change overtime based on the state of the store.
+   *
+   *  TODO: Provide references to setup guidelines for Aggregates
+   */
+  public prepareAggregate<A extends any[], T>(root: AggregateRoot<Q, T>): Aggregate<A, T> {
+    const { name, query, matches } = root;
     const _impl = async (...args: A): Promise<Option<T>> => {
       const start = Date.now();
 
       const id = createHash('sha256')
-        .update(aggregateName + JSON.stringify(query) + JSON.stringify(args))
+        .update(name + JSON.stringify(query) + JSON.stringify(args))
         .digest('hex');
 
       const latestSnapshot = await this.cache.get<T>(id);
@@ -147,6 +165,22 @@ export class EventStore<Q> {
     };
 
     return _impl;
+  }
+
+  public createAggregate<A extends any[], T>(
+    name: string,
+    query: Q,
+    matches: AggregateMatches<T>,
+  ): Aggregate<A, T> {
+    this.logger.warn(`
+      The createAggregate method has been deprecated in favour of prepareAggregate
+      It will be removed in a future version of the EventStore
+    `);
+    return this.prepareAggregate({
+      name,
+      query,
+      matches,
+    });
   }
 
   public async listen(event_namespace: string, event_type: string, handler: EventHandler<Q, any>): Promise<void> {
