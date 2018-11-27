@@ -37,16 +37,6 @@ function toAsyncIter<T>(input: T[]): AsyncIterator<T> {
   };
 }
 
-function newEvent(data: EventData) {
-  return {
-    id,
-    data,
-    context: {
-      time: new Date().toISOString(),
-    },
-  };
-}
-
 test('Test composeAggregator one match', async (t) => {
   const validate: any = stub();
   validate.returns(true);
@@ -56,7 +46,7 @@ test('Test composeAggregator one match', async (t) => {
 
   const aggregator = composeAggregator(matches);
   t.deepEqual(typeof aggregator, 'function');
-  t.deepEqual(await aggregator(None, newEvent({ type: 'test' })), Some('test'));
+  t.deepEqual(await aggregator(None, createEvent('test_namespace', 'EventTestType', {})), Some('test'));
 });
 
 test('Test composeAggregator no matches', async (t) => {
@@ -64,7 +54,7 @@ test('Test composeAggregator no matches', async (t) => {
 
   const aggregator = composeAggregator(matches);
   t.deepEqual(typeof aggregator, 'function');
-  t.deepEqual(await aggregator(None, newEvent({ type: 'test' })), None);
+  t.deepEqual(await aggregator(None, createEvent('test_namespace', 'EventTestType', {})), None);
 });
 
 test('Test composeAggregator one no matching match', async (t) => {
@@ -76,7 +66,7 @@ test('Test composeAggregator one no matching match', async (t) => {
 
   const aggregator = composeAggregator(matches);
   t.deepEqual(typeof aggregator, 'function');
-  t.deepEqual(await aggregator(None, newEvent({ type: 'test' })), None);
+  t.deepEqual(await aggregator(None, createEvent('test_namespace', 'EventTestType', {})), None);
 });
 
 test('Iter reducer', async (t) => {
@@ -152,7 +142,7 @@ test('save emits if everything is fine', async (t) => {
 
   const es = await newEventStore(store, { logger, emitter });
 
-  await es.save({ id: '', data: { type: 'test' }, context: { time: '', subject: {} } });
+  await es.save(createEvent('test_namespace', 'EventTestType', {}));
 
   t.deepEqual(writeStub.callCount, 1);
 
@@ -172,7 +162,7 @@ test('save does not emit on errors', async (t) => {
   const es = await newEventStore(store, { logger, emitter });
 
   try {
-    await es.save({ id: '', data: { type: 'test' }, context: { time: '', subject: {} } });
+    await es.save(createEvent('test_namespace', 'EventTestType', {}));
     t.fail('On write errors save should reject');
   } catch (err) {
     if (err instanceof Error) {
@@ -197,7 +187,7 @@ test('save does not emit on duplicates', async (t) => {
 
   const es = await newEventStore(store, { logger, emitter });
 
-  await es.save({ id: '', data: { type: 'test' }, context: { time: '', subject: {} } });
+  await es.save(createEvent('test_namespace', 'EventTestType', {}));
   t.deepEqual(writeStub.callCount, 1);
   t.deepEqual(emitStub.callCount, 0);
 });
@@ -298,7 +288,7 @@ test('listen calls handler if event doesnt exist and saves after its execution',
   const subscribe = spy();
 
   const exists = stub().resolves(false);
-  const saveStub = stub();
+  const saveStub = stub().resolves();
   const store = await getFakeStoreAdapter({exists, saveStub});
 
   const emitter = {
