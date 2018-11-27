@@ -2,7 +2,25 @@ import { test } from 'ava';
 import { id } from './test-helpers';
 import { createEvent, createContext, EventData, EventContext, Event, isEvent } from '.';
 
-test('creates an event with default fields filled', (t) => {
+// This test does nothing, but will fail to compile if Typescript finds errors, so should be left in
+test("typechecks createEvent", (t: any) => {
+  interface TestEvent extends EventData {
+    type: "foobar.Baz";
+    event_namespace: "foobar";
+    event_type: "Baz";
+    foo: string;
+    bar: number;
+  }
+
+  const evt: Event<TestEvent, any> = createEvent("foobar", "Baz", {
+    foo: "hello",
+    bar: 10,
+  });
+
+  t.pass();
+});
+
+test('creates an event with default fields filled', (t: any) => {
   const evt = createEvent('ns', 'Type', { foo: 'bar' });
 
   const expected = {
@@ -25,7 +43,7 @@ test('creates an event with default fields filled', (t) => {
   t.true(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(evt.id));
 });
 
-test('creates an event with a given context', (t) => {
+test('creates an event with a given context', (t: any) => {
   const evt = createEvent(
     'ns',
     'Type',
@@ -51,7 +69,7 @@ test('creates an event with a given context', (t) => {
   t.deepEqual(evt, expected);
 });
 
-test('creates a context with subject and no action', (t) => {
+test('creates a context with subject and no action', (t: any) => {
   const evt = createEvent(
     'ns',
     'Type',
@@ -64,7 +82,7 @@ test('creates a context with subject and no action', (t) => {
   t.deepEqual(evt.context.subject, { bar: 'baz' });
 });
 
-test('creates a context with subject and an action', (t) => {
+test('creates a context with subject and an action', (t: any) => {
   const evt = createEvent(
     'ns',
     'Type',
@@ -82,7 +100,7 @@ test('creates a context with subject and an action', (t) => {
   t.deepEqual(evt.context, expected);
 });
 
-test('createEvent passes is Event', (t) => {
+test('createEvent passes is Event', (t: any) => {
   const ev = createEvent('ns', 'Type', {});
 
   t.truthy(isEvent((o: any): o is any => !!o)(ev));

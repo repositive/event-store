@@ -8,22 +8,25 @@ function defaultContext(): EventContext<{}> {
   };
 }
 
-export function createEvent(
-  event_namespace: string,
-  event_type: string,
-  data: object,
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
+export function createEvent<T extends EventData>(
+  event_namespace: T["event_namespace"],
+  event_type: T["event_type"],
+  data: Omit<T, "event_namespace" | "event_type" | "type">,
   context: EventContext<any> = defaultContext(),
   _uuid: () => string = v4,
-): Event<EventData, EventContext<any>> {
+): Event<T, EventContext<any>> {
   const d = {
-    ...data,
+    // FIXME: Remove `as object` when TS 3.2 is released, see https://stackoverflow.com/a/53188276/383609
+    ...(data as object),
     type: `${event_namespace}.${event_type}`,
     event_type,
     event_namespace,
   };
 
   return {
-    data: d,
+    data: d as T,
     context,
     id: _uuid(),
   };
