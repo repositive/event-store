@@ -2,7 +2,6 @@ import { Pool, QueryResult } from 'pg';
 import { Event } from '.';
 export declare const cafebabe = "cafebabe-cafe-babe-cafe-babecafebabe";
 export declare const id = "d00dd00d-d00d-d00d-d00d-d00dd00dd00d";
-export declare function createEvent(type: string, data: any, context?: any, time?: string): any;
 export declare function getFakePool(queryStub?: any): any;
 export declare function fakePoolResult(rows?: any[]): QueryResult;
 export declare const fakeEmitter: (e: any) => undefined;
