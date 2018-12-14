@@ -14,6 +14,7 @@ import {
 import { None, Some, Option, Either } from 'funfix';
 import { v4 } from 'uuid';
 import { createHash } from 'crypto';
+import { createEvent } from './helpers';
 
 export type Aggregate<A extends any[], T> = (...args: A) => Promise<Option<T>>;
 export type ValidateF<E extends Event<any, any>> = (o: any) => o is E;
@@ -152,21 +153,13 @@ export class EventStore<Q> {
 
     const last = await this.store.lastEventOf(pattern);
 
-    await this.emitter.emit({
-      id: v4(),
-      data: {
-        type: '_eventstore.EventReplayRequested',
-        event_type: 'EventReplayRequested',
-        event_namespace: '_eventstore',
-        requested_event_namespace: event_namespace,
-        requested_event_type: event_type,
-        since: last.map((l) => l.context.time).getOrElse(new Date(0).toISOString()),
-      },
-      context: {
-        actor: {},
-        time: new Date().toISOString(),
-      },
+    const replay = createEvent<EventReplayRequested>('_eventstore', 'EventReplayRequested', {
+      requested_event_namespace: event_namespace,
+      requested_event_type: event_type,
+      since: last.map((l) => l.context.time).getOrElse(new Date(0).toISOString()),
     });
+
+    await this.emitter.emit(replay);
 
   }
 }
