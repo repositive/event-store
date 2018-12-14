@@ -1,6 +1,7 @@
 import { test } from 'ava';
 import { id } from './test-helpers';
 import { createEvent, createContext, EventData, EventContext, Event, isEvent } from '.';
+import { isEventData } from './helpers';
 
 // This test does nothing, but will fail to compile if Typescript finds errors, so should be left in
 test("typechecks createEvent", (t: any) => {
@@ -104,4 +105,42 @@ test('createEvent passes is Event', (t: any) => {
   const ev = createEvent('ns', 'Type', {});
 
   t.truthy(isEvent((o: any): o is any => !!o)(ev));
+});
+
+test('isEventData supports new style events', (t: any) => {
+  const fakeEvent: any = {
+    id: '...',
+    data: {
+      event_namespace: 'some_ns',
+      event_type: 'SomeType',
+      // New fields should override this
+      type: 'ignoreme.IgnoreMe'
+    },
+    context: {}
+  };
+
+  t.truthy(
+    isEventData(
+      fakeEvent.data,
+      (data: any): data is any =>
+        data.event_namespace === 'some_ns' && data.event_type === 'SomeType'
+    )
+  );
+});
+
+test('isEventData supports old style events', (t: any) => {
+  const fakeEvent: any = {
+    id: '...',
+    data: {
+      type: 'oldstyle.OldStyle'
+    },
+    context: {}
+  };
+
+  t.truthy(
+    isEventData(
+      fakeEvent.data,
+      (data: any): data is any => data.type === 'oldstyle.OldStyle'
+    )
+  );
 });
