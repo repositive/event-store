@@ -1,19 +1,20 @@
 import { test } from 'ava';
 import { id } from './test-helpers';
 import { createEvent, createContext, EventData, EventContext, Event, isEvent } from '.';
+import { isEventData } from './helpers';
 
 // This test does nothing, but will fail to compile if Typescript finds errors, so should be left in
-test("typechecks createEvent", (t: any) => {
+test('typechecks createEvent', (t: any) => {
   interface TestEvent extends EventData {
-    type: "foobar.Baz";
-    event_namespace: "foobar";
-    event_type: "Baz";
+    type: 'foobar.Baz';
+    event_namespace: 'foobar';
+    event_type: 'Baz';
     foo: string;
     bar: number;
   }
 
-  const evt: Event<TestEvent, any> = createEvent("foobar", "Baz", {
-    foo: "hello",
+  const evt: Event<TestEvent, any> = createEvent('foobar', 'Baz', {
+    foo: 'hello',
     bar: 10,
   });
 
@@ -70,13 +71,7 @@ test('creates an event with a given context', (t: any) => {
 });
 
 test('creates a context with subject and no action', (t: any) => {
-  const evt = createEvent(
-    'ns',
-    'Type',
-    { foo: 'bar' },
-    createContext({ bar: 'baz' }),
-    () => id,
-  );
+  const evt = createEvent('ns', 'Type', { foo: 'bar' }, createContext({ bar: 'baz' }), () => id);
 
   t.is(evt.context.action, undefined);
   t.deepEqual(evt.context.subject, { bar: 'baz' });
@@ -104,4 +99,39 @@ test('createEvent passes is Event', (t: any) => {
   const ev = createEvent('ns', 'Type', {});
 
   t.truthy(isEvent((o: any): o is any => !!o)(ev));
+});
+
+test('isEventData supports new style events', (t: any) => {
+  const fakeEvent: any = {
+    id: '...',
+    data: {
+      event_namespace: 'some_ns',
+      event_type: 'SomeType',
+      // New fields should override this
+      type: 'ignoreme.IgnoreMe',
+    },
+    context: {},
+  };
+
+  t.truthy(
+    isEventData(
+      fakeEvent.data,
+      (data: any): data is any =>
+        data.event_namespace === 'some_ns' && data.event_type === 'SomeType',
+    ),
+  );
+});
+
+test('isEventData supports old style events', (t: any) => {
+  const fakeEvent: any = {
+    id: '...',
+    data: {
+      type: 'oldstyle.OldStyle',
+    },
+    context: {},
+  };
+
+  t.truthy(
+    isEventData(fakeEvent.data, (data: any): data is any => data.type === 'oldstyle.OldStyle'),
+  );
 });

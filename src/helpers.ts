@@ -11,9 +11,9 @@ function defaultContext(): EventContext<{}> {
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 export function createEvent<T extends EventData>(
-  event_namespace: T["event_namespace"],
-  event_type: T["event_type"],
-  data: Omit<T, "event_namespace" | "event_type" | "type">,
+  event_namespace: T['event_namespace'],
+  event_type: T['event_type'],
+  data: Omit<T, 'event_namespace' | 'event_type' | 'type'>,
   context: EventContext<any> = defaultContext(),
   _uuid: () => string = v4,
 ): Event<T, EventContext<any>> {
@@ -46,10 +46,18 @@ export function createContext(
 
 export function isEventData<D extends EventData>(o: any, is?: (o: any) => o is D): o is D {
   const _is = is || ((_: any) => true);
-  return o && typeof o.event_namespace === 'string' && typeof o.event_type === 'string' && _is(o);
+  return (
+    o &&
+    ((typeof o.event_namespace === 'string' && typeof o.event_type === 'string') ||
+      typeof o.type === 'string') &&
+    _is(o)
+  );
 }
 
-export function isEventContext<S, C extends EventContext<S>>(o: any, is?: (o: any) => o is C): o is C {
+export function isEventContext<S, C extends EventContext<S>>(
+  o: any,
+  is?: (o: any) => o is C,
+): o is C {
   const _is = is || ((_: any) => true);
   return o && typeof o.time === 'string' && _is(o);
 }
@@ -59,9 +67,13 @@ export function isEvent<D extends EventData, C extends EventContext<any>>(
   isContext?: (o: any) => o is C,
 ): (o: any) => o is Event<D, C> {
   return function(o: any): o is Event<D, C> {
-    return o &&
-    typeof o.id === 'string' &&
-    o.data && isEventData(o.data, isData) &&
-    o.context && isEventContext(o.context, isContext);
+    return (
+      o &&
+      typeof o.id === 'string' &&
+      o.data &&
+      isEventData(o.data, isData) &&
+      o.context &&
+      isEventContext(o.context, isContext)
+    );
   };
 }
