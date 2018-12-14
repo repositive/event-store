@@ -46,7 +46,12 @@ export function createContext(
 
 export function isEventData<D extends EventData>(o: any, is?: (o: any) => o is D): o is D {
   const _is = is || ((_: any) => true);
-  return o && typeof o.event_namespace === 'string' && typeof o.event_type === 'string' && _is(o);
+  return (
+    o &&
+    ((typeof o.event_namespace === 'string' && typeof o.event_type === 'string') ||
+      typeof o.type === 'string') &&
+    _is(o)
+  );
 }
 
 export function isEventContext<S, C extends EventContext<S>>(o: any, is?: (o: any) => o is C): o is C {
