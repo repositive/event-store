@@ -45,8 +45,8 @@ export class EventStore<Q> {
     this.emitter = options.emitter || createDumbEmitterAdapter();
     this.logger = options.logger || console;
 
-    this.emitter.subscribe(
-      '_eventstore.EventStoreReplayRequested',
+    this.emitter.subscribe<Event<EventReplayRequested, any>>(
+      '_eventstore.EventReplayRequested',
       createEventReplayHandler({store: this.store, emitter: this.emitter}),
     );
   }

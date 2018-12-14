@@ -24,7 +24,7 @@ export type EmitterHandler<T extends Event<EventData, EventContext<any>>> = (
 export interface EmitterAdapter {
   emit(event: Event<any, any>): Promise<void>;
   subscribe<T extends Event<EventData, EventContext<any>>>(
-    name: string,
+    name: T["data"]["type"],
     handler: EmitterHandler<T>,
   ): void;
 }
