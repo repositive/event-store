@@ -16,7 +16,7 @@ export interface CacheAdapter {
 export declare type EmitterHandler<T extends Event<EventData, EventContext<any>>> = (event: T) => Promise<void>;
 export interface EmitterAdapter {
     emit(event: Event<any, any>): Promise<void>;
-    subscribe<T extends Event<EventData, EventContext<any>>>(name: string, handler: EmitterHandler<T>): void;
+    subscribe<T extends Event<EventData, EventContext<any>>>(name: T["data"]["type"], handler: EmitterHandler<T>): void;
 }
 export declare class DuplicateError extends Error {
 }
