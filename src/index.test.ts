@@ -390,7 +390,7 @@ test('listen type checks its string arguments', async (t) => {
   const writeStub = stub().resolves(Left(new DuplicateError()));
   const store: any = {
     write: writeStub,
-    lastEventOf: () => Promise.resolve(None) as any
+    lastEventOf: () => Promise.resolve(None) as any,
   };
   const emitStub = stub().resolves();
   const emitter: any = { emit: emitStub, subscribe: () => Promise.resolve() };

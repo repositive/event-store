@@ -136,16 +136,22 @@ export class EventStore<Q> {
     return _impl;
   }
 
-  public async listen<T extends EventData>(event_namespace: T['event_namespace'], event_type: T['event_type'], handler: EventHandler<Q, any>): Promise<void> {
+  public async listen<T extends EventData>(
+    event_namespace: T['event_namespace'],
+    event_type: T['event_type'],
+    handler: EventHandler<Q, any>,
+  ): Promise<void> {
     const pattern = [event_namespace, event_type].join('.');
 
     const _handler = async (event: Event<any, any>) => {
       const exists = await this.store.exists(event.id);
       if (!exists) {
         const result = await handler(event, this);
-        await result.map(() => {
-          return this.store.write(event);
-        }).getOrElse(Promise.resolve());
+        await result
+          .map(() => {
+            return this.store.write(event);
+          })
+          .getOrElse(Promise.resolve());
       }
     };
 
@@ -160,7 +166,6 @@ export class EventStore<Q> {
     });
 
     await this.emitter.emit(replay);
-
   }
 }
 
