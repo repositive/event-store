@@ -136,7 +136,7 @@ export class EventStore<Q> {
     return _impl;
   }
 
-  public async listen(event_namespace: string, event_type: string, handler: EventHandler<Q, any>): Promise<void> {
+  public async listen<T extends EventData>(event_namespace: T['event_namespace'], event_type: T['event_type'], handler: EventHandler<Q, any>): Promise<void> {
     const pattern = [event_namespace, event_type].join('.');
 
     const _handler = async (event: Event<any, any>) => {
