@@ -379,3 +379,25 @@ test('listen does not call handler if event already exists and does not save eve
   t.true(handler.notCalled);
   t.true(saveStub.notCalled);
 });
+
+// Noop test, but will fail to compile if something doesn't work
+test('listen type checks its string arguments', async (t) => {
+  interface DummyEvent extends EventData {
+    event_namespace: 'foo';
+    event_type: 'Bar';
+  }
+
+  const writeStub = stub().resolves(Left(new DuplicateError()));
+  const store: any = {
+    write: writeStub,
+    lastEventOf: () => Promise.resolve(None) as any,
+  };
+  const emitStub = stub().resolves();
+  const emitter: any = { emit: emitStub, subscribe: () => Promise.resolve() };
+
+  const es = await newEventStore(store, { logger, emitter });
+
+  es.listen<DummyEvent>('foo', 'Bar', () => Promise.resolve() as any);
+
+  t.pass();
+});
