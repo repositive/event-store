@@ -19,7 +19,7 @@ export declare class EventStore<Q> {
     constructor(store_adapter: StoreAdapter<Q>, options?: EventStoreOptions);
     save(event: Event<EventData, EventContext<any>>): Promise<void>;
     createAggregate<A extends any[], T>(aggregateName: string, query: Q, matches: AggregateMatches<T>): Aggregate<A, T>;
-    listen(event_namespace: string, event_type: string, handler: EventHandler<Q, any>): Promise<void>;
+    listen<T extends EventData>(event_namespace: T['event_namespace'], event_type: T['event_type'], handler: EventHandler<Q, any>): Promise<void>;
 }
 export interface EventReplayRequested extends EventData {
     type: '_eventstore.EventReplayRequested';
