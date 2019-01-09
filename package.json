@@ -9,7 +9,8 @@
     "test": "nyc --all --reporter lcov ava-ts --verbose",
     "testIntegration": "nyc --reporter lcov ava-ts --verbose ./src/integrationsetup.ts ./src/**/*.integration.ts",
     "testDev": "nyc --reporter lcov ava-ts --watch",
-    "lint": "tslint --project tsconfig.json"
+    "lint": "tslint --project tsconfig.json",
+    "doc": "typedoc --out doc --exclude **/*.test.ts --exclude */*.test.ts --name 'Event store' src"
   },
   "ava": {
     "sources": [
@@ -55,6 +56,7 @@
     "@repositive/iris": "^1.0.0-alpha.8",
     "config": "^2.0.1",
     "funfix": "7.0.1",
-    "ramda": "0.25.0"
+    "ramda": "0.25.0",
+    "typedoc": "^0.14.0"
   }
 }
