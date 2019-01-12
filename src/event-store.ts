@@ -36,12 +36,73 @@ export interface EventStoreOptions {
   logger?: Logger;
 }
 
+/**
+Main event store class
+
+An event store requires an implementation of three things; {@link StoreAdapter},
+{@link EmitterAdapter} and {@link CacheAdapter}. The following example uses Postgres for the backing
+store and cache, and an AMQP (RabbitMQ) queue to emit and subscribe to events. Note the typo in
+`AQMPEmitterAdapter`.
+
+```typescript
+import {
+  createAQMPEmitterAdapter,
+  createPgStoreAdapter,
+  createPgCacheAdapter,
+  EventStore
+} from '@repositive/event-store';
+
+const emitterAdapter = createAQMPEmitterAdapter(irisOpts);
+const storeAdapter = createPgStoreAdapter(postgres);
+const cacheAdapter = createPgCacheAdapter(postgres);
+
+const store = new EventStore(storeAdapter, {cache: cacheAdapter, emitter: emitterAdapter});
+```
+
+The store uses `console` as its default logger, but can be overridden by passing in extra arguments.
+The following example uses [Pino](http://npmjs.com/pino).
+
+```typescript
+import * as pino from 'pino';
+import {
+  createAQMPEmitterAdapter,
+  createPgStoreAdapter,
+  createPgCacheAdapter,
+  EventStore
+} from '@repositive/event-store';
+
+const logger = pino();
+
+const emitterAdapter = createAQMPEmitterAdapter(irisOpts, logger);
+const storeAdapter = createPgStoreAdapter(postgres, logger);
+const cacheAdapter = createPgCacheAdapter(postgres, logger);
+
+const store = new EventStore(
+  storeAdapter,
+  {cache: cacheAdapter, emitter: emitterAdapter, logger}
+);
+```
+
+Any logger can be used that implements the {@link Logger} interface.
+
+@param Q - The query type of the backing store
+
+For example, when using a Postgres store, this should be `string`. Other databases may accept
+different types
+*/
 export class EventStore<Q> {
   private store: StoreAdapter<Q>;
   private cache: CacheAdapter;
   private emitter: EmitterAdapter;
   private logger: Logger;
 
+  /**
+  Create a new event store
+
+  @param store_adapter - The backing store used to save and retrieve events
+
+  @param options - Cache adapter, emitter adapter and (optional) logger to use
+  */
   constructor(store_adapter: StoreAdapter<Q>, options: EventStoreOptions = {}) {
     this.store = store_adapter;
     this.cache = options.cache || createDumbCacheAdapter();
@@ -54,6 +115,11 @@ export class EventStore<Q> {
     );
   }
 
+  /**
+  Save an event and emit it onto the queue
+
+  @param event - The event to save and emit
+  */
   public async save(event: Event<EventData, EventContext<any>>): Promise<void> {
     await this.store.write(event).then((result) => {
       return result
