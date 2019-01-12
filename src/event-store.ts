@@ -141,6 +141,86 @@ export class EventStore<Q> {
     });
   }
 
+  /**
+  Prepare and return an aggregator function
+
+  Use this to create an aggregate that can be used by the rest of the application.
+
+  @example
+
+  ```typescript
+  import { EventStore, PgQuery, Aggregate, isEvent } from '@repositive/event-store';
+  import {
+    isThingCreated,
+    isThingUpdated,
+    ThingUpdated,
+    ThingCreated
+  } from './events';
+
+  export interface Thing {
+    // ...
+  }
+
+  const onThingCreated = async (
+    acc: Option<Thing>,
+    event: Event<ThingCreated, EventContext<any>>
+  ): Promise<Option<Thing>> => {
+    // ...
+  };
+
+  const onThingUpdated = async (
+    acc: Option<Thing>,
+    event: Event<ThingUpdated, EventContext<any>>
+  ): Promise<Option<Thing>> => {
+    // ...
+  };
+
+  export function prepareThingById(
+    store: EventStore<PgQuery>
+  ): Aggregate<[string], Thing> {
+    return store.createAggregate(
+      'thingById',
+      {
+        text: `select * from events where data->>'thing_id' = $1`
+      },
+      [
+        [isEvent(isThingCreated), onThingCreated],
+        [isEvent(isThingUpdated), onThingUpdated]
+      ]
+    );
+  }
+  ```
+
+  The above example will create an aggregator with the identifier `ThingById` that accepts one
+  argument (a thing ID) and returns the fictional `Thing` object. It queries the database for all
+  events that contain a data field called `thing_id` with a value equal to the given input.
+
+  It supports two events; `ThingCreated` and `ThingUpdated`, handled by `onThingCreated` and
+  `onThingUpdated` respectively.
+
+  @param aggregateName - The unique identifier of this aggregate. It is good convention to name it
+  the same as the aggregate function, i.e. `thingById` in the example above.
+
+  @param query - The query sent to the database to select events to aggregate over. This can return
+  other events than those desired; they will be ignored if no handler for them is specified in the
+  `matches` list.
+
+  @param matches - A list of pairs where the first item determines whether the second should be
+  executed. `matches` is evaluated against every event returned from the backing store, with the
+  first match from top to bottom being called for that event. This defines the relationship between
+  events and their handlers.
+
+  The {@link isEvent} helper can be used to reduce boilerplate. An example `isThingCreated` function
+  may look like this:
+
+  ```typescript
+  export function isThingCreated(o: any): o is ThingUpdated {
+    return o && o.type === 'thingdomain.ThingUpdated';
+  }
+  ```
+
+  @returns Result of aggregation over queried events
+  */
   public createAggregate<A extends any[], T>(
     aggregateName: string,
     query: Q,
@@ -205,6 +285,21 @@ export class EventStore<Q> {
     return _impl;
   }
 
+  /**
+  Listen for events emitted by other event stores
+
+  When this method is called, a subscription is initialised and an {@link EventReplayRequested}
+  event is emitted. This allows this store to receive events it may have missed due to save errors,
+  downtime or deployments.
+
+  @param event_namespace - The remote namespace to listen to
+
+  @param event_type - The event type to listen for
+
+  @param handler - Handler function called for every received event. The event will be saved to the
+  backing store before this handler is called, therefore can be retrieved with an aggregator. If the
+  event cannot be saved, or already exists in the database, the handler will not be called
+  */
   public async listen<T extends EventData>(
     event_namespace: T['event_namespace'],
     event_type: T['event_type'],
@@ -238,6 +333,10 @@ export class EventStore<Q> {
   }
 }
 
+/**
+An event used to request a replay from remote event stores. It uses the `requested_event_type` and
+`requested_event_namespace` fields to specify which type of event should be replayed.
+*/
 export interface EventReplayRequested extends EventData {
   type: '_eventstore.EventReplayRequested';
   event_namespace: '_eventstore';
