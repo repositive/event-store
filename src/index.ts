@@ -1,12 +1,12 @@
-import { Pool } from 'pg';
-import * as R from 'ramda';
-import { StoreAdapter } from './adapters';
-import { Future, Option, None, Either, Left, Right } from 'funfix';
-import { EventStore, EventStoreOptions } from './event-store';
-export { isEvent, createEvent, createContext } from './helpers';
-export * from './event-store';
-export * from './adapters';
-import { createDumbCacheAdapter, createDumbEmitterAdapter } from './adapters';
+import { Pool } from "pg";
+import * as R from "ramda";
+import { StoreAdapter } from "./adapters";
+import { Future, Option, None, Either, Left, Right } from "funfix";
+import { EventStore, EventStoreOptions } from "./event-store";
+export { isEvent, createEvent, createContext } from "./helpers";
+export * from "./event-store";
+export * from "./adapters";
+import { createDumbCacheAdapter, createDumbEmitterAdapter } from "./adapters";
 
 /**
 A UUID
@@ -61,7 +61,10 @@ return value of the previous aggregate application, which may also return `None`
 
 @param event - The event to process
 */
-export type Aggregator<T> = (acc: Option<T>, event: Event<EventData, any>) => Promise<Option<T>>;
+export type Aggregator<T> = (
+  acc: Option<T>,
+  event: Event<EventData, any>,
+) => Promise<Option<T>>;
 
 /**
 The data payload of an event

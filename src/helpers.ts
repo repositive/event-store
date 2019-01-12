@@ -1,5 +1,5 @@
-import { EventData, EventContext, Event, IsoDateString, Uuid } from '.';
-import { v4 } from 'uuid';
+import { EventData, EventContext, Event, IsoDateString, Uuid } from ".";
+import { v4 } from "uuid";
 
 function defaultContext(): EventContext<{}> {
   return {
@@ -93,9 +93,9 @@ it('Creates an event', () => {
 This makes unit testing much easier to perform.
 */
 export function createEvent<T extends EventData>(
-  event_namespace: T['event_namespace'],
-  event_type: T['event_type'],
-  data: Omit<T, 'event_namespace' | 'event_type' | 'type'>,
+  event_namespace: T["event_namespace"],
+  event_type: T["event_type"],
+  data: Omit<T, "event_namespace" | "event_type" | "type">,
   context: EventContext<any> = defaultContext(),
   _uuid: () => Uuid = v4,
 ): Event<T, EventContext<any>> {
@@ -184,12 +184,16 @@ calls `is` which should be a function that checks that `event_namespace` and `ev
 specific values.
 ```
 */
-export function isEventData<D extends EventData>(o: any, is?: (o: any) => o is D): o is D {
+export function isEventData<D extends EventData>(
+  o: any,
+  is?: (o: any) => o is D,
+): o is D {
   const _is = is || ((_: any) => true);
   return (
     o &&
-    ((typeof o.event_namespace === 'string' && typeof o.event_type === 'string') ||
-      typeof o.type === 'string') &&
+    ((typeof o.event_namespace === "string" &&
+      typeof o.event_type === "string") ||
+      typeof o.type === "string") &&
     _is(o)
   );
 }
@@ -204,7 +208,7 @@ export function isEventContext<S, C extends EventContext<S>>(
   is?: (o: any) => o is C,
 ): o is C {
   const _is = is || ((_: any) => true);
-  return o && typeof o.time === 'string' && _is(o);
+  return o && typeof o.time === "string" && _is(o);
 }
 
 /**
@@ -225,7 +229,7 @@ export function isEvent<D extends EventData, C extends EventContext<any>>(
   return function(o: any): o is Event<D, C> {
     return (
       o &&
-      typeof o.id === 'string' &&
+      typeof o.id === "string" &&
       o.data &&
       isEventData(o.data, isData) &&
       o.context &&

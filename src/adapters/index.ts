@@ -1,11 +1,18 @@
-import {Option, Either} from 'funfix';
-import {Event, EventData, EventContext, IsoDateString, EventNamespaceAndType, Uuid} from '..';
+import { Option, Either } from "funfix";
+import {
+  Event,
+  EventData,
+  EventContext,
+  IsoDateString,
+  EventNamespaceAndType,
+  Uuid,
+} from "..";
 
-export * from './cache/postgres';
-export * from './cache/dumb';
-export * from './emitter/amqp';
-export * from './emitter/dumb';
-export * from './store/postgres';
+export * from "./cache/postgres";
+export * from "./cache/dumb";
+export * from "./emitter/amqp";
+export * from "./emitter/dumb";
+export * from "./store/postgres";
 
 /**
 A cache item key
@@ -113,14 +120,21 @@ export interface StoreAdapter<Q> {
 
   @param ...args - A list of arguments used in the query
   */
-  read(query: Q, since: Option<IsoDateString>, ...args: any[]): AsyncIterator<Event<EventData, EventContext<any>>>;
+  read(
+    query: Q,
+    since: Option<IsoDateString>,
+    // tslint:disable-next-line trailing-comma
+    ...args: any[]
+  ): AsyncIterator<Event<EventData, EventContext<any>>>;
 
   /**
   Save an event to the backing store
 
   @param event - The complete {@link Event} to save
   */
-  write(event: Event<EventData, EventContext<any>>): Promise<Either<DuplicateError, void>>;
+  write(
+    event: Event<EventData, EventContext<any>>,
+  ): Promise<Either<DuplicateError, void>>;
 
   /**
   Find the most recent occurrence of an event in the store
@@ -130,7 +144,9 @@ export interface StoreAdapter<Q> {
 
   @returns The most recent found event, or `None` if no event could be found
   */
-  lastEventOf<E extends Event<any, any>>(eventType: EventNamespaceAndType): Promise<Option<E>>;
+  lastEventOf<E extends Event<any, any>>(
+    eventType: EventNamespaceAndType,
+  ): Promise<Option<E>>;
 
   /**
   Check that an event with a given ID exists
