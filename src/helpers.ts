@@ -210,8 +210,11 @@ export function isEventContext<S, C extends EventContext<S>>(
 /**
 Check that an object is a complete event
 
+Use this to wrap event matching functions to reduce boilerplate
+
 @param isData - Checks that the object contains a valid event payload. This should have
 {@link isEventData} passed to it.
+
 @param isContext - Check that the object contains a valid event context.
 For aggregations, this will usually be omitted.
 */
