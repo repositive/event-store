@@ -10,7 +10,7 @@
     "testIntegration": "nyc --reporter lcov ava-ts --verbose ./src/integrationsetup.ts ./src/**/*.integration.ts",
     "testDev": "nyc --reporter lcov ava-ts --watch",
     "lint": "tslint --project tsconfig.json",
-    "doc": "typedoc --out doc --exclude **/*.test.ts --exclude */*.test.ts --excludePrivate --mode modules --name 'Event store' src"
+    "doc": "typedoc --out doc --exclude **/*.test.ts --exclude */*.test.ts --excludePrivate --mode file --name 'Event store' src"
   },
   "ava": {
     "sources": [
