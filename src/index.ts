@@ -9,6 +9,11 @@ export * from './adapters';
 import { createDumbCacheAdapter, createDumbEmitterAdapter } from './adapters';
 
 /**
+ISO8601 formatted date string
+*/
+export type IsoDateString = string;
+
+/**
 An aggregator function for an event
 
 @param acc - The current state of the aggregation. This is `None` on the first iteration, or the
@@ -49,7 +54,7 @@ The `action` field can be used to describe which operation or other trigger crea
 export interface EventContext<A> {
   action?: string;
   subject: A;
-  time: string; // ISO TIMESTAMP String
+  time: IsoDateString; // ISO TIMESTAMP String
 }
 
 /**

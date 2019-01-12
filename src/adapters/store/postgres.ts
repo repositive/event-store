@@ -2,7 +2,7 @@ import { Pool } from 'pg';
 import { v4 } from 'uuid';
 import { StoreAdapter, DuplicateError, Event, EventData, EventContext } from '../../.';
 import { Option, None, Either, Left, Right} from 'funfix';
-import { Logger } from '../../.';
+import { Logger, IsoDateString } from '../../.';
 
 export interface PgQuery {
   text: string;
@@ -25,7 +25,7 @@ export function createPgStoreAdapter(pool: Pool, logger: Logger = console): Stor
 
   async function* read<T extends Event<EventData, EventContext<any>>>(
     query: PgQuery,
-    since: Option<string> = None,
+    since: Option<IsoDateString> = None,
     // tslint:disable-next-line trailing-comma
     ...args: any[]
   ): AsyncIterator<T> {
@@ -101,7 +101,7 @@ export function createPgStoreAdapter(pool: Pool, logger: Logger = console): Stor
     ).then((results) => !!results.rows[0]);
   }
 
-  function readEventSince(eventType: string, since: Option<string> = None): AsyncIterator<Event<any, any>> {
+  function readEventSince(eventType: string, since: Option<IsoDateString> = None): AsyncIterator<Event<any, any>> {
     return read(
       {
         text: `select * from events where data->>'type' = $1`,

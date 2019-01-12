@@ -10,6 +10,7 @@ import {
   createDumbCacheAdapter,
   createDumbEmitterAdapter,
   Aggregator,
+  IsoDateString
 } from '.';
 import { None, Some, Option, Either } from 'funfix';
 import { v4 } from 'uuid';
@@ -175,7 +176,7 @@ export interface EventReplayRequested extends EventData {
   event_type: 'EventReplayRequested';
   requested_event_type: string;
   requested_event_namespace: string;
-  since: string; // ISO String
+  since: IsoDateString;
 }
 
 export async function reduce<I, O>(

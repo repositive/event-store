@@ -1,5 +1,5 @@
 import {Option, Either} from 'funfix';
-import {Event, EventData, EventContext} from '..';
+import {Event, EventData, EventContext, IsoDateString} from '..';
 
 export * from './cache/postgres';
 export * from './cache/dumb';
@@ -21,9 +21,9 @@ A cache entry returned when searching by {@link CacheKey}
 */
 export interface CacheEntry<T> {
   /**
-  ISO8601 formatted timestamp of the cache insertion date
+  Timestamp of the cache insertion date
   */
-  time: string;
+  time: IsoDateString;
 
   /**
   The cache object to insert
@@ -113,7 +113,7 @@ export interface StoreAdapter<Q> {
 
   @param ...args - A list of arguments used in the query
   */
-  read(query: Q, since: Option<string>, ...args: any[]): AsyncIterator<Event<EventData, EventContext<any>>>;
+  read(query: Q, since: Option<IsoDateString>, ...args: any[]): AsyncIterator<Event<EventData, EventContext<any>>>;
 
   /**
   Save an event to the backing store
@@ -148,6 +148,6 @@ export interface StoreAdapter<Q> {
   */
   readEventSince(
     eventTpe: string,
-    since?: Option<string>,
+    since?: Option<IsoDateString>,
   ): AsyncIterator<Event<EventData, EventContext<any>>>;
 }

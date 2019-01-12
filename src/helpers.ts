@@ -1,4 +1,4 @@
-import { EventData, EventContext, Event } from '.';
+import { EventData, EventContext, Event, IsoDateString } from '.';
 import { v4 } from 'uuid';
 
 function defaultContext(): EventContext<{}> {
@@ -167,7 +167,7 @@ it('Creates an event', () => {
 export function createContext(
   subject: object,
   action?: string,
-  _time: () => string = () => new Date().toISOString(),
+  _time: () => IsoDateString = () => new Date().toISOString(),
 ): EventContext<any> {
   return {
     action,
