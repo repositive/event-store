@@ -9,6 +9,16 @@ export * from './adapters';
 import { createDumbCacheAdapter, createDumbEmitterAdapter } from './adapters';
 
 /**
+A UUID
+
+This is a UUID stored without wrapping characters
+
+@example `cafebabe-cafe-babe-cafe-babecafebabe`
+@example `5ec93584-9e86-4aa5-b5d4-7ff84f1b82fa`
+*/
+export type Uuid = string;
+
+/**
 ISO8601 formatted date string
 */
 export type IsoDateString = string;
@@ -96,9 +106,9 @@ event namespace and type that extends {@link EventData}, and a context object th
 */
 export interface Event<D extends EventData, C extends EventContext<any>> {
   /**
-  Event ID (UUID)
+  Event ID
   */
-  id: string;
+  id: Uuid;
 
   /**
   Event data

@@ -1,4 +1,4 @@
-import { EventData, EventContext, Event, IsoDateString } from '.';
+import { EventData, EventContext, Event, IsoDateString, Uuid } from '.';
 import { v4 } from 'uuid';
 
 function defaultContext(): EventContext<{}> {
@@ -97,7 +97,7 @@ export function createEvent<T extends EventData>(
   event_type: T['event_type'],
   data: Omit<T, 'event_namespace' | 'event_type' | 'type'>,
   context: EventContext<any> = defaultContext(),
-  _uuid: () => string = v4,
+  _uuid: () => Uuid = v4,
 ): Event<T, EventContext<any>> {
   const d = {
     // FIXME: Remove `as object` when TS 3.2 is released, see https://stackoverflow.com/a/53188276/383609

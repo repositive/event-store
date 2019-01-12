@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 import { v4 } from 'uuid';
-import { StoreAdapter, DuplicateError, Event, EventData, EventContext, EventNamespaceAndType } from '../../.';
+import { StoreAdapter, DuplicateError, Event, EventData, EventContext, EventNamespaceAndType, Uuid } from '../../.';
 import { Option, None, Either, Left, Right} from 'funfix';
 import { Logger, IsoDateString } from '../../.';
 
@@ -94,7 +94,7 @@ export function createPgStoreAdapter(pool: Pool, logger: Logger = console): Stor
     ).then((results) => Option.of(results.rows[0]));
   }
 
-  async function exists(id: string): Promise<boolean> {
+  async function exists(id: Uuid): Promise<boolean> {
     return pool.query(
       `select * from events where id = $1`,
       [id],

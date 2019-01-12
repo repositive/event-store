@@ -1,5 +1,5 @@
 import {Option, Either} from 'funfix';
-import {Event, EventData, EventContext, IsoDateString, EventNamespaceAndType} from '..';
+import {Event, EventData, EventContext, IsoDateString, EventNamespaceAndType, Uuid} from '..';
 
 export * from './cache/postgres';
 export * from './cache/dumb';
@@ -135,7 +135,7 @@ export interface StoreAdapter<Q> {
   /**
   Check that an event with a given ID exists
   */
-  exists(id: string): Promise<boolean>;
+  exists(id: Uuid): Promise<boolean>;
 
   /**
   Read all events created at or after a given time
