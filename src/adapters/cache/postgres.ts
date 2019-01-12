@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 import { Option, None } from 'funfix';
-import { CacheAdapter, Event, EventData, EventContext, CacheEntry, Logger } from '../../.';
+import { CacheAdapter, Event, EventData, EventContext, CacheEntry, CacheKey, Logger } from '../../.';
 
 const insertAggregateCache = `
   INSERT INTO aggregate_cache (id, data, time)
@@ -26,7 +26,7 @@ export function createPgCacheAdapter(pool: Pool, logger: Logger = console): Cach
       throw error;
     });
 
-  async function get<T extends CacheEntry<any>>(id: string): Promise<Option<T>> {
+  async function get<T extends CacheEntry<any>>(id: CacheKey): Promise<Option<T>> {
     const query = {text: `SELECT * from aggregate_cache where id = $1`, values: [id]};
     logger.trace('execute query', query);
     const result = await pool.query(query);
@@ -34,7 +34,7 @@ export function createPgCacheAdapter(pool: Pool, logger: Logger = console): Cach
     return Option.of(result.rows[0]);
   }
 
-  function set(id: string, entry: CacheEntry<any>): Promise<void> {
+  function set(id: CacheKey, entry: CacheEntry<any>): Promise<void> {
     return pool.query(insertAggregateCache, [id, JSON.stringify(entry.data), entry.time])
       .then(() => {/**/});
   }
