@@ -10,7 +10,9 @@ import {
   createDumbCacheAdapter,
   createDumbEmitterAdapter,
   Aggregator,
-  IsoDateString
+  IsoDateString,
+  EventType,
+  EventNamespace
 } from '.';
 import { None, Some, Option, Either } from 'funfix';
 import { v4 } from 'uuid';
@@ -174,8 +176,8 @@ export interface EventReplayRequested extends EventData {
   type: '_eventstore.EventReplayRequested';
   event_namespace: '_eventstore';
   event_type: 'EventReplayRequested';
-  requested_event_type: string;
-  requested_event_namespace: string;
+  requested_event_type: EventType;
+  requested_event_namespace: EventNamespace;
   since: IsoDateString;
 }
 

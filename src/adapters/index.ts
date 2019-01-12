@@ -1,5 +1,5 @@
 import {Option, Either} from 'funfix';
-import {Event, EventData, EventContext, IsoDateString} from '..';
+import {Event, EventData, EventContext, IsoDateString, EventNamespaceAndType} from '..';
 
 export * from './cache/postgres';
 export * from './cache/dumb';
@@ -130,7 +130,7 @@ export interface StoreAdapter<Q> {
 
   @returns The most recent found event, or `None` if no event could be found
   */
-  lastEventOf<E extends Event<any, any>>(eventType: string): Promise<Option<E>>;
+  lastEventOf<E extends Event<any, any>>(eventType: EventNamespaceAndType): Promise<Option<E>>;
 
   /**
   Check that an event with a given ID exists
@@ -143,11 +143,11 @@ export interface StoreAdapter<Q> {
   @param eventType - The type of event to search for. This should be a string like
   `accounts.ProfileUpdated`
 
-  @param since - ISO8601 date string specifying when to read events from. If `None`, all events
-  matching `eventType` should be returned
+  @param since - ISO8601 date string specifying when to read events from. If passed as `None` or
+  omitted, all events matching `eventType` should be returned
   */
   readEventSince(
-    eventTpe: string,
+    eventTpe: EventNamespaceAndType,
     since?: Option<IsoDateString>,
   ): AsyncIterator<Event<EventData, EventContext<any>>>;
 }

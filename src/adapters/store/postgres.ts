@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 import { v4 } from 'uuid';
-import { StoreAdapter, DuplicateError, Event, EventData, EventContext } from '../../.';
+import { StoreAdapter, DuplicateError, Event, EventData, EventContext, EventNamespaceAndType } from '../../.';
 import { Option, None, Either, Left, Right} from 'funfix';
 import { Logger, IsoDateString } from '../../.';
 
@@ -87,7 +87,7 @@ export function createPgStoreAdapter(pool: Pool, logger: Logger = console): Stor
     });
   }
 
-  async function lastEventOf<E extends Event<any, any>>(eventType: string): Promise<Option<E>> {
+  async function lastEventOf<E extends Event<any, any>>(eventType: EventNamespaceAndType): Promise<Option<E>> {
     return pool.query(
       `select * from events where data->>'type' = $1 order by context->>'time' desc limit 1`,
       [eventType],
@@ -101,7 +101,7 @@ export function createPgStoreAdapter(pool: Pool, logger: Logger = console): Stor
     ).then((results) => !!results.rows[0]);
   }
 
-  function readEventSince(eventType: string, since: Option<IsoDateString> = None): AsyncIterator<Event<any, any>> {
+  function readEventSince(eventType: EventNamespaceAndType, since: Option<IsoDateString> = None): AsyncIterator<Event<any, any>> {
     return read(
       {
         text: `select * from events where data->>'type' = $1`,

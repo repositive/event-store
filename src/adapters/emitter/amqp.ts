@@ -1,11 +1,11 @@
-import { EmitterAdapter, Event, EventData, EventContext, EmitterHandler, Logger } from '../../.';
+import { EmitterAdapter, Event, EventData, EventContext, EmitterHandler, Logger, EventNamespaceAndType, EventNamespace } from '../../.';
 import { Option, Some, None } from 'funfix';
 import setupIris from '@repositive/iris';
 import { Iris } from '@repositive/iris';
 
 export interface IrisOptions {
   uri?: string;
-  namespace: string;
+  namespace: EventNamespace;
 }
 
 export function wait(n: number): Promise<void> {
@@ -22,7 +22,7 @@ function wrapHandler(handler: EmitterHandler<any>) {
 
 export function createAQMPEmitterAdapter(irisOpts: IrisOptions, logger: Logger = console): EmitterAdapter {
   let iris: Option<Iris> = None;
-  const subscriptions: Map<string, EmitterHandler<any>> = new Map();
+  const subscriptions: Map<EventNamespaceAndType, EmitterHandler<any>> = new Map();
   setupIris({ ...irisOpts, logger}).map((_iris) => {
     iris = Some(_iris);
     for ( const [pattern, handler] of subscriptions.entries()) {
@@ -37,7 +37,7 @@ export function createAQMPEmitterAdapter(irisOpts: IrisOptions, logger: Logger =
       .getOrElseL(() => wait(1000).then(() => emit(event)));
   }
 
-  function subscribe(pattern: string, handler: EmitterHandler<any>) {
+  function subscribe(pattern: EventNamespaceAndType, handler: EmitterHandler<any>) {
     const _handler = wrapHandler(handler);
 
     iris.map((i) => {

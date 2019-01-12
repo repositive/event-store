@@ -14,6 +14,36 @@ ISO8601 formatted date string
 export type IsoDateString = string;
 
 /**
+An event's joined {@link EventNamespace} and {@link EventType}
+
+This is the union of {@link EventNamespace}, a `.` character and {@link EventType}
+
+@example `accounts.ProfileUpdated`
+@example `organisations.InviteAccepted`
+*/
+export type EventNamespaceAndType = string;
+
+/**
+An event's namespace
+
+The lowercase namespace to which an event belongs
+
+@example `accounts`
+@example `organisations`
+*/
+export type EventNamespace = string;
+
+/**
+An event's type
+
+The TitleCase identifier for an event in past tense
+
+@example `ProfileUpdated`
+@example `InviteAccepted`
+*/
+export type EventType = string;
+
+/**
 An aggregator function for an event
 
 @param acc - The current state of the aggregation. This is `None` on the first iteration, or the
@@ -35,9 +65,9 @@ Note that the `type` field is deprecated, but **should** be kept for compatibili
 versions of this library. It is the concatenation of `event_namespace`, `.` and `event_type`.
 */
 export interface EventData {
-  type: string;
-  event_namespace: string;
-  event_type: string;
+  type: EventNamespaceAndType;
+  event_namespace: EventNamespace;
+  event_type: EventType;
 }
 
 /**
