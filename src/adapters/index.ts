@@ -8,7 +8,7 @@ export * from './emitter/dumb';
 export * from './store/postgres';
 
 export interface CacheEntry<T> {
-  time?: string; // ISO String
+  time: string;
   data: T;
 }
 
