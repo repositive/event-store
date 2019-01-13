@@ -4,6 +4,7 @@
   "description": "Event store implementation",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "repository": "https://github.com/repositive/event-store",
   "scripts": {
     "compile": "rm -fr dist && tsc",
     "test": "nyc --all --reporter lcov ava-ts --verbose",
