@@ -28,3 +28,16 @@ The database is started at `postgres://repositive:repositive@localhost:5433/even
 
 * `yarn doc`
 * Open `doc/index.html` in your favourite browser
+
+## Deploy
+
+```bash
+# (optional) login to NPM
+npm login
+
+# Increment NPM version number
+npm version major|minor|patch
+
+# Publish to NPM
+npm publish
+```
