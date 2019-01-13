@@ -63,5 +63,8 @@
     "funfix": "7.0.1",
     "ramda": "0.25.0",
     "typedoc": "^0.14.0"
+  },
+  "scripts": {
+    "publish": "post-publish.sh"
   }
 }
