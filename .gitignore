@@ -8,3 +8,4 @@ CNV
 postgres_data
 *.swp
 *.lock
+doc

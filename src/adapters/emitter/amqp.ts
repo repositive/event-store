@@ -1,11 +1,20 @@
-import { EmitterAdapter, Event, EventData, EventContext, EmitterHandler, Logger } from '../../.';
-import { Option, Some, None } from 'funfix';
-import setupIris from '@repositive/iris';
-import { Iris } from '@repositive/iris';
+import {
+  EmitterAdapter,
+  Event,
+  EventData,
+  EventContext,
+  EmitterHandler,
+  Logger,
+  EventNamespaceAndType,
+  EventNamespace,
+} from "../../.";
+import { Option, Some, None } from "funfix";
+import setupIris from "@repositive/iris";
+import { Iris } from "@repositive/iris";
 
 export interface IrisOptions {
   uri?: string;
-  namespace: string;
+  namespace: EventNamespace;
 }
 
 export function wait(n: number): Promise<void> {
@@ -15,33 +24,43 @@ export function wait(n: number): Promise<void> {
 }
 
 function wrapHandler(handler: EmitterHandler<any>) {
-  return function({payload}: {payload?: any}) {
+  return function({ payload }: { payload?: any }) {
     return handler(payload);
   };
 }
 
-export function createAQMPEmitterAdapter(irisOpts: IrisOptions, logger: Logger = console): EmitterAdapter {
+export function createAQMPEmitterAdapter(
+  irisOpts: IrisOptions,
+  logger: Logger = console,
+): EmitterAdapter {
   let iris: Option<Iris> = None;
-  const subscriptions: Map<string, EmitterHandler<any>> = new Map();
-  setupIris({ ...irisOpts, logger}).map((_iris) => {
-    iris = Some(_iris);
-    for ( const [pattern, handler] of subscriptions.entries()) {
-      _iris.register({pattern, handler: wrapHandler(handler)});
-    }
-  })
-  .subscribe();
+  const subscriptions: Map<
+    EventNamespaceAndType,
+    EmitterHandler<any>
+  > = new Map();
+  setupIris({ ...irisOpts, logger })
+    .map((_iris) => {
+      iris = Some(_iris);
+      for (const [pattern, handler] of subscriptions.entries()) {
+        _iris.register({ pattern, handler: wrapHandler(handler) });
+      }
+    })
+    .subscribe();
 
   async function emit(event: Event<EventData, EventContext<any>>) {
     await iris
-      .map((i) => i.emit({pattern: event.data.type, payload: event}))
+      .map((i) => i.emit({ pattern: event.data.type, payload: event }))
       .getOrElseL(() => wait(1000).then(() => emit(event)));
   }
 
-  function subscribe(pattern: string, handler: EmitterHandler<any>) {
+  function subscribe(
+    pattern: EventNamespaceAndType,
+    handler: EmitterHandler<any>,
+  ) {
     const _handler = wrapHandler(handler);
 
     iris.map((i) => {
-      i.register({pattern, handler: _handler});
+      i.register({ pattern, handler: _handler });
     });
     subscriptions.set(pattern, handler);
   }
