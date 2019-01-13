@@ -11,8 +11,12 @@
     "testIntegration": "nyc --reporter lcov ava-ts --verbose ./src/integrationsetup.ts ./src/**/*.integration.ts",
     "testDev": "nyc --reporter lcov ava-ts --watch",
     "lint": "tslint --project tsconfig.json",
-    "doc": "typedoc --out doc --exclude **/*.test.ts --exclude */*.test.ts --excludePrivate --mode file --name 'Event store' src"
+    "doc": "typedoc --out doc/local --exclude **/*.test.ts --exclude */*.test.ts --excludePrivate --mode file --name 'Event store dev' src"
   },
+  "bugs": {
+    "url": "https://github.com/repositive/event-store/issues"
+  },
+  "homepage": "https://repositive.github.io/event-store",
   "ava": {
     "sources": [
       "src/**/*.ts"
