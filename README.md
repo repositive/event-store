@@ -6,7 +6,7 @@ An implementation of the event sourcing paradigm in Typescript.
 
 ## [Documentation](https://repositive.github.io/event-store/doc)
 
-Start by looking at the [`EventStore`](https://repositive.github.io/event-store/doc/classes/eventstore.html) class.
+Start by looking at the `EventStore` class.
 
 ## Development
 
