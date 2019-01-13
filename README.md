@@ -1,5 +1,9 @@
 # Event store
 
+[![Build Status](https://travis-ci.org/repositive/event-store.svg?branch=master)](https://travis-ci.org/repositive/event-store)
+
+## [Documentation](https://repositive.github.io/event-store)
+
 Quickstart
 
 ```bash
