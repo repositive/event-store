@@ -13,11 +13,10 @@
     "lint": "tslint --project tsconfig.json",
     "doc": "typedoc --out doc/local --exclude **/*.test.ts --exclude */*.test.ts --excludePrivate --mode file --name 'Event store dev' src",
     "prepack": "npm run compile",
-    "publish": "post-publish.sh"
+    "publish": "./post-publish.sh"
   },
   "files": [
-    "dist/**",
-    "README.md"
+    "dist/**"
   ],
   "bugs": {
     "url": "https://github.com/repositive/event-store/issues"
