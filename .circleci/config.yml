@@ -24,16 +24,17 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
+          key: dependency-cache-{{ checksum "package-lock.json" }}
       - run: sudo npm install -g npm@latest
       - run: npm install
       - save_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
+          key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
             - ./node_modules
       - run: npm run lint
       - run: npm run compile
       - run: npm run test
+      - run: npm run doc
       - run:
           name: Integration tests
           command: npm run testIntegration
