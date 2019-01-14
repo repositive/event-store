@@ -12,6 +12,8 @@ DOC_INDEX="./doc/index.html"
 # Temporary folder to add and upload new docs from
 GH_PAGES_WORKTREE=".gh-pages-tmp"
 
+npm install
+
 echo "Build docs for version ${VERSION}"
 
 git worktree remove --force "${GH_PAGES_WORKTREE}" || true
