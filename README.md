@@ -32,6 +32,9 @@ The database is started at `postgres://repositive:repositive@localhost:5433/even
 ## Deploy
 
 ```bash
+# Make sure we're deploying up to date master
+git checkout master && git pull
+
 # (optional) login to NPM
 npm login
 
