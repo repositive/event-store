@@ -56,6 +56,10 @@ export type EventType = string;
 /**
 An aggregator function for an event
 
+__Important:__ The result of an aggregate is cached, therefore an aggregate's computation must be
+idempotent. Computations that use externally changing values like timestamps or other globals should
+wrap the aggregate in another function so the cache stays valid.
+
 @param acc - The current state of the aggregation. This is `None` on the first iteration, or the
 return value of the previous aggregate application, which may also return `None`.
 
