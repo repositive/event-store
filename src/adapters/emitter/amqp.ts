@@ -23,8 +23,10 @@ export function wait(n: number): Promise<void> {
   });
 }
 
-function wrapHandler(handler: EmitterHandler<any>) {
+function wrapHandler(handler: EmitterHandler<any>, logger: Logger) {
   return function({ payload }: { payload?: any }) {
+    logger.trace('receivedEvent', { payload });
+
     return handler(payload);
   };
 }
@@ -42,12 +44,14 @@ export function createAQMPEmitterAdapter(
     .map((_iris) => {
       iris = Some(_iris);
       for (const [pattern, handler] of subscriptions.entries()) {
-        _iris.register({ pattern, handler: wrapHandler(handler) });
+        _iris.register({ pattern, handler: wrapHandler(handler, logger) });
       }
     })
     .subscribe();
 
   async function emit(event: Event<EventData, EventContext<any>>) {
+    logger.trace('emitEvent', { event });
+
     await iris
       .map((i) => i.emit({ pattern: event.data.type, payload: event }))
       .getOrElseL(() => wait(1000).then(() => emit(event)));
@@ -57,7 +61,7 @@ export function createAQMPEmitterAdapter(
     pattern: EventNamespaceAndType,
     handler: EmitterHandler<any>,
   ) {
-    const _handler = wrapHandler(handler);
+    const _handler = wrapHandler(handler, logger);
 
     iris.map((i) => {
       i.register({ pattern, handler: _handler });
