@@ -57,7 +57,7 @@ export function createAQMPEmitterAdapter(
       .getOrElseL(() => wait(1000).then(() => emit(event)));
   }
 
-  function subscribe(
+  async function subscribe(
     pattern: EventNamespaceAndType,
     handler: EmitterHandler<any>,
   ) {
@@ -65,7 +65,7 @@ export function createAQMPEmitterAdapter(
 
     logger.trace('subscribeToEvent', { pattern, hasIris: iris.nonEmpty() });
 
-    iris
+    await iris
       .map((i) => {
         logger.trace('subscribeToEventHasIris', { pattern });
 
@@ -76,10 +76,10 @@ export function createAQMPEmitterAdapter(
       .getOrElseL(() => {
         logger.trace('subscribeToEventNoIris', { pattern, wait: 1000 });
 
-        wait(1000).then(() => {
+        return wait(1000).then(() => {
           logger.trace('subscribeToEventReAttempt', { pattern });
 
-          subscribe(pattern, handler);
+          return subscribe(pattern, handler);
         })
       });
   }
