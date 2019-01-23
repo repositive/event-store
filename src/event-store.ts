@@ -117,7 +117,7 @@ export class EventStore<Q> {
 
     this.emitter.subscribe<Event<EventReplayRequested, any>>(
       "_eventstore.EventReplayRequested",
-      createEventReplayHandler({ store: this.store, emitter: this.emitter }),
+      createEventReplayHandler({ store: this.store, emitter: this.emitter, logger: this.logger }),
     );
   }
 
@@ -396,13 +396,17 @@ export function composeAggregator<T>(
 export function createEventReplayHandler({
   store,
   emitter,
+  logger,
 }: {
   store: StoreAdapter<any>;
   emitter: EmitterAdapter;
+  logger: Logger;
 }) {
   return async function handleEventReplay(
     event: Event<EventReplayRequested, EventContext<any>>,
   ) {
+    logger.trace('replayRequest', { event });
+
     const events = store.readEventSince(
       [
         event.data.requested_event_namespace,
@@ -413,6 +417,8 @@ export function createEventReplayHandler({
 
     // Emit all events;
     reduce(events, None, async (acc, e) => {
+      logger.trace('replayRequestEmit', { e });
+
       await emitter.emit(e);
       return None;
     });

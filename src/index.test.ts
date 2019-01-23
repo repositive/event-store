@@ -212,7 +212,7 @@ test("replay handler reads correct events", async (t) => {
     emit: emit as any,
   } as EmitterAdapter;
 
-  const replayHandler = createEventReplayHandler({ store, emitter });
+  const replayHandler = createEventReplayHandler({ store, emitter, logger });
 
   const evt: Event<EventReplayRequested, EventContext<any>> = {
     id,
