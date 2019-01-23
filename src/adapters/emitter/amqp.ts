@@ -63,12 +63,21 @@ export function createAQMPEmitterAdapter(
   ) {
     const _handler = wrapHandler(handler, logger);
 
-    logger.trace('subscribe', { hasIris: iris.nonEmpty() });
+    logger.trace('subscribeToEvent', { pattern, hasIris: iris.nonEmpty() });
 
-    iris.map((i) => {
-      i.register({ pattern, handler: _handler });
-    });
-    subscriptions.set(pattern, handler);
+    iris
+      .map((i) => {
+        logger.trace('subscribeToEventHasIris', { pattern });
+
+        i.register({ pattern, handler: _handler });
+
+        subscriptions.set(pattern, handler);
+      })
+      .getOrElseL(() => {
+        logger.trace('subscribeToEventNoIris', { pattern, wait: 1000 });
+
+        wait(1000).then(() => subscribe(pattern, handler))
+      });
   }
 
   return {
