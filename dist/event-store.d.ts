@@ -200,7 +200,8 @@ export declare function reduce<I, O>(iter: AsyncIterator<I>, acc: O, f: (acc: O,
  *
  */
 export declare function composeAggregator<T>(matches: AggregateMatches<T>): Aggregator<T>;
-export declare function createEventReplayHandler({ store, emitter, }: {
+export declare function createEventReplayHandler({ store, emitter, logger, }: {
     store: StoreAdapter<any>;
     emitter: EmitterAdapter;
+    logger: Logger;
 }): (event: Event<EventReplayRequested, EventContext<any>>) => Promise<void>;
