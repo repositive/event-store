@@ -18,7 +18,7 @@ export interface IrisOptions {
 }
 
 export function wait(n: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, n))
+  return new Promise((resolve) => setTimeout(resolve, n));
 }
 
 function wrapHandler(handler: EmitterHandler<any>) {
@@ -54,7 +54,7 @@ export function createAQMPEmitterAdapter(
   async function subscribe(
     pattern: EventNamespaceAndType,
     handler: EmitterHandler<any>,
-    _attempt = 0
+    _attempt = 0,
   ): Promise<any> {
     logger.trace('amqpSubscribe', { pattern, _attempt });
 
@@ -76,7 +76,7 @@ export function createAQMPEmitterAdapter(
 
       logger.trace('amqpSubscribeRetry', { pattern, _attempt, waitTime });
 
-      subscribe(pattern, handler, _attempt + 1)
+      subscribe(pattern, handler, _attempt + 1);
     });
   }
 
