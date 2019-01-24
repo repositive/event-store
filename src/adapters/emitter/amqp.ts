@@ -53,16 +53,20 @@ export function createAQMPEmitterAdapter(
       .getOrElseL(() => wait(1000).then(() => emit(event)));
   }
 
-  function subscribe(
+  async function subscribe(
     pattern: EventNamespaceAndType,
     handler: EmitterHandler<any>,
-  ) {
+  ): Promise<any> {
     const _handler = wrapHandler(handler);
 
-    iris.map((i) => {
-      i.register({ pattern, handler: _handler });
-    });
     subscriptions.set(pattern, handler);
+
+    return iris.map((i): Promise<any> => {
+      return i.register({ pattern, handler: _handler });
+    })
+    .getOrElseL((): Promise<any> => {
+      return wait(1000).then(() => subscribe(pattern, handler));
+    });
   }
 
   return {
