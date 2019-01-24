@@ -327,7 +327,7 @@ export class EventStore<Q> {
       }
     };
 
-    this.emitter.subscribe(pattern, _handler);
+    await this.emitter.subscribe(pattern, _handler);
 
     const last = await this.store.lastEventOf(pattern);
 
