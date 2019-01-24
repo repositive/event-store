@@ -56,16 +56,29 @@ export function createAQMPEmitterAdapter(
   async function subscribe(
     pattern: EventNamespaceAndType,
     handler: EmitterHandler<any>,
+    _attempt = 0
   ): Promise<any> {
+    logger.trace('amqpSubscribe', { pattern, _attempt });
+
     const _handler = wrapHandler(handler);
 
     subscriptions.set(pattern, handler);
 
     return iris.map((i): Promise<any> => {
+      logger.trace('amqpSubscribeHasIris', { pattern, _attempt });
+
       return i.register({ pattern, handler: _handler });
     })
     .getOrElseL((): Promise<any> => {
-      return wait(1000).then(() => subscribe(pattern, handler));
+      const waitTime = 1000;
+
+      logger.trace('amqpSubscribeNoIris', { pattern, _attempt, waitTime });
+
+      return wait(waitTime).then(() => {
+        logger.trace('amqpSubscribeRetry', { pattern, _attempt, waitTime });
+
+        subscribe(pattern, handler, _attempt + 1)
+      });
     });
   }
 
