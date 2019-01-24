@@ -45,8 +45,8 @@ export function createAQMPEmitterAdapter(
     })
     .subscribe();
 
-  async function emit(event: Event<EventData, EventContext<any>>) {
-    await iris
+  async function emit(event: Event<EventData, EventContext<any>>): Promise<any> {
+    return iris
       .map((i) => i.emit({ pattern: event.data.type, payload: event }))
       .getOrElseL(() => wait(1000).then(() => emit(event)));
   }
