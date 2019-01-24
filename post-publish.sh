@@ -21,6 +21,10 @@ git worktree add "${GH_PAGES_WORKTREE}" gh-pages
 
 cd "${GH_PAGES_WORKTREE}"
 
+# Update gh-pages from remote
+git fetch origin
+git reset --hard origin/gh-pages
+
 # Create a redirect from /doc to the latest version under /doc/a.b.c
 echo "<meta http-equiv=\"refresh\" content=\"0; url=https://repositive.github.io/event-store/doc/${VERSION}\" />" > "${DOC_INDEX}"
 
