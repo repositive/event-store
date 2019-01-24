@@ -74,15 +74,13 @@ export function createAQMPEmitterAdapter(
         subscriptions.set(pattern, handler);
       })
       .getOrElseL(() => {
-        const wait_time = 100;
+        logger.trace('subscribeToEventNoIris', { pattern, wait: 1000 });
 
-        logger.trace('subscribeToEventNoIris', { pattern, wait_time });
+        return wait(1000).then(() => {
+          logger.trace('subscribeToEventReAttempt', { pattern });
 
-        // return wait(wait_time).then(() => {
-        //   logger.trace('subscribeToEventReAttempt', { pattern });
-
-          subscribe(pattern, handler);
-        // })
+          return subscribe(pattern, handler);
+        })
       });
   }
 
