@@ -327,7 +327,11 @@ export class EventStore<Q> {
       }
     };
 
-    this.emitter.subscribe(pattern, _handler);
+    this.logger.trace('listen', { pattern });
+
+    await this.emitter.subscribe(pattern, _handler);
+
+    this.logger.trace('listenerSubscribed', { pattern });
 
     const last = await this.store.lastEventOf(pattern);
 
