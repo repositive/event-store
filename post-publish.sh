@@ -22,20 +22,14 @@ git worktree add "${GH_PAGES_WORKTREE}" gh-pages
 cd "${GH_PAGES_WORKTREE}"
 
 # Update gh-pages from remote
+git checkout gh-pages
 git fetch origin
-git reset --hard origin/gh-pages
+git rebase origin/master
+
+npm run doc -- --out "$DOC_OUTPUT" --name "Event store ${VERSION}"
 
 # Create a redirect from /doc to the latest version under /doc/a.b.c
 echo "<meta http-equiv=\"refresh\" content=\"0; url=https://repositive.github.io/event-store/doc/${VERSION}\" />" > "${DOC_INDEX}"
-
-typedoc \
-    --out "$DOC_OUTPUT" \
-    --exclude **/*.test.ts \
-    --exclude */*.test.ts \
-    --excludePrivate \
-    --mode file \
-    --name "Event store ${VERSION}" \
-    ./src
 
 echo "Adding generated docs"
 git add -f "${DOC_INDEX}"
@@ -44,7 +38,7 @@ echo "Comitting"
 git commit -m "Add documentation for version ${VERSION}" || true
 
 echo "Uploading docs for version ${VERSION} to gh-pages"
-git push origin gh-pages
+git push -f origin gh-pages
 
 git worktree remove "${GH_PAGES_WORKTREE}"
 
