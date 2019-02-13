@@ -304,9 +304,77 @@ export class EventStore<Q> {
 
   @param event_type - The event type to listen for
 
-  @param handler - Handler function called for every received event. The event will be saved to the
-  backing store before this handler is called, therefore can be retrieved with an aggregator. If the
-  event cannot be saved, or already exists in the database, the handler will not be called
+  @param handler - Handler function called for every received event. If the event is already present
+  in the database, the handler function will **not** be called.
+
+  The handler must return an `Either<undefined, undefined>`. To mark an event as successfully
+  handled, return `Right(undefined)`. If processing failed and the event should **not** be saved,
+  return `Left(undefined)`. This allows the handler to be re-run when the event is ingested again by
+  a replay.
+
+  _Important:_ The received event is not saved to the backing store before the handler
+  function is called. If the handler function uses an aggregate, the event must be manually folded
+  into the result of that aggregate during handling of the event, otherwise it won't be picked up.
+  For example:
+
+  ```typescript
+  // src/handlers/some_event.ts
+
+  import { Either, Left, Right, Some } from 'funfix';
+  import { Event } from '@repositive/event-store';
+
+  import { onSomeEvent } from '../aggregates';
+  import { SomeEvent } from '../events';
+  import { myEntityById } from '../somewhere';
+
+  export async function handle_some_event(
+    event: Event<SomeEvent, any>,
+    store: Store
+  ): Either<undefined, undefined> {
+    try {
+      // Does not aggregate the current `event` being handled
+      const my_entity_base: Option<MyEntity> = await myEntityById(event.data.entity_id);
+
+      // Add current event to aggregation. May fail if `onSomeEvent` requires `Some()`
+      const my_entity: Option<MyEntity> = await onSomeEvent(my_entity_base, event);
+
+      // ...
+
+      // Event was handled successfully
+      return Right(undefined);
+    } catch(e) {
+      // Something went wrong
+      // Event will not be persisted to backing store
+      return Left(undefined);
+    }
+  }
+  ```
+
+  @example Handle the `SomeEvent` event.
+
+  ```typescript
+  import { Either, Left, Right, EventStore } from 'funfix';
+  import { Event } from '@repositive/event-store';
+
+  let store = new EventStore(...);
+
+  store.listen<SomeEvent>(
+      'some_namespace',
+      'SomeEvent',
+      async (event: Event<SomeEvent, any>, store: EventStore) => {
+          try {
+              // ... event handling logic ...
+
+              // Event was handled successfully
+              return Right(undefined);
+          } catch (e) {
+              // Something went wrong
+              // Event will not be persisted to backing store
+              return Left(undefined);
+          }
+      }
+  );
+  ```
   */
   public async listen<T extends EventData>(
     event_namespace: T["event_namespace"],
