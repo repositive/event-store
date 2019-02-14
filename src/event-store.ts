@@ -358,7 +358,7 @@ export class EventStore<Q> {
 
   let store = new EventStore(...);
 
-  store.listen<SomeEvent>(
+  store.listen(
       'some_namespace',
       'SomeEvent',
       async (event: Event<SomeEvent, any>, store: EventStore) => {
