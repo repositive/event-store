@@ -379,7 +379,7 @@ export class EventStore<Q> {
   public async listen<T extends EventData>(
     event_namespace: T["event_namespace"],
     event_type: T["event_type"],
-    handler: EventHandler<Q, Event<T, any>>,
+    handler: EventHandler<Q, Event<T, EventContext<any>>>,
   ): Promise<void> {
     const pattern = [event_namespace, event_type].join(".");
 
