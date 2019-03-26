@@ -13,6 +13,7 @@ import {
   IsoDateString,
   EventType,
   EventNamespace,
+  Subscriptions
 } from ".";
 import { None, Some, Option, Either } from "funfix";
 import { v4 } from "uuid";
@@ -416,6 +417,36 @@ export class EventStore<Q> {
     );
 
     await this.emitter.emit(replay);
+  }
+
+  /**
+  Replay all events from the first event recorded by the store. This will re-call every registered
+  event handler for every event in the database. **Use this method with caution.**
+  */
+  public async replay_all(): Promise<void> {
+    const query: any = { text: "*" };
+    const handlers: Subscriptions = this.emitter.subscriptions();
+    const events = this.store.read(query, None);
+
+    // Loop through each event and call handler
+    while (true) {
+      const _next = await events.next();
+
+      if (_next.done) {
+        return;
+      } else {
+        const event = _next.value;
+
+        const event_ident = [event.data.event_namespace, event.data.event_type].join('.') || event.data.type;
+
+        const handler = handlers.get(event_ident);
+
+        // Execute handler
+        if(handler) {
+          await handler(event);
+        }
+      }
+    }
   }
 }
 

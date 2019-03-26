@@ -6,6 +6,7 @@ import {
   IsoDateString,
   EventNamespaceAndType,
   Uuid,
+  Subscriptions
 } from "..";
 
 export * from "./cache/postgres";
@@ -68,6 +69,11 @@ export type EmitterHandler<T extends Event<EventData, EventContext<any>>> = (
 ) => Promise<void>;
 
 /**
+Event subscriptions
+*/
+export type Subscriptions = Map<EventNamespaceAndType, EmitterHandler<any>>;
+
+/**
 The interface an emitter/subscriber backing service must implement
 
 This adapter is used to emit events for other domains to receive and create subscribers to consume
@@ -95,6 +101,11 @@ export interface EmitterAdapter {
     name: T["data"]["type"],
     handler: EmitterHandler<T>,
   ): void;
+
+  /**
+  Return a list of event identifiers and handlers
+  */
+  subscriptions(): Subscriptions;
 }
 
 /**
