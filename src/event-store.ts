@@ -428,6 +428,8 @@ export class EventStore<Q> {
     const handlers: Subscriptions = this.emitter.subscriptions();
     const events = this.store.read(query, None);
 
+    this.logger.trace('replayAll');
+
     // Loop through each event and call handler
     while (true) {
       const _next = await events.next();
@@ -440,6 +442,8 @@ export class EventStore<Q> {
         const event_ident = [event.data.event_namespace, event.data.event_type].join('.') || event.data.type;
 
         const handler = handlers.get(event_ident);
+
+        this.logger.trace({ event, event_ident, handler }, 'replayAllEvent');
 
         // Execute handler
         if(handler) {
