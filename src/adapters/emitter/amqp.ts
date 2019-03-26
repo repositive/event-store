@@ -7,6 +7,7 @@ import {
   Logger,
   EventNamespaceAndType,
   EventNamespace,
+  Subscriptions
 } from "../../.";
 import { Option, Some, None } from "funfix";
 import setupIris from "@repositive/iris";
@@ -32,14 +33,12 @@ export function createAQMPEmitterAdapter(
   logger: Logger = console,
 ): EmitterAdapter {
   let iris: Option<Iris> = None;
-  const subscriptions: Map<
-    EventNamespaceAndType,
-    EmitterHandler<any>
-  > = new Map();
+  const subs: Subscriptions = new Map();
+
   setupIris({ ...irisOpts, logger })
     .map((_iris) => {
       iris = Some(_iris);
-      for (const [pattern, handler] of subscriptions.entries()) {
+      for (const [pattern, handler] of subs.entries()) {
         _iris.register({ pattern, handler: wrapHandler(handler) });
       }
     })
@@ -60,7 +59,7 @@ export function createAQMPEmitterAdapter(
 
     const _handler = wrapHandler(handler);
 
-    subscriptions.set(pattern, handler);
+    subs.set(pattern, handler);
 
     return iris.map((i): Promise<any> => {
       logger.trace('amqpSubscribeHasIris', { pattern, _attempt });
@@ -80,8 +79,13 @@ export function createAQMPEmitterAdapter(
     });
   }
 
+  function subscriptions(): Subscriptions {
+    return subs
+  }
+
   return {
     emit,
     subscribe,
+    subscriptions,
   };
 }
