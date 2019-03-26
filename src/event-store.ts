@@ -424,7 +424,7 @@ export class EventStore<Q> {
   event handler for every event in the database. **Use this method with caution.**
   */
   public async replay_all(): Promise<void> {
-    const query: any = { text: "*" };
+    const query: any = { text: "select * from events" };
     const handlers: Subscriptions = this.emitter.subscriptions();
     const events = this.store.read(query, None);
 
