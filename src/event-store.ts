@@ -438,7 +438,7 @@ export class EventStore<Q> {
             event,
             event_ident,
             handler_type: typeof handler,
-            registered_handlers: handlers.keys()
+            registered_handlers: [ ...handlers.keys() ]
           },
           'replayAllEvent'
         );
