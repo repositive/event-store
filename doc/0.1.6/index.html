@@ -1,0 +1,381 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Event store 0.1.6</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">Event store 0.1.6</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> Event store 0.1.6</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<h1 id="event-store">Event store</h1>
+				<p><a href="https://circleci.com/gh/repositive/event-store/tree/master"><img src="https://circleci.com/gh/repositive/event-store/tree/master.svg?style=svg" alt="CircleCI"></a></p>
+				<p>An implementation of the event sourcing paradigm in Typescript.</p>
+				<h2 id="documentation"><a href="https://repositive.github.io/event-store/doc">Documentation</a></h2>
+				<p>Start by looking at the <code>EventStore</code> class.</p>
+				<h2 id="development">Development</h2>
+				<pre><code class="language-bash">npm install
+
+npm run compile
+
+docker-compose up -d
+
+npm <span class="hljs-built_in">test</span>
+
+docker-compose run integration_tests</code></pre>
+				<p>The database is started at <code>postgres://repositive:repositive@localhost:5433/event-store</code>. Run <code>db.sql</code> (user/pass <code>repositive</code>/<code>repositive</code>) to create the table structure and <code>test.sql</code> to add some sample data.</p>
+				<h2 id="building-documentation">Building documentation</h2>
+				<ul>
+					<li><code>yarn doc</code></li>
+					<li>Open <code>doc/index.html</code> in your favourite browser</li>
+				</ul>
+				<h2 id="deploy">Deploy</h2>
+				<pre><code class="language-bash"><span class="hljs-comment"># Make sure we're deploying up to date master</span>
+git checkout master &amp;&amp; git pull
+
+<span class="hljs-comment"># (optional) login to NPM</span>
+npm login
+
+<span class="hljs-comment"># Increment NPM version number</span>
+npm version major|minor|patch
+
+<span class="hljs-comment"># Publish to NPM</span>
+npm publish</code></pre>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-class">
+						<a href="classes/duplicateerror.html" class="tsd-kind-icon">Duplicate<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter">
+						<a href="classes/eventstore.html" class="tsd-kind-icon">Event<wbr>Store</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/cacheadapter.html" class="tsd-kind-icon">Cache<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/cacheentry.html" class="tsd-kind-icon">Cache<wbr>Entry</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/emitteradapter.html" class="tsd-kind-icon">Emitter<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/event.html" class="tsd-kind-icon">Event</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/eventcontext.html" class="tsd-kind-icon">Event<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/eventdata.html" class="tsd-kind-icon">Event<wbr>Data</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/eventreplayrequested.html" class="tsd-kind-icon">Event<wbr>Replay<wbr>Requested</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/eventstoreoptions.html" class="tsd-kind-icon">Event<wbr>Store<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/irisoptions.html" class="tsd-kind-icon">Iris<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/listenoptions.html" class="tsd-kind-icon">Listen<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/logger.html" class="tsd-kind-icon">Logger</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/pgquery.html" class="tsd-kind-icon">Pg<wbr>Query</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/storeadapter.html" class="tsd-kind-icon">Store<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#aggregate" class="tsd-kind-icon">Aggregate</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#aggregatematch" class="tsd-kind-icon">Aggregate<wbr>Match</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#aggregatematches" class="tsd-kind-icon">Aggregate<wbr>Matches</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#aggregator" class="tsd-kind-icon">Aggregator</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#cachekey" class="tsd-kind-icon">Cache<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#emitterhandler" class="tsd-kind-icon">Emitter<wbr>Handler</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#eventhandler" class="tsd-kind-icon">Event<wbr>Handler</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#eventnamespace" class="tsd-kind-icon">Event<wbr>Namespace</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#eventnamespaceandtype" class="tsd-kind-icon">Event<wbr>Namespace<wbr>And<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#eventtype" class="tsd-kind-icon">Event<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#executef" class="tsd-kind-icon">ExecuteF</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#isodatestring" class="tsd-kind-icon">Iso<wbr>Date<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#omit" class="tsd-kind-icon">Omit</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#subscriptions" class="tsd-kind-icon">Subscriptions</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#uuid" class="tsd-kind-icon">Uuid</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#validatef" class="tsd-kind-icon">ValidateF</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#aggregatecachetable" class="tsd-kind-icon">aggregate<wbr>Cache<wbr>Table</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#cafebabe" class="tsd-kind-icon">cafebabe</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#defaultquerystub" class="tsd-kind-icon">default<wbr>Query<wbr>Stub</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#eventstable" class="tsd-kind-icon">events<wbr>Table</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#id" class="tsd-kind-icon">id</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#insertaggregatecache" class="tsd-kind-icon">insert<wbr>Aggregate<wbr>Cache</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#logger" class="tsd-kind-icon">logger</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#composeaggregator" class="tsd-kind-icon">compose<wbr>Aggregator</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createaqmpemitteradapter" class="tsd-kind-icon">createAQMPEmitter<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createcontext" class="tsd-kind-icon">create<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createdumbcacheadapter" class="tsd-kind-icon">create<wbr>Dumb<wbr>Cache<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createdumbemitteradapter" class="tsd-kind-icon">create<wbr>Dumb<wbr>Emitter<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#createevent" class="tsd-kind-icon">create<wbr>Event</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createeventreplayhandler" class="tsd-kind-icon">create<wbr>Event<wbr>Replay<wbr>Handler</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createfakeiterator" class="tsd-kind-icon">create<wbr>Fake<wbr>Iterator</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createpgcacheadapter" class="tsd-kind-icon">create<wbr>PgCache<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createpgstoreadapter" class="tsd-kind-icon">create<wbr>PgStore<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-not-exported">
+						<a href="globals.html#defaultcontext" class="tsd-kind-icon">default<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#fakeemitter" class="tsd-kind-icon">fake<wbr>Emitter</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#fakepoolresult" class="tsd-kind-icon">fake<wbr>Pool<wbr>Result</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getdbconnection" class="tsd-kind-icon">get<wbr>DbConnection</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getfakepool" class="tsd-kind-icon">get<wbr>Fake<wbr>Pool</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getfakestoreadapter" class="tsd-kind-icon">get<wbr>Fake<wbr>Store<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#insertevent" class="tsd-kind-icon">insert<wbr>Event</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#isevent" class="tsd-kind-icon">is<wbr>Event</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#iseventcontext" class="tsd-kind-icon">is<wbr>Event<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#iseventdata" class="tsd-kind-icon">is<wbr>Event<wbr>Data</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#neweventstore" class="tsd-kind-icon">new<wbr>Event<wbr>Store</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#query" class="tsd-kind-icon">query</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#reduce" class="tsd-kind-icon">reduce</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-not-exported">
+						<a href="globals.html#toasynciter" class="tsd-kind-icon">to<wbr>Async<wbr>Iter</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#truncateall" class="tsd-kind-icon">truncate<wbr>All</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#wait" class="tsd-kind-icon">wait</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-not-exported">
+						<a href="globals.html#wraphandler" class="tsd-kind-icon">wrap<wbr>Handler</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-is-not-exported">
+						<a href="globals.html#defaultlistenoptions" class="tsd-kind-icon">default<wbr>Listen<wbr>Options</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>

@@ -1,0 +1,599 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>EventStore | Event store 0.1.6</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.js" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">Event store 0.1.6</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="eventstore.html">EventStore</a>
+				</li>
+			</ul>
+			<h1>Class EventStore&lt;Q&gt;</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Main event store class</p>
+					</div>
+					<p>An event store requires an implementation of three things; <a href="../interfaces/storeadapter.html">StoreAdapter</a>,
+						<a href="../interfaces/emitteradapter.html">EmitterAdapter</a> and <a href="../interfaces/cacheadapter.html">CacheAdapter</a>. The following example uses Postgres for the backing
+						store and cache, and an AMQP (RabbitMQ) queue to emit and subscribe to events. Note the typo in
+					<code>AQMPEmitterAdapter</code>.</p>
+					<pre><code class="language-typescript"><span class="hljs-keyword">import</span> {
+createAQMPEmitterAdapter,
+createPgStoreAdapter,
+createPgCacheAdapter,
+EventStore
+} <span class="hljs-keyword">from</span> <span class="hljs-string">'@repositive/event-store'</span>;
+
+<span class="hljs-keyword">const</span> emitterAdapter = createAQMPEmitterAdapter(irisOpts);
+<span class="hljs-keyword">const</span> storeAdapter = createPgStoreAdapter(postgres);
+<span class="hljs-keyword">const</span> cacheAdapter = createPgCacheAdapter(postgres);
+
+<span class="hljs-keyword">const</span> store = <span class="hljs-keyword">new</span> EventStore(storeAdapter, {cache: cacheAdapter, emitter: emitterAdapter});</code></pre>
+					<p>The store uses <code>console</code> as its default logger, but can be overridden by passing in extra arguments.
+					The following example uses <a href="http://npmjs.com/pino">Pino</a>.</p>
+					<pre><code class="language-typescript"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> pino <span class="hljs-keyword">from</span> <span class="hljs-string">'pino'</span>;
+<span class="hljs-keyword">import</span> {
+createAQMPEmitterAdapter,
+createPgStoreAdapter,
+createPgCacheAdapter,
+EventStore
+} <span class="hljs-keyword">from</span> <span class="hljs-string">'@repositive/event-store'</span>;
+
+<span class="hljs-keyword">const</span> logger = pino();
+
+<span class="hljs-keyword">const</span> emitterAdapter = createAQMPEmitterAdapter(irisOpts, logger);
+<span class="hljs-keyword">const</span> storeAdapter = createPgStoreAdapter(postgres, logger);
+<span class="hljs-keyword">const</span> cacheAdapter = createPgCacheAdapter(postgres, logger);
+
+<span class="hljs-keyword">const</span> store = <span class="hljs-keyword">new</span> EventStore(
+storeAdapter,
+{cache: cacheAdapter, emitter: emitterAdapter, logger}
+);</code></pre>
+					<p>Any logger can be used that implements the <a href="../interfaces/logger.html">Logger</a> interface.</p>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-type-parameters">
+				<h3>Type parameters</h3>
+				<ul class="tsd-type-parameters">
+					<li>
+						<h4>Q</h4>
+						<div class="tsd-comment tsd-typography">
+							<div class="lead">
+								<p>The query type of the backing store</p>
+								<p>For example, when using a Postgres store, this should be <code>string</code>. Other databases may accept
+								different types</p>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">EventStore</span>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Constructors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="eventstore.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="eventstore.html#createaggregate" class="tsd-kind-icon">create<wbr>Aggregate</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="eventstore.html#listen" class="tsd-kind-icon">listen</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="eventstore.html#replay_all" class="tsd-kind-icon">replay_<wbr>all</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="eventstore.html#save" class="tsd-kind-icon">save</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Event<wbr>Store<span class="tsd-signature-symbol">(</span>store_adapter<span class="tsd-signature-symbol">: </span><a href="../interfaces/storeadapter.html" class="tsd-signature-type">StoreAdapter</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Q</span><span class="tsd-signature-symbol">&gt;</span>, options<span class="tsd-signature-symbol">?: </span><a href="../interfaces/eventstoreoptions.html" class="tsd-signature-type">EventStoreOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="eventstore.html" class="tsd-signature-type">EventStore</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/d2251c8/src/event-store.ts#L106">event-store.ts:106</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Create a new event store</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>store_adapter: <a href="../interfaces/storeadapter.html" class="tsd-signature-type">StoreAdapter</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Q</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>The backing store used to save and retrieve events</p>
+										</div>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> options: <a href="../interfaces/eventstoreoptions.html" class="tsd-signature-type">EventStoreOptions</a><span class="tsd-signature-symbol"> =&nbsp;{}</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>Cache adapter, emitter adapter and (optional) logger to use</p>
+										</div>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="eventstore.html" class="tsd-signature-type">EventStore</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+					<a name="createaggregate" class="tsd-anchor"></a>
+					<h3>create<wbr>Aggregate</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Aggregate&lt;A, T&gt;<span class="tsd-signature-symbol">(</span>aggregateName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, query<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Q</span>, matches<span class="tsd-signature-symbol">: </span><a href="../globals.html#aggregatematches" class="tsd-signature-type">AggregateMatches</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../globals.html#aggregate" class="tsd-signature-type">Aggregate</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/d2251c8/src/event-store.ts#L233">event-store.ts:233</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Prepare and return an aggregator function</p>
+								</div>
+								<p>Use this to create an aggregate that can be used by the rest of the application.</p>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-typescript"><span class="hljs-keyword">import</span> { EventStore, PgQuery, Aggregate, isEvent } <span class="hljs-keyword">from</span> <span class="hljs-string">'@repositive/event-store'</span>;
+<span class="hljs-keyword">import</span> {
+isThingCreated,
+isThingUpdated,
+ThingUpdated,
+ThingCreated
+} <span class="hljs-keyword">from</span> <span class="hljs-string">'./events'</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> Thing {
+<span class="hljs-comment">// ...</span>
+}
+
+<span class="hljs-keyword">const</span> onThingCreated = <span class="hljs-keyword">async</span> (
+acc: Option&lt;Thing&gt;,
+event: Event&lt;ThingCreated, EventContext&lt;<span class="hljs-built_in">any</span>&gt;&gt;
+): <span class="hljs-built_in">Promise</span>&lt;Option&lt;Thing&gt;&gt; =&gt; {
+<span class="hljs-comment">// ...</span>
+};
+
+<span class="hljs-keyword">const</span> onThingUpdated = <span class="hljs-keyword">async</span> (
+acc: Option&lt;Thing&gt;,
+event: Event&lt;ThingUpdated, EventContext&lt;<span class="hljs-built_in">any</span>&gt;&gt;
+): <span class="hljs-built_in">Promise</span>&lt;Option&lt;Thing&gt;&gt; =&gt; {
+<span class="hljs-comment">// ...</span>
+};
+
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">prepareThingById</span>(<span class="hljs-params">
+store: EventStore&lt;PgQuery&gt;
+</span>): <span class="hljs-title">Aggregate</span>&lt;[<span class="hljs-title">string</span>], <span class="hljs-title">Thing</span>&gt; </span>{
+<span class="hljs-keyword">return</span> store.createAggregate(
+<span class="hljs-string">'thingById'</span>,
+{
+text: <span class="hljs-string">`select * from events where data-&gt;&gt;'thing_id' = $1`</span>
+},
+[
+[isEvent(isThingCreated), onThingCreated],
+[isEvent(isThingUpdated), onThingUpdated]
+]
+);
+}</code></pre>
+										<p>The above example will create an aggregator with the identifier <code>ThingById</code> that accepts one
+											argument (a thing ID) and returns the fictional <code>Thing</code> object. It queries the database for all
+										events that contain a data field called <code>thing_id</code> with a value equal to the given input.</p>
+										<p>It supports two events; <code>ThingCreated</code> and <code>ThingUpdated</code>, handled by <code>onThingCreated</code> and
+										<code>onThingUpdated</code> respectively.</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>A<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h4>
+								</li>
+								<li>
+									<h4>T</h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>aggregateName: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The unique identifier of this aggregate. It is good convention to name it
+										the same as the aggregate function, i.e. <code>thingById</code> in the example above.</p>
+									</div>
+								</li>
+								<li>
+									<h5>query: <span class="tsd-signature-type">Q</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The query sent to the database to select events to aggregate over. This can return
+											other events than those desired; they will be ignored if no handler for them is specified in the
+										<code>matches</code> list.</p>
+									</div>
+								</li>
+								<li>
+									<h5>matches: <a href="../globals.html#aggregatematches" class="tsd-signature-type">AggregateMatches</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A list of pairs where the first item determines whether the second should be
+											executed. <code>matches</code> is evaluated against every event returned from the backing store, with the
+											first match from top to bottom being called for that event. This defines the relationship between
+										events and their handlers.</p>
+										<p>The <a href="../globals.html#isevent">isEvent</a> helper can be used to reduce boilerplate. An example <code>isThingCreated</code> function
+										may look like this:</p>
+										<pre><code class="language-typescript"><span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isThingCreated</span>(<span class="hljs-params">o: <span class="hljs-built_in">any</span></span>): <span class="hljs-title">o</span> <span class="hljs-title">is</span> <span class="hljs-title">ThingUpdated</span> </span>{
+<span class="hljs-keyword">return</span> o &amp;&amp; o.type === <span class="hljs-string">'thingdomain.ThingUpdated'</span>;
+}</code></pre>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../globals.html#aggregate" class="tsd-signature-type">Aggregate</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>Result of aggregation over queried events</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+					<a name="listen" class="tsd-anchor"></a>
+					<h3>listen</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">listen&lt;T&gt;<span class="tsd-signature-symbol">(</span>event_namespace<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T[&quot;event_namespace&quot;]</span>, event_type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T[&quot;event_type&quot;]</span>, handler<span class="tsd-signature-symbol">: </span><a href="../globals.html#eventhandler" class="tsd-signature-type">EventHandler</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Q</span><span class="tsd-signature-symbol">, </span><a href="../interfaces/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><a href="../interfaces/eventcontext.html" class="tsd-signature-type">EventContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span>, options<span class="tsd-signature-symbol">?: </span><a href="../interfaces/listenoptions.html" class="tsd-signature-type">ListenOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/d2251c8/src/event-store.ts#L383">event-store.ts:383</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Listen for events emitted by other event stores</p>
+								</div>
+								<p>When this method is called, a subscription is initialised and an <a href="../interfaces/eventreplayrequested.html">EventReplayRequested</a>
+									event is emitted. This allows this store to receive events it may have missed due to save errors,
+								downtime or deployments.</p>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><p>Handle the <code>SomeEvent</code> event.</p>
+										<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { Either, Left, Right, EventStore } <span class="hljs-keyword">from</span> <span class="hljs-string">'funfix'</span>;
+<span class="hljs-keyword">import</span> { Event } <span class="hljs-keyword">from</span> <span class="hljs-string">'@repositive/event-store'</span>;
+
+<span class="hljs-keyword">let</span> store = <span class="hljs-keyword">new</span> EventStore(...);
+
+store.listen(
+<span class="hljs-string">'some_namespace'</span>,
+<span class="hljs-string">'SomeEvent'</span>,
+<span class="hljs-keyword">async</span> (event: Event&lt;SomeEvent, <span class="hljs-built_in">any</span>&gt;, store: EventStore) =&gt; {
+<span class="hljs-keyword">try</span> {
+<span class="hljs-comment">// ... event handling logic ...</span>
+
+<span class="hljs-comment">// Event was handled successfully</span>
+<span class="hljs-keyword">return</span> Right(<span class="hljs-literal">undefined</span>);
+} <span class="hljs-keyword">catch</span> (e) {
+<span class="hljs-comment">// Something went wrong</span>
+<span class="hljs-comment">// Event will not be persisted to backing store</span>
+<span class="hljs-keyword">return</span> Left(<span class="hljs-literal">undefined</span>);
+}
+}
+);</code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T<span class="tsd-signature-symbol">: </span><a href="../interfaces/eventdata.html" class="tsd-signature-type">EventData</a></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>event_namespace: <span class="tsd-signature-type">T[&quot;event_namespace&quot;]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The remote namespace to listen to</p>
+									</div>
+								</li>
+								<li>
+									<h5>event_type: <span class="tsd-signature-type">T[&quot;event_type&quot;]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The event type to listen for</p>
+									</div>
+								</li>
+								<li>
+									<h5>handler: <a href="../globals.html#eventhandler" class="tsd-signature-type">EventHandler</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Q</span><span class="tsd-signature-symbol">, </span><a href="../interfaces/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><a href="../interfaces/eventcontext.html" class="tsd-signature-type">EventContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Handler function called for every received event. If the event is already present
+										in the database, the handler function will <strong>not</strong> be called.</p>
+										<p>The handler must return an <code>Either&lt;undefined, undefined&gt;</code>. To mark an event as successfully
+											handled, return <code>Right(undefined)</code>. If processing failed and the event should <strong>not</strong> be saved,
+											return <code>Left(undefined)</code>. This allows the handler to be re-run when the event is ingested again by
+										a replay.</p>
+										<p><em>Important:</em> The received event is not saved to the backing store before the handler
+											function is called. If the handler function uses an aggregate, the event must be manually folded
+											into the result of that aggregate during handling of the event, otherwise it won&#39;t be picked up.
+										For example:</p>
+										<pre><code class="language-typescript"><span class="hljs-comment">// src/handlers/some_event.ts</span>
+
+<span class="hljs-keyword">import</span> { Either, Left, Right, Some } <span class="hljs-keyword">from</span> <span class="hljs-string">'funfix'</span>;
+<span class="hljs-keyword">import</span> { Event } <span class="hljs-keyword">from</span> <span class="hljs-string">'@repositive/event-store'</span>;
+
+<span class="hljs-keyword">import</span> { onSomeEvent } <span class="hljs-keyword">from</span> <span class="hljs-string">'../aggregates'</span>;
+<span class="hljs-keyword">import</span> { SomeEvent } <span class="hljs-keyword">from</span> <span class="hljs-string">'../events'</span>;
+<span class="hljs-keyword">import</span> { myEntityById } <span class="hljs-keyword">from</span> <span class="hljs-string">'../somewhere'</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">handle_some_event</span>(<span class="hljs-params">
+event: Event&lt;SomeEvent, <span class="hljs-built_in">any</span>&gt;,
+store: Store
+</span>): <span class="hljs-title">Either</span>&lt;<span class="hljs-title">undefined</span>, <span class="hljs-title">undefined</span>&gt; </span>{
+<span class="hljs-keyword">try</span> {
+<span class="hljs-comment">// Does not aggregate the current `event` being handled</span>
+<span class="hljs-keyword">const</span> my_entity_base: Option&lt;MyEntity&gt; = <span class="hljs-keyword">await</span> myEntityById(event.data.entity_id);
+
+<span class="hljs-comment">// Add current event to aggregation. May fail if `onSomeEvent` requires `Some()`</span>
+<span class="hljs-keyword">const</span> my_entity: Option&lt;MyEntity&gt; = <span class="hljs-keyword">await</span> onSomeEvent(my_entity_base, event);
+
+<span class="hljs-comment">// ...</span>
+
+<span class="hljs-comment">// Event was handled successfully</span>
+<span class="hljs-keyword">return</span> Right(<span class="hljs-literal">undefined</span>);
+} <span class="hljs-keyword">catch</span>(e) {
+<span class="hljs-comment">// Something went wrong</span>
+<span class="hljs-comment">// Event will not be persisted to backing store</span>
+<span class="hljs-keyword">return</span> Left(<span class="hljs-literal">undefined</span>);
+}
+}</code></pre>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="../interfaces/listenoptions.html" class="tsd-signature-type">ListenOptions</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="replay_all" class="tsd-anchor"></a>
+					<h3>replay_<wbr>all</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">replay_<wbr>all<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/d2251c8/src/event-store.ts#L424">event-store.ts:424</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Replay all events from the first event recorded by the store. This will re-call every registered
+									event handler for every event in the database. <strong>Use this method with caution.</strong></p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="save" class="tsd-anchor"></a>
+					<h3>save</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">save<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><a href="../interfaces/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/eventdata.html" class="tsd-signature-type">EventData</a><span class="tsd-signature-symbol">, </span><a href="../interfaces/eventcontext.html" class="tsd-signature-type">EventContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/d2251c8/src/event-store.ts#L132">event-store.ts:132</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Save an event and emit it onto the queue</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>event: <a href="../interfaces/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/eventdata.html" class="tsd-signature-type">EventData</a><span class="tsd-signature-symbol">, </span><a href="../interfaces/eventcontext.html" class="tsd-signature-type">EventContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The event to save and emit</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class tsd-has-type-parameter">
+						<a href="eventstore.html" class="tsd-kind-icon">Event<wbr>Store</a>
+						<ul>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class">
+								<a href="eventstore.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+								<a href="eventstore.html#createaggregate" class="tsd-kind-icon">create<wbr>Aggregate</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+								<a href="eventstore.html#listen" class="tsd-kind-icon">listen</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="eventstore.html#replay_all" class="tsd-kind-icon">replay_<wbr>all</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="eventstore.html#save" class="tsd-kind-icon">save</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
