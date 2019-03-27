@@ -13,22 +13,17 @@ import {
   IsoDateString,
   EventType,
   EventNamespace,
-} from ".";
-import { None, Some, Option, Either } from "funfix";
-import { v4 } from "uuid";
-import { createHash } from "crypto";
-import { createEvent } from "./helpers";
+  Subscriptions,
+} from '.';
+import { None, Some, Option, Either } from 'funfix';
+import { v4 } from 'uuid';
+import { createHash } from 'crypto';
+import { createEvent } from './helpers';
 
 export type Aggregate<A extends any[], T> = (...args: A) => Promise<Option<T>>;
 export type ValidateF<E extends Event<any, any>> = (o: any) => o is E;
-export type ExecuteF<T, E extends Event<any, any>> = (
-  acc: Option<T>,
-  ev: E,
-) => Promise<Option<T>>;
-export type AggregateMatch<A, T extends Event<any, any>> = [
-  ValidateF<T>,
-  ExecuteF<A, T>
-];
+export type ExecuteF<T, E extends Event<any, any>> = (acc: Option<T>, ev: E) => Promise<Option<T>>;
+export type AggregateMatch<A, T extends Event<any, any>> = [ValidateF<T>, ExecuteF<A, T>];
 export type AggregateMatches<T> = Array<AggregateMatch<T, any>>;
 
 export type EventHandler<Q, T extends Event<EventData, EventContext<any>>> = (
@@ -41,6 +36,14 @@ export interface EventStoreOptions {
   emitter?: EmitterAdapter;
   logger?: Logger;
 }
+
+export interface ListenOptions {
+  executeHandlerIfEventExists?: boolean;
+}
+
+const defaultListenOptions: ListenOptions = {
+  executeHandlerIfEventExists: false,
+};
 
 /**
 Main event store class
@@ -116,7 +119,7 @@ export class EventStore<Q> {
     this.logger = options.logger || console;
 
     this.emitter.subscribe<Event<EventReplayRequested, any>>(
-      "_eventstore.EventReplayRequested",
+      '_eventstore.EventReplayRequested',
       createEventReplayHandler({ store: this.store, emitter: this.emitter }),
     );
   }
@@ -235,13 +238,13 @@ export class EventStore<Q> {
     const _impl = async (...args: A): Promise<Option<T>> => {
       const start = Date.now();
 
-      const id = createHash("sha256")
+      const id = createHash('sha256')
         .update(aggregateName + JSON.stringify(query) + JSON.stringify(args))
-        .digest("hex");
+        .digest('hex');
 
       const latestSnapshot = await this.cache.get<T>(id);
 
-      this.logger.trace("cacheSnapshot", latestSnapshot);
+      this.logger.trace('cacheSnapshot', latestSnapshot);
       const results = this.store.read(
         query,
         latestSnapshot.flatMap((snapshot) => Option.of(snapshot.time)),
@@ -251,27 +254,28 @@ export class EventStore<Q> {
       const aggregatedAt = new Date();
       const aggregator = composeAggregator(matches);
 
-      const aggregatedResult = await reduce<
-        Event<EventData, EventContext<any>>,
-        Option<T>
-      >(results, latestSnapshot.map((snapshot) => snapshot.data), aggregator);
+      const aggregatedResult = await reduce<Event<EventData, EventContext<any>>, Option<T>>(
+        results,
+        latestSnapshot.map((snapshot) => snapshot.data),
+        aggregator,
+      );
 
-      this.logger.trace("aggregatedResult", aggregatedResult);
+      this.logger.trace('aggregatedResult', aggregatedResult);
 
       await aggregatedResult.map((result) => {
         const snapshotHash = latestSnapshot
           .map((snapshot) => {
-            return createHash("sha256")
+            return createHash('sha256')
               .update(JSON.stringify(snapshot.data))
-              .digest("hex");
+              .digest('hex');
           })
-          .getOrElse("");
+          .getOrElse('');
 
-        const toCacheHash = createHash("sha256")
+        const toCacheHash = createHash('sha256')
           .update(JSON.stringify(result))
-          .digest("hex");
+          .digest('hex');
         if (snapshotHash !== toCacheHash) {
-          this.logger.trace("save to cache", result);
+          this.logger.trace('save to cache', result);
           return this.cache.set(id, {
             data: result,
             time: aggregatedAt.toISOString(),
@@ -279,7 +283,7 @@ export class EventStore<Q> {
         }
       });
 
-      this.logger.trace("aggregateLatency", {
+      this.logger.trace('aggregateLatency', {
         query,
         args,
         query_time: aggregatedAt.getTime() - start,
@@ -377,15 +381,16 @@ export class EventStore<Q> {
   ```
   */
   public async listen<T extends EventData>(
-    event_namespace: T["event_namespace"],
-    event_type: T["event_type"],
+    event_namespace: T['event_namespace'],
+    event_type: T['event_type'],
     handler: EventHandler<Q, Event<T, EventContext<any>>>,
+    options?: ListenOptions,
   ): Promise<void> {
-    const pattern = [event_namespace, event_type].join(".");
+    const { executeHandlerIfEventExists } = {...defaultListenOptions, ...options} || defaultListenOptions;
+    const pattern = [event_namespace, event_type].join('.');
 
     const _handler = async (event: Event<any, any>) => {
-      const exists = await this.store.exists(event.id);
-      if (!exists) {
+      if (executeHandlerIfEventExists || !(await this.store.exists(event.id))) {
         const result = await handler(event, this);
         await result
           .map(() => {
@@ -403,19 +408,63 @@ export class EventStore<Q> {
 
     const last = await this.store.lastEventOf(pattern);
 
-    const replay = createEvent<EventReplayRequested>(
-      "_eventstore",
-      "EventReplayRequested",
-      {
-        requested_event_namespace: event_namespace,
-        requested_event_type: event_type,
-        since: last
-          .map((l) => l.context.time)
-          .getOrElse(new Date(0).toISOString()),
-      },
-    );
+    const replay = createEvent<EventReplayRequested>('_eventstore', 'EventReplayRequested', {
+      requested_event_namespace: event_namespace,
+      requested_event_type: event_type,
+      since: last.map((l) => l.context.time).getOrElse(new Date(0).toISOString()),
+    });
 
     await this.emitter.emit(replay);
+  }
+
+  /**
+  Replay all events from the first event recorded by the store. This will re-call every registered
+  event handler for every event in the database. **Use this method with caution.**
+  */
+  public async replay_all(): Promise<void> {
+    const query: any = { text: 'select * from events' };
+    const handlers: Subscriptions = this.emitter.subscriptions();
+    const events = this.store.read(query, None);
+
+    this.logger.debug('Executing replayAll');
+
+    let iteration = 0;
+    let handled = 0;
+    // Loop through each event and call handler
+    while (true) {
+      const _next = await events.next();
+
+      if (_next.done) {
+        this.logger.debug(`Done with replayAll, processed ${iteration} events, handled ${handled}`);
+        return;
+      } else {
+        const event = _next.value;
+
+        const event_ident =
+          [event.data.event_namespace, event.data.event_type].join('.') || event.data.type;
+
+        const handler = handlers.get(event_ident);
+
+        this.logger.trace(
+          {
+            event,
+            event_ident,
+            handler_type: typeof handler,
+            registered_handlers: [ ...handlers.keys() ],
+            iteration,
+          },
+          'replayAllEvent',
+        );
+
+        // Execute handler
+        if (handler) {
+          handled++;
+          await handler(event);
+        }
+      }
+
+      iteration++;
+    }
   }
 }
 
@@ -424,9 +473,9 @@ An event used to request a replay from remote event stores. It uses the `request
 `requested_event_namespace` fields to specify which type of event should be replayed.
 */
 export interface EventReplayRequested extends EventData {
-  type: "_eventstore.EventReplayRequested";
-  event_namespace: "_eventstore";
-  event_type: "EventReplayRequested";
+  type: '_eventstore.EventReplayRequested';
+  event_namespace: '_eventstore';
+  event_type: 'EventReplayRequested';
   requested_event_type: EventType;
   requested_event_namespace: EventNamespace;
   since: IsoDateString;
@@ -452,9 +501,7 @@ export async function reduce<I, O>(
  *  Compose a list of maching functions into an aggregator
  *
  */
-export function composeAggregator<T>(
-  matches: AggregateMatches<T>,
-): Aggregator<T> {
+export function composeAggregator<T>(matches: AggregateMatches<T>): Aggregator<T> {
   return async (acc: Option<T>, event: Event<EventData, any>) => {
     return matches.reduce((matchAcc, [validate, execute]) => {
       if (validate(event)) {
@@ -472,14 +519,9 @@ export function createEventReplayHandler({
   store: StoreAdapter<any>;
   emitter: EmitterAdapter;
 }) {
-  return async function handleEventReplay(
-    event: Event<EventReplayRequested, EventContext<any>>,
-  ) {
+  return async function handleEventReplay(event: Event<EventReplayRequested, EventContext<any>>) {
     const events = store.readEventSince(
-      [
-        event.data.requested_event_namespace,
-        event.data.requested_event_type,
-      ].join("."),
+      [event.data.requested_event_namespace, event.data.requested_event_type].join('.'),
       Option.of(event.data.since),
     );
 
