@@ -6,7 +6,7 @@ import {
   IsoDateString,
   EventNamespaceAndType,
   Uuid,
-  Subscriptions
+  Subscriptions,
 } from "..";
 
 export * from "./cache/postgres";

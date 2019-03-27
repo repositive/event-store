@@ -19,7 +19,7 @@ export function createDumbEmitterAdapter(): EmitterAdapter {
   }
 
   function subscriptions(): Subscriptions {
-    return subs
+    return subs;
   }
 
   return {

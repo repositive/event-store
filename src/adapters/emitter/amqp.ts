@@ -7,7 +7,7 @@ import {
   Logger,
   EventNamespaceAndType,
   EventNamespace,
-  Subscriptions
+  Subscriptions,
 } from "../../.";
 import { Option, Some, None } from "funfix";
 import setupIris from "@repositive/iris";

@@ -120,7 +120,7 @@ export class EventStore<Q> {
 
     this.emitter.subscribe<Event<EventReplayRequested, any>>(
       '_eventstore.EventReplayRequested',
-      createEventReplayHandler({ store: this.store, emitter: this.emitter })
+      createEventReplayHandler({ store: this.store, emitter: this.emitter }),
     );
   }
 
@@ -130,7 +130,7 @@ export class EventStore<Q> {
   @param event - The event to save and emit
   */
   public async save(event: Event<EventData, EventContext<any>>): Promise<void> {
-    await this.store.write(event).then(result => {
+    await this.store.write(event).then((result) => {
       return result
         .map(() => {
           // If there are no errors saving, emit the event
@@ -139,7 +139,7 @@ export class EventStore<Q> {
         .getOrElseL(() => {
           return result
             .swap()
-            .map(error => {
+            .map((error) => {
               if (error instanceof DuplicateError) {
                 return Promise.resolve();
               }
@@ -233,7 +233,7 @@ export class EventStore<Q> {
   public createAggregate<A extends any[], T>(
     aggregateName: string,
     query: Q,
-    matches: AggregateMatches<T>
+    matches: AggregateMatches<T>,
   ): Aggregate<A, T> {
     const _impl = async (...args: A): Promise<Option<T>> => {
       const start = Date.now();
@@ -247,8 +247,8 @@ export class EventStore<Q> {
       this.logger.trace('cacheSnapshot', latestSnapshot);
       const results = this.store.read(
         query,
-        latestSnapshot.flatMap(snapshot => Option.of(snapshot.time)),
-        ...args
+        latestSnapshot.flatMap((snapshot) => Option.of(snapshot.time)),
+        ...args,
       );
 
       const aggregatedAt = new Date();
@@ -256,15 +256,15 @@ export class EventStore<Q> {
 
       const aggregatedResult = await reduce<Event<EventData, EventContext<any>>, Option<T>>(
         results,
-        latestSnapshot.map(snapshot => snapshot.data),
-        aggregator
+        latestSnapshot.map((snapshot) => snapshot.data),
+        aggregator,
       );
 
       this.logger.trace('aggregatedResult', aggregatedResult);
 
-      await aggregatedResult.map(result => {
+      await aggregatedResult.map((result) => {
         const snapshotHash = latestSnapshot
-          .map(snapshot => {
+          .map((snapshot) => {
             return createHash('sha256')
               .update(JSON.stringify(snapshot.data))
               .digest('hex');
@@ -278,7 +278,7 @@ export class EventStore<Q> {
           this.logger.trace('save to cache', result);
           return this.cache.set(id, {
             data: result,
-            time: aggregatedAt.toISOString()
+            time: aggregatedAt.toISOString(),
           });
         }
       });
@@ -288,7 +288,7 @@ export class EventStore<Q> {
         args,
         query_time: aggregatedAt.getTime() - start,
         aggregate_time: Date.now() - aggregatedAt.getTime(),
-        total_time: Date.now() - start
+        total_time: Date.now() - start,
       });
 
       return aggregatedResult;
@@ -484,7 +484,7 @@ export interface EventReplayRequested extends EventData {
 export async function reduce<I, O>(
   iter: AsyncIterator<I>,
   acc: O,
-  f: (acc: O, next: I) => Promise<O>
+  f: (acc: O, next: I) => Promise<O>,
 ): Promise<O> {
   let _acc = acc;
   while (true) {
@@ -514,7 +514,7 @@ export function composeAggregator<T>(matches: AggregateMatches<T>): Aggregator<T
 
 export function createEventReplayHandler({
   store,
-  emitter
+  emitter,
 }: {
   store: StoreAdapter<any>;
   emitter: EmitterAdapter;
@@ -522,7 +522,7 @@ export function createEventReplayHandler({
   return async function handleEventReplay(event: Event<EventReplayRequested, EventContext<any>>) {
     const events = store.readEventSince(
       [event.data.requested_event_namespace, event.data.requested_event_type].join('.'),
-      Option.of(event.data.since)
+      Option.of(event.data.since),
     );
 
     // Emit all events;
