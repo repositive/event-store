@@ -13,7 +13,7 @@ import {
   IsoDateString,
   EventType,
   EventNamespace,
-  Subscriptions
+  Subscriptions,
 } from '.';
 import { None, Some, Option, Either } from 'funfix';
 import { v4 } from 'uuid';
@@ -28,7 +28,7 @@ export type AggregateMatches<T> = Array<AggregateMatch<T, any>>;
 
 export type EventHandler<Q, T extends Event<EventData, EventContext<any>>> = (
   event: T,
-  store: EventStore<Q>
+  store: EventStore<Q>,
 ) => Promise<Either<undefined, undefined>>;
 
 export interface EventStoreOptions {
@@ -36,6 +36,14 @@ export interface EventStoreOptions {
   emitter?: EmitterAdapter;
   logger?: Logger;
 }
+
+export interface ListenOptions {
+  executeHandlerIfEventExists?: boolean;
+}
+
+const defaultListenOptions: ListenOptions = {
+  executeHandlerIfEventExists: false,
+};
 
 /**
 Main event store class
@@ -375,13 +383,14 @@ export class EventStore<Q> {
   public async listen<T extends EventData>(
     event_namespace: T['event_namespace'],
     event_type: T['event_type'],
-    handler: EventHandler<Q, Event<T, EventContext<any>>>
+    handler: EventHandler<Q, Event<T, EventContext<any>>>,
+    options?: ListenOptions,
   ): Promise<void> {
+    const { executeHandlerIfEventExists } = {...defaultListenOptions, ...options} || defaultListenOptions;
     const pattern = [event_namespace, event_type].join('.');
 
     const _handler = async (event: Event<any, any>) => {
-      const exists = await this.store.exists(event.id);
-      if (!exists) {
+      if (executeHandlerIfEventExists || !(await this.store.exists(event.id))) {
         const result = await handler(event, this);
         await result
           .map(() => {
@@ -402,7 +411,7 @@ export class EventStore<Q> {
     const replay = createEvent<EventReplayRequested>('_eventstore', 'EventReplayRequested', {
       requested_event_namespace: event_namespace,
       requested_event_type: event_type,
-      since: last.map(l => l.context.time).getOrElse(new Date(0).toISOString())
+      since: last.map((l) => l.context.time).getOrElse(new Date(0).toISOString()),
     });
 
     await this.emitter.emit(replay);
@@ -417,13 +426,16 @@ export class EventStore<Q> {
     const handlers: Subscriptions = this.emitter.subscriptions();
     const events = this.store.read(query, None);
 
-    this.logger.trace('replayAll');
+    this.logger.debug('Executing replayAll');
 
+    let iteration = 0;
+    let handled = 0;
     // Loop through each event and call handler
     while (true) {
       const _next = await events.next();
 
       if (_next.done) {
+        this.logger.debug(`Done with replayAll, processed ${iteration} events, handled ${handled}`);
         return;
       } else {
         const event = _next.value;
@@ -438,16 +450,20 @@ export class EventStore<Q> {
             event,
             event_ident,
             handler_type: typeof handler,
-            registered_handlers: [ ...handlers.keys() ]
+            registered_handlers: [ ...handlers.keys() ],
+            iteration,
           },
-          'replayAllEvent'
+          'replayAllEvent',
         );
 
         // Execute handler
         if (handler) {
+          handled++;
           await handler(event);
         }
       }
+
+      iteration++;
     }
   }
 }

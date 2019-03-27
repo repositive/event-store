@@ -80,7 +80,7 @@ export function createAQMPEmitterAdapter(
   }
 
   function subscriptions(): Subscriptions {
-    return subs
+    return subs;
   }
 
   return {
