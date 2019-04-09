@@ -123,7 +123,7 @@ export function createPgStoreAdapter(
       .then((results) => {
         logger.trace({ eventType, time: Date.now() - start }, 'eventStoreLastEventOfResult');
 
-        return Option.of(results.rows[0])
+        return Option.of(results.rows[0]);
       });
   }
 
@@ -135,11 +135,11 @@ export function createPgStoreAdapter(
     return pool
       .query(`select * from events where id = $1`, [id])
       .then((results) => {
-        const exists = !!results.rows[0];
+        const eventExists = !!results.rows[0];
 
-        logger.trace({ id, exists, time: Date.now() - start }, 'eventStoreEventExistsResponse');
+        logger.trace({ id, eventExists, time: Date.now() - start }, 'eventStoreEventExistsResponse');
 
-        return exists
+        return eventExists;
       });
   }
 
