@@ -55,25 +55,25 @@ export function createAQMPEmitterAdapter(
     handler: EmitterHandler<any>,
     _attempt = 0,
   ): Promise<any> {
-    logger.trace('amqpSubscribe', { pattern, _attempt });
+    logger.trace({ pattern, _attempt }, 'amqpSubscribe');
 
     const _handler = wrapHandler(handler);
 
     subs.set(pattern, handler);
 
     return iris.map((i): Promise<any> => {
-      logger.trace('amqpSubscribeHasIris', { pattern, _attempt });
+      logger.trace({ pattern, _attempt }, 'amqpSubscribeHasIris');
 
       return i.register({ pattern, handler: _handler });
     })
     .getOrElseL(async (): Promise<any> => {
       const waitTime = 1000;
 
-      logger.trace('amqpSubscribeNoIris', { pattern, _attempt, waitTime });
+      logger.trace({ pattern, _attempt, waitTime }, 'amqpSubscribeNoIris');
 
       await wait(waitTime);
 
-      logger.trace('amqpSubscribeRetry', { pattern, _attempt, waitTime });
+      logger.trace({ pattern, _attempt, waitTime }, 'amqpSubscribeRetry');
 
       subscribe(pattern, handler, _attempt + 1);
     });

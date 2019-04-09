@@ -58,7 +58,7 @@ export function createPgStoreAdapter(
         text: `DECLARE ${cursorId} CURSOR FOR (${cached_query})`,
         values: args,
       };
-      logger.trace("Cursor query", cursorQuery);
+      logger.trace({ cursorQuery }, "eventStoreCursorQuery");
       await transaction.query(cursorQuery);
       while (true) {
         const results = await transaction.query(`FETCH 100 FROM ${cursorId}`);
@@ -73,7 +73,7 @@ export function createPgStoreAdapter(
 
       await transaction.query("COMMIT");
     } catch (error) {
-      logger.error("errorInCursor", error);
+      logger.error(error, 'eventStoreCursorError');
       throw error;
     } finally {
       transaction.release();
@@ -111,18 +111,36 @@ export function createPgStoreAdapter(
   async function lastEventOf<E extends Event<any, any>>(
     eventType: EventNamespaceAndType,
   ): Promise<Option<E>> {
+    logger.trace({ eventType }, 'eventStoreLastEventOfResult');
+
+    const start = Date.now();
+
     return pool
       .query(
         `select * from events where data->>'type' = $1 order by context->>'time' desc limit 1`,
         [eventType],
       )
-      .then((results) => Option.of(results.rows[0]));
+      .then((results) => {
+        logger.trace({ eventType, time: Date.now() - start }, 'eventStoreLastEventOfResult');
+
+        return Option.of(results.rows[0]);
+      });
   }
 
   async function exists(id: Uuid): Promise<boolean> {
+    logger.trace({ id }, 'eventStoreEventExists');
+
+    const start = Date.now();
+
     return pool
       .query(`select * from events where id = $1`, [id])
-      .then((results) => !!results.rows[0]);
+      .then((results) => {
+        const eventExists = !!results.rows[0];
+
+        logger.trace({ id, eventExists, time: Date.now() - start }, 'eventStoreEventExistsResponse');
+
+        return eventExists;
+      });
   }
 
   function readEventSince(
