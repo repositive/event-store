@@ -244,7 +244,7 @@ export class EventStore<Q> {
 
       const latestSnapshot = await this.cache.get<T>(id);
 
-      this.logger.trace('cacheSnapshot', latestSnapshot);
+      this.logger.trace(latestSnapshot, 'eventStoreCacheSnapshot');
       const results = this.store.read(
         query,
         latestSnapshot.flatMap((snapshot) => Option.of(snapshot.time)),
@@ -260,7 +260,7 @@ export class EventStore<Q> {
         aggregator,
       );
 
-      this.logger.trace('aggregatedResult', aggregatedResult);
+      this.logger.trace({ query, aggregatedResult, time: Date.now() - start }, 'eventStoreAggregatedResult');
 
       await aggregatedResult.map((result) => {
         const snapshotHash = latestSnapshot
@@ -283,13 +283,13 @@ export class EventStore<Q> {
         }
       });
 
-      this.logger.trace('aggregateLatency', {
+      this.logger.trace({
         query,
         args,
         query_time: aggregatedAt.getTime() - start,
         aggregate_time: Date.now() - aggregatedAt.getTime(),
         total_time: Date.now() - start,
-      });
+      }, 'eventStoreAggregateLatency');
 
       return aggregatedResult;
     };
@@ -400,11 +400,11 @@ export class EventStore<Q> {
       }
     };
 
-    this.logger.trace('listen', { pattern });
+    this.logger.trace({ pattern }, 'eventStoreListen');
 
     await this.emitter.subscribe(pattern, _handler);
 
-    this.logger.trace('listenerSubscribed', { pattern });
+    this.logger.trace({ pattern }, 'eventStoreListenerSubscribed');
 
     const last = await this.store.lastEventOf(pattern);
 
@@ -426,7 +426,7 @@ export class EventStore<Q> {
     const handlers: Subscriptions = this.emitter.subscriptions();
     const events = this.store.read(query, None);
 
-    this.logger.debug('Executing replayAll');
+    this.logger.debug('eventStoreReplayAll');
 
     let iteration = 0;
     let handled = 0;
@@ -435,7 +435,7 @@ export class EventStore<Q> {
       const _next = await events.next();
 
       if (_next.done) {
-        this.logger.debug(`Done with replayAll, processed ${iteration} events, handled ${handled}`);
+        this.logger.debug({ totalEvents: iteration, handledEvents: handled }, 'eventStoreReplayAllComplete');
         return;
       } else {
         const event = _next.value;

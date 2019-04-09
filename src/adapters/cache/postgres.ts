@@ -31,7 +31,7 @@ export function createPgCacheAdapter(
   logger: Logger = console,
 ): CacheAdapter {
   pool.query(aggregateCacheTable).catch((error) => {
-    logger.error("Error creating cache table", error);
+    logger.error(error, "eventStoreCacheTableCreateError");
     throw error;
   });
 
@@ -42,9 +42,9 @@ export function createPgCacheAdapter(
       text: `SELECT * from aggregate_cache where id = $1`,
       values: [id],
     };
-    logger.trace("execute query", query);
+    logger.trace({ query }, "eventStoreAggregateCacheQuery");
     const result = await pool.query(query);
-    logger.trace("db response", result);
+    logger.trace(result, "eventStoreAggregateCacheResponse");
     return Option.of(result.rows[0]);
   }
 
