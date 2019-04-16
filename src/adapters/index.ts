@@ -10,6 +10,7 @@ import {
 } from "..";
 
 export * from "./cache/postgres";
+export * from "./cache/redis";
 export * from "./cache/dumb";
 export * from "./emitter/amqp";
 export * from "./emitter/dumb";
