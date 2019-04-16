@@ -45,6 +45,6 @@ jobs:
             PGPASSWORD: repositive
             PGDATABASE: event-store
             PGHOST: localhost
-            REDISHOST: //localhost:6379
+            REDIS_URI: //localhost:6379
 
       - run: echo "$(git rev-parse --short HEAD)" > tag.txt
