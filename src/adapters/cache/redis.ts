@@ -1,17 +1,14 @@
 import { Option, None, Some } from 'funfix';
 import { CacheAdapter, Event, EventData, EventContext, CacheEntry, Logger } from '../../.';
-import { ClientOpts } from 'redis';
+import { RedisClient } from 'redis';
 import * as redis from 'redis';
 
 export { ClientOpts as RedisClientOptions } from 'redis';
 
 export function createRedisCacheAdapter(
-  redis_url: string,
+  redis_client: RedisClient,
   logger: Logger = console,
-  client_options?: ClientOpts,
 ): CacheAdapter {
-  const redis_client = redis.createClient(redis_url, client_options);
-
   async function get<T extends CacheEntry<any>>(id: string): Promise<Option<T>> {
     logger.trace({ id }, 'eventStoreRedisCacheQuery');
 
