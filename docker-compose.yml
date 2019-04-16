@@ -2,6 +2,7 @@ version: '3'
 services:
   postgres:
     image: "postgres:9.6"
+    user: "${UID}"
     ports:
       - "5433:5432"
     volumes:
@@ -11,15 +12,21 @@ services:
       - POSTGRES_USER=repositive
       - POSTGRES_PASSWORD=repositive
 
+  redis:
+    image: "redis:5-alpine"
+    ports:
+      - "6380:6379"
+
   integration_tests:
+    user: "${UID}"
     command: /bin/sh -c "npm run testIntegration"
-    image: node:10
+    image: node:11-slim
     working_dir: /opt
     environment:
       - PGUSER=repositive
       - PGPASSWORD=repositive
       - PGDATABASE=event-store
       - PGHOST=postgres
+      - REDIS_URI=redis://redis
     volumes:
       - .:/opt
-
