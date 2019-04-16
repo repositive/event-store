@@ -8,7 +8,7 @@ export { ClientOpts as RedisClientOptions } from 'redis';
 export function createRedisCacheAdapter(
   redis_url: string,
   logger: Logger = console,
-  client_options?: ClientOpts
+  client_options?: ClientOpts,
 ): CacheAdapter {
   const redis_client = redis.createClient(redis_url, client_options);
 
@@ -18,11 +18,11 @@ export function createRedisCacheAdapter(
     try {
       const result: string = await new Promise((resolve, reject) =>
         redis_client.hget('aggregate_cache', id, (err: Error, item: string) =>
-          err ? reject(err) : resolve(item)
-        )
+          err ? reject(err) : resolve(item),
+        ),
       );
 
-      const opt: Option<T> = Option.of(result).map((result: string): T => JSON.parse(result));
+      const opt: Option<T> = Option.of(result).map((res: string): T => JSON.parse(res));
 
       logger.trace(opt, 'eventStoreRedisCacheResponse');
 
@@ -43,8 +43,8 @@ export function createRedisCacheAdapter(
           'aggregate_cache',
           id,
           JSON.stringify(entry),
-          (err: Error, operation_return: number) => (err ? reject(err) : resolve(operation_return))
-        )
+          (err: Error, operation_return: number) => (err ? reject(err) : resolve(operation_return)),
+        ),
       );
     } catch (e) {
       logger.error(e.stack, 'eventStoreRedisCacheSetError');
@@ -53,6 +53,6 @@ export function createRedisCacheAdapter(
 
   return {
     get,
-    set
+    set,
   };
 }
