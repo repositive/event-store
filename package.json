@@ -46,6 +46,7 @@
     "@types/pg": "7.4.10",
     "@types/pino": "5.6.1",
     "@types/ramda": "0.25.35",
+    "@types/redis": "^2.8.12",
     "@types/sinon": "^5.0.7",
     "@types/uuid": "^3.4.4",
     "ava": "^1.4.0",
@@ -67,6 +68,7 @@
     "@repositive/iris": "^1.0.0-alpha.8",
     "config": "^2.0.2",
     "funfix": "7.0.1",
-    "ramda": "0.25.0"
+    "ramda": "0.25.0",
+    "redis": "^2.8.0"
   }
 }

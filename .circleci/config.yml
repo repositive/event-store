@@ -13,12 +13,14 @@ workflows:
 jobs:
   test_and_make:
     docker:
-      - image: circleci/node:8.9
+      - image: circleci/node:11
       - image: postgres:9.6
         environment:
           POSTGRES_DB: event-store
           POSTGRES_USER: repositive
           POSTGRES_PASSWORD: repositive
+      - image: redis:5-alpine
+
     steps:
       - checkout
       - setup_remote_docker:
@@ -43,5 +45,6 @@ jobs:
             PGPASSWORD: repositive
             PGDATABASE: event-store
             PGHOST: localhost
+            REDIS_URI: //localhost:6379
 
       - run: echo "$(git rev-parse --short HEAD)" > tag.txt
