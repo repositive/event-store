@@ -18,8 +18,13 @@ fn dump_domain_events(domain: &str, namespace: &str) -> Result<Vec<Event>, Strin
     )
     .map_err(|e| e.to_string())?;
 
+    // NOTE: This query reformats dates to be RFC3339 compatible
     conn.query(
-        "select id, data, context from events where data->>'event_namespace' = $1 order by context->>'time' asc",
+        r#"select
+            id,
+            data,
+            context || jsonb_build_object('time', to_timestamp(context->>'time', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"')) as context
+        from events where data->>'event_namespace' = $1 order by context->>'time' asc"#,
         &[&namespace],
     )
     .map_err(|e| e.to_string())
