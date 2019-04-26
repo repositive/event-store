@@ -9,6 +9,7 @@ mod event;
 use config::{Config, ConfigConnection};
 use event::Event;
 use postgres::{Connection, TlsMode};
+use std::collections::HashMap;
 use structopt::StructOpt;
 use uuid::Uuid;
 
@@ -20,7 +21,7 @@ struct Options {
     connection: String,
 }
 
-fn dump_domain_events(
+fn collect_domain_events(
     domain: &str,
     namespace: &str,
     connection: &ConfigConnection,
@@ -76,9 +77,30 @@ fn main() -> Result<(), String> {
 
     debug!("Connection {:?}", connection);
 
-    for (domain, namespace) in connection.domains.iter() {
-        let events = dump_domain_events(domain, namespace, connection)?;
-        println!("{:?}", events);
+    let domain_events: Vec<Vec<Event>> = connection
+        .domains
+        .iter()
+        .map(|(domain, namespace)| collect_domain_events(domain, namespace, connection).unwrap())
+        .collect();
+
+    let domain_events_sum: usize = domain_events.iter().map(|events| events.len()).sum();
+
+    debug!("Collected total {} events", domain_events_sum);
+
+    let all_events: HashMap<Uuid, Event> = domain_events
+        .into_iter()
+        .flat_map(|events| events.into_iter().map(|event| (event.id, event)))
+        .collect();
+
+    if all_events.len() != domain_events_sum {
+        error!("Unique list of events is not the same length as all collected events");
+        error!(
+            "Expected all events {} to equal domain events {}",
+            all_events.len(),
+            domain_events_sum
+        );
+
+        return Err(String::from("Events are not properly unique"));
     }
 
     Ok(())
