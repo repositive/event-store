@@ -8,7 +8,8 @@ pub struct Config {
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct ConfigConnection {
-    pub db_uri: String,
+    pub source_db_uri: String,
+    pub dest_db_uri: String,
     pub domains: HashMap<String, String>,
 }
 
