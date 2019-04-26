@@ -10,6 +10,11 @@ pub struct EventData {
 
     #[serde(flatten)]
     pub payload: serde_json::Value,
+
+    /// Legacy combined `type` field. Removed when saving into destination DB
+    #[serde(skip_serializing)]
+    #[serde(rename = "type")]
+    legacy_type: String,
 }
 
 /// Event context
