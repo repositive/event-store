@@ -28,7 +28,7 @@ pub struct EventContext {
 /// An event
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Event {
-    id: Uuid,
-    data: EventData,
-    context: EventContext,
+    pub id: Uuid,
+    pub data: EventData,
+    pub context: EventContext,
 }
