@@ -15,9 +15,9 @@ pub struct ConfigConnection {
 
 impl Config {
     pub fn load() -> Result<Self, String> {
-        let file = include_str!("../connections.toml");
+        let file = std::fs::read_to_string("./connections.toml").map_err(|e| e.to_string())?;
 
-        let config = toml::from_str(file).map_err(|e| e.to_string())?;
+        let config = toml::from_str(&file).map_err(|e| e.to_string())?;
 
         Ok(config)
     }
