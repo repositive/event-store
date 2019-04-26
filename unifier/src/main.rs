@@ -19,6 +19,10 @@ struct Options {
     /// Which connection to select from connections.toml
     #[structopt(short = "c", long = "connection")]
     connection: String,
+
+    /// Truncate destination events table before inserting data
+    #[structopt(long = "truncate")]
+    truncate: bool,
 }
 
 fn collect_domain_events(
@@ -108,10 +112,18 @@ fn main() -> Result<(), String> {
 
     let dest_connection = Connection::connect(connection.dest_db_uri.clone(), TlsMode::None)
         .map_err(|e| e.to_string())?;
+
     let txn = dest_connection.transaction().map_err(|e| e.to_string())?;
     let stmt = txn
         .prepare("insert into events (id, data, context) values ($1, $2, $3)")
         .map_err(|e| e.to_string())?;
+
+    if args.truncate {
+        warn!("Truncating destination table events");
+
+        txn.query("truncate table events", &[])
+            .map_err(|e| e.to_string())?;
+    }
 
     for (id, event) in all_events.iter() {
         debug!("Insert event {}", id);

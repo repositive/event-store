@@ -16,6 +16,6 @@ This tool is to help unify multiple event store backing databases into a single 
     ```
 
     where `domains` is like `domains.<domain name> = <domain namespace>`
-* `cargo run -- --connection <connection name>`
-* Run as `RUST_LOG=unify=info cargo run -- --connection <connection name>` for logging output
+* `RUST_LOG=unifier=info cargo run --release -- --connection local `
 * Run with `--release` for speedier operation
+* Run with `--help` to see options
