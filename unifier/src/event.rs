@@ -15,7 +15,6 @@ pub struct EventData {
 /// Event context
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EventContext {
-    /// TODO: What is this?
     pub action: Option<String>,
 
     /// Optional event "subject" or metadata

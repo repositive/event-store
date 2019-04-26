@@ -8,7 +8,7 @@ mod event;
 
 use config::{Config, ConfigConnection};
 use event::Event;
-use postgres::{Connection, TlsMode};
+use postgres::{Client, NoTls};
 use std::collections::HashMap;
 use structopt::StructOpt;
 use uuid::Uuid;
@@ -35,11 +35,8 @@ fn collect_domain_events(
         domain, namespace
     );
 
-    let conn = Connection::connect(
-        format!("{}/{}", connection.source_db_uri, domain),
-        TlsMode::None,
-    )
-    .map_err(|e| e.to_string())?;
+    let mut conn = Client::connect(&format!("{}/{}", connection.source_db_uri, domain), NoTls)
+        .map_err(|e| e.to_string())?;
 
     // NOTE: This query reformats dates to be RFC3339 compatible
     conn.query(
@@ -110,10 +107,10 @@ fn main() -> Result<(), String> {
         return Err(String::from("Events are not properly unique"));
     }
 
-    let dest_connection = Connection::connect(connection.dest_db_uri.clone(), TlsMode::None)
-        .map_err(|e| e.to_string())?;
+    let mut dest_connection =
+        Client::connect(&connection.dest_db_uri.clone(), NoTls).map_err(|e| e.to_string())?;
 
-    let txn = dest_connection.transaction().map_err(|e| e.to_string())?;
+    let mut txn = dest_connection.transaction().map_err(|e| e.to_string())?;
     let stmt = txn
         .prepare("insert into events (id, data, context) values ($1, $2, $3)")
         .map_err(|e| e.to_string())?;
@@ -121,18 +118,21 @@ fn main() -> Result<(), String> {
     if args.truncate {
         warn!("Truncating destination table events");
 
-        txn.query("truncate table events", &[])
+        txn.simple_query("truncate table events")
             .map_err(|e| e.to_string())?;
     }
 
     for (id, event) in all_events.iter() {
         debug!("Insert event {}", id);
 
-        stmt.execute(&[
-            &event.id,
-            &serde_json::to_value(&event.data).unwrap(),
-            &serde_json::to_value(&event.context).unwrap(),
-        ])
+        txn.execute(
+            &stmt,
+            &[
+                &event.id,
+                &serde_json::to_value(&event.data).unwrap(),
+                &serde_json::to_value(&event.context).unwrap(),
+            ],
+        )
         .map_err(|e| e.to_string())?;
     }
 
