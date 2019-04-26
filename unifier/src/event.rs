@@ -1,5 +1,6 @@
 use chrono::prelude::*;
 use serde_derive::{Deserialize, Serialize};
+use std::collections::HashMap;
 use uuid::Uuid;
 
 /// Event data
@@ -22,8 +23,9 @@ pub struct EventData {
 pub struct EventContext {
     pub action: Option<String>,
 
-    /// Optional event "subject" or metadata
-    pub subject: Option<serde_json::Value>,
+    /// Event "subject" or metadata
+    #[serde(default)]
+    pub subject: HashMap<String, serde_json::Value>,
 
     /// Event creation time
     pub time: DateTime<Utc>,
