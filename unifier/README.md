@@ -6,13 +6,19 @@ This tool is to help unify multiple event store backing databases into a single 
 
 * Get [rustup](https://rustup.rs)
 * Create `connections.toml` in this folder
-* Add a connection like
+* Add a connection like this:
     ```toml
     [connections.local]
     source_db_uri = "postgres://repositive:repositive@localhost:5432"
     dest_db_uri = "postgres://repositive:repositive@localhost:5432/event-store"
-    domains.organisations = "organisations"
+    domains.accounts = "accounts"
+    domains.analysis = "analysis"
+    domains.bookmarks = "bookmarks"
+    domains.cmp-inventory-overview = "cmp_overview"
     domains.mnemosyne = "metadata"
+    domains.molecular-ingest = "molecular_ingest"
+    domains.organisations = "organisations"
+    domains.search = "gnowee"
     ```
 
     where `domains` is like `domains.<domain name> = <domain namespace>`
