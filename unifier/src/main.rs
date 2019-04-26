@@ -58,8 +58,8 @@ fn collect_domain_events(
 
             Event {
                 id,
-                data: serde_json::from_value(data).expect(&format!("Failed to parse event data for event ID {}", id)),
-                context: serde_json::from_value(context).expect(&format!("Failed to parse event context for event ID {}", id)),
+                data: serde_json::from_value(data).expect(&format!("Failed to parse event data for event ID {} (domain {})", id, domain)),
+                context: serde_json::from_value(context).expect(&format!("Failed to parse event context for event ID {} (domain {})", id, domain)),
             }
         }).collect()
     })
