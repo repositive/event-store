@@ -9,8 +9,8 @@ This tool is to help unify multiple event store backing databases into a single 
 * Add a connection like
     ```toml
     [connections.local]
-    db_uri = "postgres://repositive:repositive@localhost:5432"
-    domains.analysis = "analysis"
+    source_db_uri = "postgres://repositive:repositive@localhost:5432"
+    dest_db_uri = "postgres://repositive:repositive@localhost:5432/event-store"
     domains.organisations = "organisations"
     domains.mnemosyne = "metadata"
     ```
