@@ -1,22 +1,37 @@
 #[macro_use]
 extern crate log;
+#[macro_use]
+extern crate structopt;
 
+mod config;
 mod event;
 
-use crate::event::EventData;
+use config::{Config, ConfigConnection};
 use event::Event;
 use postgres::{Connection, TlsMode};
+use structopt::StructOpt;
 use uuid::Uuid;
 
-fn dump_domain_events(domain: &str, namespace: &str) -> Result<Vec<Event>, String> {
-    let conn = Connection::connect(
-        format!(
-            "postgresql://repositive:repositive@localhost:5432/{}",
-            domain
-        ),
-        TlsMode::None,
-    )
-    .map_err(|e| e.to_string())?;
+#[derive(Debug, StructOpt)]
+#[structopt(name = "unify", about = "Unify multiple event stores into one")]
+struct Options {
+    /// Which connection to select from connections.toml
+    #[structopt(short = "c", long = "connection")]
+    connection: String,
+}
+
+fn dump_domain_events(
+    domain: &str,
+    namespace: &str,
+    connection: &ConfigConnection,
+) -> Result<Vec<Event>, String> {
+    info!(
+        "Collecting events from domain {} where namespace is {}...",
+        domain, namespace
+    );
+
+    let conn = Connection::connect(format!("{}/{}", connection.db_uri, domain), TlsMode::None)
+        .map_err(|e| e.to_string())?;
 
     // NOTE: This query reformats dates to be RFC3339 compatible
     conn.query(
@@ -29,7 +44,7 @@ fn dump_domain_events(domain: &str, namespace: &str) -> Result<Vec<Event>, Strin
     )
     .map_err(|e| e.to_string())
     .map(|result| {
-        info!("Found {} events for namespace {} in domain {}", result.len(), namespace, domain);
+        info!("Collected {} events for namespace {} in domain {}", result.len(), namespace, domain);
 
         result.iter().map(|row| {
             let id: Uuid = row.get(0);
@@ -48,8 +63,23 @@ fn dump_domain_events(domain: &str, namespace: &str) -> Result<Vec<Event>, Strin
 fn main() -> Result<(), String> {
     pretty_env_logger::init();
 
-    let events = dump_domain_events("analysis", "analysis")?;
-    println!("{:?}", events);
+    let config = Config::load()?;
+
+    let args = Options::from_args();
+
+    debug!("Args {:?}", args);
+
+    let connection = config.get(&args.connection).expect(&format!(
+        "Failed to find config for key {}",
+        args.connection
+    ));
+
+    debug!("Connection {:?}", connection);
+
+    for (domain, namespace) in connection.domains.iter() {
+        let events = dump_domain_events(domain, namespace, connection)?;
+        println!("{:?}", events);
+    }
 
     Ok(())
 }
