@@ -5,5 +5,17 @@ This tool is to help unify multiple event store backing databases into a single 
 ## Getting started
 
 * Get [rustup](https://rustup.rs)
-* TODO lol sdfkjhgasoeriyg
-* `cargo run -- <connection name>`
+* Create `connections.toml` in this folder
+* Add a connection like
+    ```toml
+    [connections.local]
+    db_uri = "postgres://repositive:repositive@localhost:5432"
+    domains.analysis = "analysis"
+    domains.organisations = "organisations"
+    domains.mnemosyne = "metadata"
+    ```
+
+    where `domains` is like `domains.<domain name> = <domain namespace>`
+* `cargo run -- --connection <connection name>`
+* Run as `RUST_LOG=unify=info cargo run -- --connection <connection name>` for logging output
+* Run with `--release` for speedier operation
