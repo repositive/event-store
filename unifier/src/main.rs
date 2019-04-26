@@ -21,8 +21,8 @@ struct Options {
     connection: String,
 
     /// Truncate destination events table before inserting data
-    #[structopt(long = "truncate")]
-    truncate: bool,
+    #[structopt(long = "truncate-dest")]
+    truncate_dest: bool,
 }
 
 fn collect_domain_events(
@@ -115,7 +115,7 @@ fn main() -> Result<(), String> {
         .prepare("insert into events (id, data, context) values ($1, $2, $3)")
         .map_err(|e| e.to_string())?;
 
-    if args.truncate {
+    if args.truncate_dest {
         warn!("Truncating destination table events");
 
         txn.simple_query("truncate table events")
