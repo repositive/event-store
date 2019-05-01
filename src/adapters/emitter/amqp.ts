@@ -1,91 +1,119 @@
 import {
-  EmitterAdapter,
-  Event,
-  EventData,
-  EventContext,
-  EmitterHandler,
-  Logger,
-  EventNamespaceAndType,
-  EventNamespace,
-  Subscriptions,
+    EmitterAdapter,
+    Event,
+    EventData,
+    EventContext,
+    EmitterHandler,
+    Logger,
+    EventNamespaceAndType,
+    Subscriptions,
 } from "../../.";
-import { Option, Some, None } from "funfix";
-import setupIris from "@repositive/iris";
-import { Iris } from "@repositive/iris";
+import { Channel, Message } from 'amqplib';
 
-export interface IrisOptions {
-  uri?: string;
-  namespace: EventNamespace;
+/**
+ * Available options for the adapter
+ * You can provide the namespace or set an environment variable `AMQP_EXCHANGE`
+ * defaut exchange is called `event_store`
+ * You can provide the namespace or set an environment variable `AMQP_NAMESPACE`
+ * default namespace is `default`
+ */
+export interface AmqpAdapterOptions {
+    logger?: Logger;
+    exchange?: string;
+    namespace?: string;
 }
 
-export function wait(n: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, n));
+const namespace = process.env.AMQP_NAMESPACE;
+const exchange = process.env.AMQP_EXCHANGE;
+
+export const default_amqp_options = {
+    logger: console,
+    exchange: exchange || 'event_store',
+    namespace: namespace || 'default'
+};
+
+// Helper function used to wait until the queue is created
+// This functions receives a handler and execuetes it until it returns true.
+async function waitUntil(check: () => boolean): Promise<void> {
+    function waitImmediate(): Promise<void> {
+        return new Promise((resolve) => {
+            setImmediate(() => {
+                resolve();
+            })
+        });
+    }
+
+    while (true) {
+        if (check()) {
+            break;
+        }
+        await waitImmediate();
+    }
 }
 
-function wrapHandler(handler: EmitterHandler<any>) {
-  return function({ payload }: { payload?: any }) {
-    return handler(payload);
-  };
-}
-
-export function createAQMPEmitterAdapter(
-  irisOpts: IrisOptions,
-  logger: Logger = console,
+export function createAMQPEmitterAdapter(
+    channel: Channel,
+    options: AmqpAdapterOptions = default_amqp_options
 ): EmitterAdapter {
-  let iris: Option<Iris> = None;
-  const subs: Subscriptions = new Map();
+    const subs: Subscriptions = new Map();
+    const { logger, exchange, namespace } = options as typeof default_amqp_options;
 
-  setupIris({ ...irisOpts, logger })
-    .map((_iris) => {
-      iris = Some(_iris);
-      for (const [pattern, handler] of subs.entries()) {
-        _iris.register({ pattern, handler: wrapHandler(handler) });
-      }
+    // This flag is used by the subscribe queue to evaluate
+    // When is safe to start listening for events.
+    // This flat is set to true when the exchange and queue are succesfully created
+    let queueCreated = false;
+
+    channel.assertExchange(exchange, "topic").then(() => {
+        return channel.assertQueue(namespace);
     })
-    .subscribe();
+        .then(() => {
+            queueCreated = true;
+        })
+        .catch((err) => {
+            // Creating the exchange and queue is mandatory.
+            // if an error happens, abort the program.
+            logger.error(err);
+            process.exit(1);
+        });
 
-  async function emit(event: Event<EventData, EventContext<any>>) {
-    await iris
-      .map((i) => i.emit({ pattern: event.data.type, payload: event }))
-      .getOrElseL(() => wait(1000).then(() => emit(event)));
-  }
+    async function emit(event: Event<EventData, EventContext<any>>) {
+        const routing_key = `${event.data.event_namespace}.${event.data.event_type}`;
+        const payload = Buffer.from(JSON.stringify(event));
+        await channel.publish(exchange, routing_key, payload);
+    }
 
-  async function subscribe(
-    pattern: EventNamespaceAndType,
-    handler: EmitterHandler<any>,
-    _attempt = 0,
-  ): Promise<any> {
-    logger.trace({ pattern, _attempt }, 'amqpSubscribe');
+    async function subscribe(
+        pattern: EventNamespaceAndType,
+        handler: EmitterHandler<any>
+    ): Promise<any> {
+        logger.trace({ pattern }, 'amqpSubscribe');
 
-    const _handler = wrapHandler(handler);
+        function handleMessage(msg: Message) {
+            const event: Event<EventData, EventContext<any>> = JSON.parse(msg.content.toString());
+            const event_type = `${event.data.event_namespace}.${event.data.event_type}`;
+            if (event_type === pattern) {
+                handler(event);
+            }
+        }
 
-    subs.set(pattern, handler);
+        await waitUntil(() => queueCreated);
+        await channel.bindQueue(namespace, exchange, pattern);
+        await channel.consume(
+            namespace,
+            handleMessage,
+            { noAck: false }
+        );
 
-    return iris.map((i): Promise<any> => {
-      logger.trace({ pattern, _attempt }, 'amqpSubscribeHasIris');
+        subs.set(pattern, handler);
+    }
 
-      return i.register({ pattern, handler: _handler });
-    })
-    .getOrElseL(async (): Promise<any> => {
-      const waitTime = 1000;
+    function subscriptions(): Subscriptions {
+        return subs;
+    }
 
-      logger.trace({ pattern, _attempt, waitTime }, 'amqpSubscribeNoIris');
-
-      await wait(waitTime);
-
-      logger.trace({ pattern, _attempt, waitTime }, 'amqpSubscribeRetry');
-
-      subscribe(pattern, handler, _attempt + 1);
-    });
-  }
-
-  function subscriptions(): Subscriptions {
-    return subs;
-  }
-
-  return {
-    emit,
-    subscribe,
-    subscriptions,
-  };
+    return {
+        emit,
+        subscribe,
+        subscriptions,
+    };
 }
