@@ -1,6 +1,6 @@
 {
   "name": "@repositive/event-store",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Event store implementation",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
