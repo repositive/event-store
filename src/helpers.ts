@@ -237,3 +237,57 @@ export function isEvent<D extends EventData, C extends EventContext<any>>(
     );
   };
 }
+
+/**
+Match a complete event object against a given namespace and type
+
+A function is returned which can then be passed to aggregators.
+
+```typescript
+import { isEventType, EventData } from "@repositive/event-store";
+
+interface AccountCreated extends EventData { ... };
+interface AccountUpdated extends EventData { ... };
+
+const isAccountCreated = isEventType<AccountCreated>("accounts", "AccountCreated");
+const isAccountUpdated = isEventType<AccountUpdated>("accounts", "AccountUpdated");
+
+export function createUserByIdAggregate(
+  store: EventStore<PgQuery>
+): Aggregate<[string], User> {
+  return store.createAggregate(
+    "User",
+    {
+      text: `select * from events where data->>'user_id' = $1`,
+    },
+    [
+      [isAccountCreated, onAccountCreated],
+      [isAccountUpdated, onAccountUpdated],
+    ]
+  );
+}
+```
+
+@param ns - The event namespace to use, like `search` or `accounts`
+
+@param ty - The event type to use, like `LoggedIn` or `ImageDeleted`
+*/
+export function isEventType<E extends EventData>(
+  ns: string,
+  ty: string,
+): (o: any) => o is Event<E, EventContext<any>> {
+  return function(o: any): o is Event<E, EventContext<any>> {
+    return (
+      o &&
+      typeof o.id === 'string' &&
+      o.data &&
+      isEventData(
+        o.data,
+        (d: any): d is E =>
+          (d.event_namespace === ns && d.event_type === ty) || d.type === `${ns}.${ty}`,
+      ) &&
+      o.context &&
+      isEventContext(o.context, (d: any): d is EventContext<any> => true)
+    );
+  };
+}

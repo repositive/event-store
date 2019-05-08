@@ -8,7 +8,7 @@ import {
   Event,
   isEvent,
 } from ".";
-import { isEventData } from "./helpers";
+import { isEventData, isEventType } from "./helpers";
 
 // This test does nothing, but will fail to compile if Typescript finds errors, so should be left in
 test("typechecks createEvent", (t: any) => {
@@ -156,4 +156,30 @@ test("isEventData supports old style events", (t: any) => {
       (data: any): data is any => data.type === "oldstyle.OldStyle",
     ),
   );
+});
+
+test("isEventType checks a complete new event", (t: any) => {
+  const fakeEvent: any = {
+    id: "...",
+    data: {
+      event_namespace: "some_ns",
+      event_type: "SomeType",
+      type: "ignoreme.IgnoreMe",
+    },
+    context: { time: 't' },
+  };
+
+  t.truthy(isEventType('some_ns', 'SomeType')(fakeEvent));
+});
+
+test("isEventType checks a complete old event", (t: any) => {
+  const fakeEvent: any = {
+    id: "...",
+    data: {
+      type: "ignoreme.IgnoreMe",
+    },
+    context: { time: 't' },
+  };
+
+  t.truthy(isEventType('ignoreme', 'IgnoreMe')(fakeEvent));
 });
