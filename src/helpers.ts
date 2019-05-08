@@ -237,3 +237,30 @@ export function isEvent<D extends EventData, C extends EventContext<any>>(
     );
   };
 }
+
+/**
+Match a complete event object against a given namespace and type
+
+@param ns - The event namespace to use, like `search` or `accounts`
+
+@param ty - The event type to use, like `LoggedIn` or `ImageDeleted`
+*/
+export function isEventType<E extends EventData>(
+  ns: string,
+  ty: string,
+): (o: any) => o is Event<E, EventContext<any>> {
+  return function(o: any): o is Event<E, EventContext<any>> {
+    return (
+      o &&
+      typeof o.id === 'string' &&
+      o.data &&
+      isEventData(
+        o.data,
+        (d: any): d is E =>
+          (d.event_namespace === ns && d.event_type === ty) || d.type === `${ns}.${ty}`,
+      ) &&
+      o.context &&
+      isEventContext(o.context, (d: any): d is EventContext<any> => true)
+    );
+  };
+}
