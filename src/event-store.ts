@@ -39,10 +39,12 @@ export interface EventStoreOptions {
 
 export interface ListenOptions {
   executeHandlerIfEventExists?: boolean;
+  requestReplay?: boolean;
 }
 
 const defaultListenOptions: ListenOptions = {
   executeHandlerIfEventExists: false,
+  requestReplay: true,
 };
 
 /**
@@ -260,7 +262,10 @@ export class EventStore<Q> {
         aggregator,
       );
 
-      this.logger.trace({ query, aggregatedResult, time: Date.now() - start }, 'eventStoreAggregatedResult');
+      this.logger.trace(
+        { query, aggregatedResult, time: Date.now() - start },
+        'eventStoreAggregatedResult',
+      );
 
       await aggregatedResult.map((result) => {
         const snapshotHash = latestSnapshot
@@ -283,13 +288,16 @@ export class EventStore<Q> {
         }
       });
 
-      this.logger.trace({
-        query,
-        args,
-        query_time: aggregatedAt.getTime() - start,
-        aggregate_time: Date.now() - aggregatedAt.getTime(),
-        total_time: Date.now() - start,
-      }, 'eventStoreAggregateLatency');
+      this.logger.trace(
+        {
+          query,
+          args,
+          query_time: aggregatedAt.getTime() - start,
+          aggregate_time: Date.now() - aggregatedAt.getTime(),
+          total_time: Date.now() - start,
+        },
+        'eventStoreAggregateLatency',
+      );
 
       return aggregatedResult;
     };
@@ -386,7 +394,8 @@ export class EventStore<Q> {
     handler: EventHandler<Q, Event<T, EventContext<any>>>,
     options?: ListenOptions,
   ): Promise<void> {
-    const { executeHandlerIfEventExists } = {...defaultListenOptions, ...options} || defaultListenOptions;
+    const { executeHandlerIfEventExists, requestReplay } =
+      { ...defaultListenOptions, ...options } || defaultListenOptions;
     const pattern = [event_namespace, event_type].join('.');
 
     const _handler = async (event: Event<any, any>) => {
@@ -406,15 +415,21 @@ export class EventStore<Q> {
 
     this.logger.trace({ pattern }, 'eventStoreListenerSubscribed');
 
-    const last = await this.store.lastEventOf(pattern);
+    if (requestReplay) {
+      const last = await this.store.lastEventOf(pattern);
 
-    const replay = createEvent<EventReplayRequested>('_eventstore', 'EventReplayRequested', {
-      requested_event_namespace: event_namespace,
-      requested_event_type: event_type,
-      since: last.map((l) => l.context.time).getOrElse(new Date(0).toISOString()),
-    });
+      const replay = createEvent<EventReplayRequested>('_eventstore', 'EventReplayRequested', {
+        requested_event_namespace: event_namespace,
+        requested_event_type: event_type,
+        since: last.map((l) => l.context.time).getOrElse(new Date(0).toISOString()),
+      });
 
-    await this.emitter.emit(replay);
+      this.logger.trace({ event_namespace, event_type, replay }, 'eventStoreReplayRequested');
+
+      await this.emitter.emit(replay);
+    } else {
+      this.logger.trace({ event_namespace, event_type }, 'eventStoreReplayNotRequested');
+    }
   }
 
   /**
@@ -435,7 +450,10 @@ export class EventStore<Q> {
       const _next = await events.next();
 
       if (_next.done) {
-        this.logger.debug({ totalEvents: iteration, handledEvents: handled }, 'eventStoreReplayAllComplete');
+        this.logger.debug(
+          { totalEvents: iteration, handledEvents: handled },
+          'eventStoreReplayAllComplete',
+        );
         return;
       } else {
         const event = _next.value;
@@ -450,7 +468,7 @@ export class EventStore<Q> {
             event,
             event_ident,
             handler_type: typeof handler,
-            registered_handlers: [ ...handlers.keys() ],
+            registered_handlers: [...handlers.keys()],
             iteration,
           },
           'replayAllEvent',
