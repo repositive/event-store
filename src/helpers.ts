@@ -273,8 +273,8 @@ export function createUserByIdAggregate(
 @param ty - The event type to use, like `LoggedIn` or `ImageDeleted`
 */
 export function isEventType<E extends EventData>(
-  ns: string,
-  ty: string,
+  ns: E["event_namespace"],
+  ty: E["event_type"],
 ): (o: any) => o is Event<E, EventContext<any>> {
   return function(o: any): o is Event<E, EventContext<any>> {
     return (
