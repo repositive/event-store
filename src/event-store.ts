@@ -39,10 +39,12 @@ export interface EventStoreOptions {
 
 export interface ListenOptions {
   executeHandlerIfEventExists?: boolean;
+  requestReplay?: boolean;
 }
 
 const defaultListenOptions: ListenOptions = {
   executeHandlerIfEventExists: false,
+  requestReplay: true,
 };
 
 /**
@@ -386,7 +388,7 @@ export class EventStore<Q> {
     handler: EventHandler<Q, Event<T, EventContext<any>>>,
     options?: ListenOptions,
   ): Promise<void> {
-    const { executeHandlerIfEventExists } = {...defaultListenOptions, ...options} || defaultListenOptions;
+    const { executeHandlerIfEventExists, requestReplay } = {...defaultListenOptions, ...options} || defaultListenOptions;
     const pattern = [event_namespace, event_type].join('.');
 
     const _handler = async (event: Event<any, any>) => {
@@ -406,15 +408,21 @@ export class EventStore<Q> {
 
     this.logger.trace({ pattern }, 'eventStoreListenerSubscribed');
 
-    const last = await this.store.lastEventOf(pattern);
+    if (requestReplay) {
+      const last = await this.store.lastEventOf(pattern);
 
-    const replay = createEvent<EventReplayRequested>('_eventstore', 'EventReplayRequested', {
-      requested_event_namespace: event_namespace,
-      requested_event_type: event_type,
-      since: last.map((l) => l.context.time).getOrElse(new Date(0).toISOString()),
-    });
+      const replay = createEvent<EventReplayRequested>('_eventstore', 'EventReplayRequested', {
+        requested_event_namespace: event_namespace,
+        requested_event_type: event_type,
+        since: last.map((l) => l.context.time).getOrElse(new Date(0).toISOString()),
+      });
 
-    await this.emitter.emit(replay);
+      this.logger.trace({ event_namespace, event_type, replay }, 'eventStoreReplayRequested');
+
+      await this.emitter.emit(replay);
+    } else {
+      this.logger.trace({ event_namespace, event_type }, 'eventStoreReplayNotRequested');
+    }
   }
 
   /**
