@@ -3,7 +3,7 @@ import * as R from "ramda";
 import { StoreAdapter } from "./adapters";
 import { Future, Option, None, Either, Left, Right } from "funfix";
 import { EventStore, EventStoreOptions } from "./event-store";
-export { isEvent, createEvent, createContext } from "./helpers";
+export { isEvent, createEvent, createContext, isEventType } from "./helpers";
 export * from "./event-store";
 export * from "./adapters";
 import { createDumbCacheAdapter, createDumbEmitterAdapter } from "./adapters";
