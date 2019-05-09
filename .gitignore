@@ -10,3 +10,4 @@ postgres_data
 *.lock
 doc
 .gh-pages-tmp
+.eslintcache
