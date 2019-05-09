@@ -254,7 +254,7 @@ export function isEventType<E extends EventData>(
           (d.event_namespace === ns && d.event_type === ty),
       ) &&
       o.context &&
-      isEventContext(o.context, (d: any): d is EventContext<any> => true)
+      o.context.time === 'string'
     );
   };
 }

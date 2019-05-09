@@ -1,12 +1,7 @@
-import { Pool } from "pg";
-import * as R from "ramda";
-import { StoreAdapter } from "./adapters";
-import { Future, Option, None, Either, Left, Right } from "funfix";
-import { EventStore, EventStoreOptions } from "./event-store";
+import { Option } from "funfix";
 export { createEvent, createContext, isEventType } from "./helpers";
 export * from "./event-store";
 export * from "./adapters";
-import { createDumbCacheAdapter, createDumbEmitterAdapter } from "./adapters";
 
 /**
 A UUID

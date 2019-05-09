@@ -1,4 +1,4 @@
-import { Client, Pool, QueryConfig, QueryResult } from "pg";
+import { Pool, QueryConfig, QueryResult } from "pg";
 import { stub } from "sinon";
 import { Event, EventData, EventContext } from ".";
 import { Right, None } from "funfix";
@@ -37,7 +37,7 @@ export function fakePoolResult(rows: any[] = []): QueryResult {
   };
 }
 
-export const fakeEmitter = (e: any) => undefined;
+export const fakeEmitter = (_e: any) => undefined;
 
 // For integration tests
 export function getDbConnection(): Pool {
@@ -104,12 +104,12 @@ export async function getFakeStoreAdapter({
 }): Promise<any> {
   const writer =
     saveStub ||
-    function(evt: any): Promise<undefined> {
+    function(_evt: any): Promise<undefined> {
       return Promise.resolve(undefined);
     };
 
   const storeAdapter = {
-    read: (readQuery: any, time: any, ...args: any[]) => {
+    read: (_readQuery: any, _time: any, ...args: any[]) => {
       let idx = 0;
       const result = readStub(...args);
 

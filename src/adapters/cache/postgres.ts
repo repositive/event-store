@@ -1,10 +1,7 @@
 import { Pool } from "pg";
-import { Option, None } from "funfix";
+import { Option } from "funfix";
 import {
   CacheAdapter,
-  Event,
-  EventData,
-  EventContext,
   CacheEntry,
   CacheKey,
   Logger,

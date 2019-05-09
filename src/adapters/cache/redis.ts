@@ -1,7 +1,6 @@
-import { Option, None, Some } from 'funfix';
-import { CacheAdapter, Event, EventData, EventContext, CacheEntry, Logger } from '../../.';
+import { Option, None } from 'funfix';
+import { CacheAdapter, CacheEntry, Logger } from '../../.';
 import { RedisClient } from 'redis';
-import * as redis from 'redis';
 
 export { ClientOpts as RedisClientOptions } from 'redis';
 

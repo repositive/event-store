@@ -4,8 +4,6 @@ import {
   createEvent,
   createContext,
   EventData,
-  EventContext,
-  Event,
 } from ".";
 import { isEventData, isEventType } from "./helpers";
 
@@ -18,7 +16,7 @@ test("typechecks createEvent", (t: any) => {
     bar: number;
   }
 
-  const evt: Event<TestEvent, any> = createEvent("foobar", "Baz", {
+  createEvent<TestEvent>("foobar", "Baz", {
     foo: "hello",
     bar: 10,
   });

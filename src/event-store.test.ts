@@ -19,8 +19,8 @@ test("listen type checks its string arguments", async (t) => {
     listen: stub().resolves(),
   } as any;
 
-  es.listen<BarEvent>("foo", "Bar", (event: Event<BarEvent, any>) => Promise.resolve() as any);
-  es.listen("foo", "Bar", (event: Event<BarEvent, any>) => Promise.resolve() as any);
+  es.listen<BarEvent>("foo", "Bar", (_event: Event<BarEvent, any>) => Promise.resolve() as any);
+  es.listen("foo", "Bar", (_event: Event<BarEvent, any>) => Promise.resolve() as any);
 
   // @ts-ignore This will blow up without ts-ignore
   es.listen<FooBar>("foo", "Bar", (event: Event<BoomEvent, any>) => Promise.resolve() as any);

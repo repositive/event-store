@@ -4,19 +4,15 @@ import {
   DuplicateError,
   EventStore,
   AggregateMatches,
-  Event,
-  EventContext,
   composeAggregator,
   EventData,
-  StoreAdapter,
   EmitterAdapter,
   createEvent,
 } from ".";
 import { stub, spy } from "sinon";
 import { Some, None, Left, Right } from "funfix";
-import { v4 as uuid } from "uuid";
 import * as pino from "pino";
-import { id, getFakeStoreAdapter, createFakeIterator } from "./test-helpers";
+import { getFakeStoreAdapter } from "./test-helpers";
 
 const logger = pino();
 logger.level = "fatal";

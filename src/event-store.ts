@@ -10,15 +10,10 @@ import {
   createDumbCacheAdapter,
   createDumbEmitterAdapter,
   Aggregator,
-  IsoDateString,
-  EventType,
-  EventNamespace,
   Subscriptions,
 } from '.';
-import { None, Some, Option, Either } from 'funfix';
-import { v4 } from 'uuid';
+import { None, Option, Either } from 'funfix';
 import { createHash } from 'crypto';
-import { createEvent } from './helpers';
 
 export type Aggregate<A extends any[], T> = (...args: A) => Promise<Option<T>>;
 export type ValidateF<E extends Event<any, any>> = (o: any) => o is E;

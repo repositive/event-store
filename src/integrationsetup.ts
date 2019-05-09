@@ -1,7 +1,4 @@
 import test from "ava";
-import { Client, Pool, QueryConfig, QueryResult } from "pg";
-import { Future, Option, None, Some } from "funfix";
-import { stub } from "sinon";
 import * as fs from "fs";
 
 import { getDbConnection } from "./test-helpers";
