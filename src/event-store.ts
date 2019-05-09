@@ -37,16 +37,6 @@ export interface EventStoreOptions {
   logger?: Logger;
 }
 
-export interface ListenOptions {
-  executeHandlerIfEventExists?: boolean;
-  requestReplay?: boolean;
-}
-
-const defaultListenOptions: ListenOptions = {
-  executeHandlerIfEventExists: false,
-  requestReplay: true,
-};
-
 /**
 Main event store class
 
@@ -119,12 +109,6 @@ export class EventStore<Q> {
     this.cache = options.cache || createDumbCacheAdapter();
     this.emitter = options.emitter || createDumbEmitterAdapter();
     this.logger = options.logger || console;
-
-    this.emitter.subscribe<Event<EventReplayRequested, any>>(
-      '_eventstore',
-      'EventReplayRequested',
-      createEventReplayHandler({ store: this.store, emitter: this.emitter }),
-    );
   }
 
   /**
@@ -307,61 +291,17 @@ export class EventStore<Q> {
   }
 
   /**
-  Listen for events emitted by other event stores
-
-  When this method is called, a subscription is initialised and an {@link EventReplayRequested}
-  event is emitted. This allows this store to receive events it may have missed due to save errors,
-  downtime or deployments.
+  Listen for events emitted by other event stores. The event __will__ exist in the backing store
+  before the handler is called, so can be aggregated on safely.
 
   @param event_namespace - The remote namespace to listen to
 
   @param event_type - The event type to listen for
 
-  @param handler - Handler function called for every received event. If the event is already present
-  in the database, the handler function will **not** be called.
+  @param handler - Handler function called for every received event.
 
   The handler must return an `Either<undefined, undefined>`. To mark an event as successfully
-  handled, return `Right(undefined)`. If processing failed and the event should **not** be saved,
-  return `Left(undefined)`. This allows the handler to be re-run when the event is ingested again by
-  a replay.
-
-  _Important:_ The received event is not saved to the backing store before the handler
-  function is called. If the handler function uses an aggregate, the event must be manually folded
-  into the result of that aggregate during handling of the event, otherwise it won't be picked up.
-  For example:
-
-  ```typescript
-  // src/handlers/some_event.ts
-
-  import { Either, Left, Right, Some } from 'funfix';
-  import { Event } from '@repositive/event-store';
-
-  import { onSomeEvent } from '../aggregates';
-  import { SomeEvent } from '../events';
-  import { myEntityById } from '../somewhere';
-
-  export async function handle_some_event(
-    event: Event<SomeEvent, any>,
-    store: Store
-  ): Either<undefined, undefined> {
-    try {
-      // Does not aggregate the current `event` being handled
-      const my_entity_base: Option<MyEntity> = await myEntityById(event.data.entity_id);
-
-      // Add current event to aggregation. May fail if `onSomeEvent` requires `Some()`
-      const my_entity: Option<MyEntity> = await onSomeEvent(my_entity_base, event);
-
-      // ...
-
-      // Event was handled successfully
-      return Right(undefined);
-    } catch(e) {
-      // Something went wrong
-      // Event will not be persisted to backing store
-      return Left(undefined);
-    }
-  }
-  ```
+  handled, return `Right(undefined)`.
 
   @example Handle the `SomeEvent` event.
 
@@ -382,7 +322,6 @@ export class EventStore<Q> {
               return Right(undefined);
           } catch (e) {
               // Something went wrong
-              // Event will not be persisted to backing store
               return Left(undefined);
           }
       }
@@ -393,20 +332,9 @@ export class EventStore<Q> {
     event_namespace: T['event_namespace'],
     event_type: T['event_type'],
     handler: EventHandler<Q, Event<T, EventContext<any>>>,
-    options?: ListenOptions,
   ): Promise<void> {
-    const { executeHandlerIfEventExists, requestReplay } =
-      { ...defaultListenOptions, ...options } || defaultListenOptions;
-
     const _handler = async (event: Event<any, any>) => {
-      if (executeHandlerIfEventExists || !(await this.store.exists(event.id))) {
-        const result = await handler(event, this);
-        await result
-          .map(() => {
-            return this.store.write(event);
-          })
-          .getOrElse(Promise.resolve());
-      }
+      return (await handler(event, this)).getOrElse(Promise.resolve());
     };
 
     this.logger.trace({ event_namespace, event_type }, 'eventStoreListen');
@@ -414,22 +342,6 @@ export class EventStore<Q> {
     await this.emitter.subscribe(event_namespace, event_type, _handler);
 
     this.logger.trace({ event_namespace, event_type }, 'eventStoreListenerSubscribed');
-
-    if (requestReplay) {
-      const last = await this.store.lastEventOf(event_namespace, event_type);
-
-      const replay = createEvent<EventReplayRequested>('_eventstore', 'EventReplayRequested', {
-        requested_event_namespace: event_namespace,
-        requested_event_type: event_type,
-        since: last.map((l) => l.context.time).getOrElse(new Date(0).toISOString()),
-      });
-
-      this.logger.trace({ event_namespace, event_type, replay }, 'eventStoreReplayRequested');
-
-      await this.emitter.emit(replay);
-    } else {
-      this.logger.trace({ event_namespace, event_type }, 'eventStoreReplayNotRequested');
-    }
   }
 
   /**
@@ -486,18 +398,6 @@ export class EventStore<Q> {
   }
 }
 
-/**
-An event used to request a replay from remote event stores. It uses the `requested_event_type` and
-`requested_event_namespace` fields to specify which type of event should be replayed.
-*/
-export interface EventReplayRequested extends EventData {
-  event_namespace: '_eventstore';
-  event_type: 'EventReplayRequested';
-  requested_event_type: EventType;
-  requested_event_namespace: EventNamespace;
-  since: IsoDateString;
-}
-
 export async function reduce<I, O>(
   iter: AsyncIterator<I>,
   acc: O,
@@ -526,27 +426,5 @@ export function composeAggregator<T>(matches: AggregateMatches<T>): Aggregator<T
       }
       return matchAcc;
     }, acc);
-  };
-}
-
-export function createEventReplayHandler({
-  store,
-  emitter,
-}: {
-  store: StoreAdapter<any>;
-  emitter: EmitterAdapter;
-}) {
-  return async function handleEventReplay(event: Event<EventReplayRequested, EventContext<any>>) {
-    const events = store.readEventSince(
-      event.data.requested_event_namespace,
-      event.data.requested_event_type,
-      Option.of(event.data.since),
-    );
-
-    // Emit all events;
-    reduce(events, None, async (acc, e) => {
-      await emitter.emit(e);
-      return None;
-    });
   };
 }
