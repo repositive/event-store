@@ -242,7 +242,7 @@ export function isEventType<E extends EventData>(
       o.data &&
       isEventData(o.data, (d: any): d is E => d.event_namespace === ns && d.event_type === ty) &&
       o.context &&
-      o.context.time === "string"
+      typeof o.context.time === "string"
     );
   };
 }
