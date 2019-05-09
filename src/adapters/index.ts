@@ -4,7 +4,8 @@ import {
   EventData,
   EventContext,
   IsoDateString,
-  EventNamespaceAndType,
+  EventNamespace,
+  EventType,
   Uuid,
   Subscriptions,
 } from "..";
@@ -15,6 +16,16 @@ export * from "./cache/dumb";
 export * from "./emitter/amqp";
 export * from "./emitter/dumb";
 export * from "./store/postgres";
+
+/**
+An event's joined {@link EventNamespace} and {@link EventType}
+
+This is the union of {@link EventNamespace}, a `.` character and {@link EventType}
+
+@example `accounts.ProfileUpdated`
+@example `organisations.InviteAccepted`
+*/
+type SubscriptionKey = string;
 
 /**
 A cache item key
@@ -72,7 +83,7 @@ export type EmitterHandler<T extends Event<EventData, EventContext<any>>> = (
 /**
 Event subscriptions
 */
-export type Subscriptions = Map<EventNamespaceAndType, EmitterHandler<any>>;
+export type Subscriptions = Map<SubscriptionKey, EmitterHandler<any>>;
 
 /**
 The interface an emitter/subscriber backing service must implement
@@ -91,15 +102,19 @@ export interface EmitterAdapter {
   /**
   Subscribe to incoming events
 
-  @param name - A string identifying the type of event that this subscription should consume. This
-  should look something like `accounts.ProfileUpdated`, `organisations.MembershipUpdated` or similar
+  @param ns - A string identifying the **namespace** of the event that this subscription should
+  consume. This should look something like `accounts` or `organisations`.
+
+  @param ty - A string identifying the **type** of the event that this subscription should consume.
+  This should look something like `LoggedIn` or `OrganisationUpdated`.
 
   @param handler - An {@link EmitterHandler} function called when the incoming event has been saved
   successfully. Any domain-specific logic like sending a notification or triggering some data
   processing should be performed here.
   */
   subscribe<T extends Event<EventData, EventContext<any>>>(
-    name: T["data"]["type"],
+    ns: T["data"]["event_namespace"],
+    ty: T["data"]["event_type"],
     handler: EmitterHandler<T>,
   ): void;
 
@@ -151,13 +166,15 @@ export interface StoreAdapter<Q> {
   /**
   Find the most recent occurrence of an event in the store
 
-  @param eventType - The type of event to filter for. This should be a string like
-  `accounts.ProfileUpdated`
+  @param ns - The namespace of the event to filter for. This should be a string like `accounts`
+
+  @param ty - The type of the event to filter for. This should be a string like `ProfileUpdated`
 
   @returns The most recent found event, or `None` if no event could be found
   */
   lastEventOf<E extends Event<any, any>>(
-    eventType: EventNamespaceAndType,
+    ns: EventNamespace,
+    ty: EventType,
   ): Promise<Option<E>>;
 
   /**
@@ -168,14 +185,16 @@ export interface StoreAdapter<Q> {
   /**
   Read all events created at or after a given time
 
-  @param eventType - The type of event to search for. This should be a string like
-  `accounts.ProfileUpdated`
+  @param ns - The namespace of the event to filter for. This should be a string like `accounts`
+
+  @param ty - The type of the event to filter for. This should be a string like `ProfileUpdated`
 
   @param since - ISO8601 date string specifying when to read events from. If passed as `None` or
   omitted, all events matching `eventType` should be returned
   */
   readEventSince(
-    eventTpe: EventNamespaceAndType,
+    ns: EventNamespace,
+    ty: EventType,
     since?: Option<IsoDateString>,
   ): AsyncIterator<Event<EventData, EventContext<any>>>;
 }

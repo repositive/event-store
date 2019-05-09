@@ -121,7 +121,8 @@ export class EventStore<Q> {
     this.logger = options.logger || console;
 
     this.emitter.subscribe<Event<EventReplayRequested, any>>(
-      '_eventstore.EventReplayRequested',
+      '_eventstore',
+      'EventReplayRequested',
       createEventReplayHandler({ store: this.store, emitter: this.emitter }),
     );
   }
@@ -221,13 +222,13 @@ export class EventStore<Q> {
   first match from top to bottom being called for that event. This defines the relationship between
   events and their handlers.
 
-  The {@link isEvent} helper can be used to reduce boilerplate. An example `isThingCreated` function
-  may look like this:
+  The {@link isEventType} helper can be used to reduce boilerplate. An example `isThingCreated`
+  function may look like this:
 
   ```typescript
-  export function isThingCreated(o: any): o is ThingUpdated {
-    return o && o.type === 'thingdomain.ThingUpdated';
-  }
+  import { isEventType } from "@repositive/event-store";
+
+  export const isThingCreated = isEventType<ThingUpdated>('thingdomain', 'ThingUpdated');
   ```
 
   @returns Result of aggregation over queried events
@@ -396,7 +397,6 @@ export class EventStore<Q> {
   ): Promise<void> {
     const { executeHandlerIfEventExists, requestReplay } =
       { ...defaultListenOptions, ...options } || defaultListenOptions;
-    const pattern = [event_namespace, event_type].join('.');
 
     const _handler = async (event: Event<any, any>) => {
       if (executeHandlerIfEventExists || !(await this.store.exists(event.id))) {
@@ -409,14 +409,14 @@ export class EventStore<Q> {
       }
     };
 
-    this.logger.trace({ pattern }, 'eventStoreListen');
+    this.logger.trace({ event_namespace, event_type }, 'eventStoreListen');
 
-    await this.emitter.subscribe(pattern, _handler);
+    await this.emitter.subscribe(event_namespace, event_type, _handler);
 
-    this.logger.trace({ pattern }, 'eventStoreListenerSubscribed');
+    this.logger.trace({ event_namespace, event_type }, 'eventStoreListenerSubscribed');
 
     if (requestReplay) {
-      const last = await this.store.lastEventOf(pattern);
+      const last = await this.store.lastEventOf(event_namespace, event_type);
 
       const replay = createEvent<EventReplayRequested>('_eventstore', 'EventReplayRequested', {
         requested_event_namespace: event_namespace,
@@ -459,7 +459,7 @@ export class EventStore<Q> {
         const event = _next.value;
 
         const event_ident =
-          [event.data.event_namespace, event.data.event_type].join('.') || event.data.type;
+          [event.data.event_namespace, event.data.event_type].join('.');
 
         const handler = handlers.get(event_ident);
 
@@ -491,7 +491,6 @@ An event used to request a replay from remote event stores. It uses the `request
 `requested_event_namespace` fields to specify which type of event should be replayed.
 */
 export interface EventReplayRequested extends EventData {
-  type: '_eventstore.EventReplayRequested';
   event_namespace: '_eventstore';
   event_type: 'EventReplayRequested';
   requested_event_type: EventType;
@@ -539,7 +538,8 @@ export function createEventReplayHandler({
 }) {
   return async function handleEventReplay(event: Event<EventReplayRequested, EventContext<any>>) {
     const events = store.readEventSince(
-      [event.data.requested_event_namespace, event.data.requested_event_type].join('.'),
+      event.data.requested_event_namespace,
+      event.data.requested_event_type,
       Option.of(event.data.since),
     );
 

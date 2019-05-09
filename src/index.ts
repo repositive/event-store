@@ -24,16 +24,6 @@ ISO8601 formatted date string
 export type IsoDateString = string;
 
 /**
-An event's joined {@link EventNamespace} and {@link EventType}
-
-This is the union of {@link EventNamespace}, a `.` character and {@link EventType}
-
-@example `accounts.ProfileUpdated`
-@example `organisations.InviteAccepted`
-*/
-export type EventNamespaceAndType = string;
-
-/**
 An event's namespace
 
 The lowercase namespace to which an event belongs
@@ -74,15 +64,11 @@ export type Aggregator<T> = (
 The data payload of an event
 
 A complete event is defined by the {@link Event} type. This interface defines that the event type
-be present in the data payload, defined by `type`, `event_type` and `event_namespace`. Domain event
+be present in the data payload, defined by `event_type` and `event_namespace`. Domain event
 definitions __should not__ override the fields defined in this interface. The event store assumes
 ownership of these fields and will usually overwrite any fields with the same name in user data.
-
-Note that the `type` field is deprecated, but **should** be kept for compatibility with legacy
-versions of this library. It is the concatenation of `event_namespace`, `.` and `event_type`.
 */
 export interface EventData {
-  type: EventNamespaceAndType;
   event_namespace: EventNamespace;
   event_type: EventType;
 }

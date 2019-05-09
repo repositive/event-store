@@ -6,7 +6,8 @@ import {
   Event,
   EventData,
   EventContext,
-  EventNamespaceAndType,
+  EventNamespace,
+  EventType,
   Uuid,
 } from "../../.";
 import { Option, None, Either, Left, Right } from "funfix";
@@ -109,19 +110,20 @@ export function createPgStoreAdapter(
   }
 
   async function lastEventOf<E extends Event<any, any>>(
-    eventType: EventNamespaceAndType,
+    ns: EventNamespace,
+    ty: EventType,
   ): Promise<Option<E>> {
-    logger.trace({ eventType }, 'eventStoreLastEventOfResult');
+    logger.trace({ ns, ty }, 'eventStoreLastEventOf');
 
     const start = Date.now();
 
     return pool
       .query(
-        `select * from events where data->>'type' = $1 order by context->>'time' desc limit 1`,
-        [eventType],
+        `select * from events where data->>'event_namespace' = $1 and data->>'event_type' = $2 order by context->>'time' desc limit 1`,
+        [ns, ty],
       )
       .then((results) => {
-        logger.trace({ eventType, time: Date.now() - start }, 'eventStoreLastEventOfResult');
+        logger.trace({ ns, ty, time: Date.now() - start }, 'eventStoreLastEventOfResult');
 
         return Option.of(results.rows[0]);
       });
@@ -144,15 +146,17 @@ export function createPgStoreAdapter(
   }
 
   function readEventSince(
-    eventType: EventNamespaceAndType,
+    ns: EventNamespace,
+    ty: EventType,
     since: Option<IsoDateString> = None,
   ): AsyncIterator<Event<any, any>> {
     return read(
       {
-        text: `select * from events where data->>'type' = $1`,
+        text: `select * from events where data->>'event_namespace' = $1 and data->>'event_type' = $2`,
       },
       since,
-      eventType,
+      ns,
+      ty,
     );
   }
 

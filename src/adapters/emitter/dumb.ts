@@ -1,4 +1,4 @@
-import { EmitterAdapter, EmitterHandler, EventNamespaceAndType, Subscriptions } from "../../";
+import { EmitterAdapter, EmitterHandler, EventNamespace, EventType, Subscriptions } from "../../";
 
 export function createDumbEmitterAdapter(): EmitterAdapter {
   const subs = new Map();
@@ -8,13 +8,14 @@ export function createDumbEmitterAdapter(): EmitterAdapter {
   }
 
   function subscribe(
-    pattern: EventNamespaceAndType,
+    ns: EventNamespace,
+    ty: EventType,
     handler: EmitterHandler<any>,
   ) {
     /* I DO NOT DO ANYTHING */
   }
 
-  async function unsubscribe(pattern: EventNamespaceAndType) {
+  async function unsubscribe(ns: EventNamespace, ty: EventType) {
     /* I DO NOT DO ANYTHING */
   }
 

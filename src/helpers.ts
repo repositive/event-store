@@ -26,7 +26,6 @@ event object:
 import { createEvent, EventData } from '@repositive/event-store';
 
 interface ExampleEvent extends EventData {
-  type: 'docs.ExampleEvent';
   event_namespace: 'docs';
   event_Type: 'ExampleEvent';
   foo: number;
@@ -51,8 +50,8 @@ when calling `createEvent` like `createEvent<ExampleEvent>(...)`.
 By convention, this should have the same name as the event interface definition to reduce confusion.
 
 @param data - The event's data payload.
-This function will overwrite fields named `type`, `event_type` or `event_namespace` in the payload
-input with its own values.
+This function will overwrite fields named `event_type` or `event_namespace` in the payloadinput with
+its own values.
 
 @param context - The event's context.
 If not provided, `createEvent()` will create a default context with no action, an empty subject
@@ -66,7 +65,6 @@ when unit testing so that a consistent static value can be passed. For example:
 import { createEvent, EventData } from '@repositive/event-store';
 
 interface ExampleEvent extends EventData {
-  type: 'docs.ExampleEvent';
   event_namespace: 'docs';
   event_Type: 'ExampleEvent';
   foo: number;
@@ -95,14 +93,12 @@ This makes unit testing much easier to perform.
 export function createEvent<T extends EventData>(
   event_namespace: T["event_namespace"],
   event_type: T["event_type"],
-  data: Omit<T, "event_namespace" | "event_type" | "type">,
+  data: Omit<T, "event_namespace" | "event_type">,
   context: EventContext<any> = defaultContext(),
   _uuid: () => Uuid = v4,
 ): Event<T, EventContext<any>> {
   const d = {
-    // FIXME: Remove `as object` when TS 3.2 is released, see https://stackoverflow.com/a/53188276/383609
-    ...(data as object),
-    type: `${event_namespace}.${event_type}`,
+    ...data,
     event_type,
     event_namespace,
   };
@@ -138,9 +134,8 @@ that returns a static string. For example:
 import { createEvent, EventData } from '@repositive/event-store';
 
 interface ExampleEvent extends EventData {
-  type: 'docs.ExampleEvent';
   event_namespace: 'docs';
-  event_Type: 'ExampleEvent';
+  event_type: 'ExampleEvent';
   foo: number;
   bar: number;
 }
@@ -179,7 +174,7 @@ export function createContext(
 /**
 Check that a given object is valid event data for a given type
 
-This function checks that `type`, `event_namespace` and `event_type` all exist and are strings, then
+This function checks that `event_namespace` and `event_type` all exist and are strings, then
 calls `is` which should be a function that checks that `event_namespace` and `event_type` contain
 specific values.
 ```
@@ -191,9 +186,8 @@ export function isEventData<D extends EventData>(
   const _is = is || ((_: any) => true);
   return (
     o &&
-    ((typeof o.event_namespace === "string" &&
-      typeof o.event_type === "string") ||
-      typeof o.type === "string") &&
+    (typeof o.event_namespace === "string" &&
+      typeof o.event_type === "string") &&
     _is(o)
   );
 }
@@ -284,7 +278,7 @@ export function isEventType<E extends EventData>(
       isEventData(
         o.data,
         (d: any): d is E =>
-          (d.event_namespace === ns && d.event_type === ty) || d.type === `${ns}.${ty}`,
+          (d.event_namespace === ns && d.event_type === ty),
       ) &&
       o.context &&
       isEventContext(o.context, (d: any): d is EventContext<any> => true)

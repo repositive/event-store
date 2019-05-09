@@ -217,7 +217,6 @@ test("replay handler reads correct events", async (t) => {
   const evt: Event<EventReplayRequested, EventContext<any>> = {
     id,
     data: {
-      type: "_eventstore.EventReplayRequested",
       event_namespace: "_eventstore",
       event_type: "EventReplayRequested",
       requested_event_namespace: "ns",
@@ -229,7 +228,7 @@ test("replay handler reads correct events", async (t) => {
 
   replayHandler(evt);
 
-  t.truthy(readSpy.calledWithExactly("ns.SomeType", Some(since)));
+  t.truthy(readSpy.calledWithExactly("ns", "SomeType", Some(since)));
 });
 
 test("listen emits EventReplayRequested without existing events", async (t) => {
@@ -253,7 +252,7 @@ test("listen emits EventReplayRequested without existing events", async (t) => {
 
   const event = emit.firstCall.args[0];
 
-  t.deepEqual(event.data.type, `_eventstore.EventReplayRequested`);
+  t.deepEqual(event.data.type, undefined);
   t.deepEqual(event.data.requested_event_namespace, namespc);
   t.deepEqual(event.data.requested_event_type, evtype);
   t.deepEqual(event.data.since, new Date(0).toISOString());
@@ -284,7 +283,7 @@ test("listen emits EventReplayRequested with existing events", async (t) => {
 
   const event = emit.firstCall.args[0];
 
-  t.deepEqual(event.data.type, `_eventstore.EventReplayRequested`);
+  t.deepEqual(event.data.type, undefined);
   t.deepEqual(event.data.requested_event_namespace, namespc);
   t.deepEqual(event.data.requested_event_type, evtype);
   t.deepEqual(event.data.since, existingEvent.context.time);
@@ -312,8 +311,8 @@ test("listen calls handler if event doesnt exist and saves after its execution",
 
   await es.listen(namespc, evtype, handler);
 
-  t.deepEqual(subscribe.secondCall.args[0], `${namespc}.${evtype}`);
-  const wrapped_handler = subscribe.secondCall.args[1];
+  t.deepEqual(subscribe.secondCall.args.slice(0, 2), [namespc, evtype]);
+  const wrapped_handler = subscribe.secondCall.args[2];
 
   const event = createEvent("test", "event", {});
   await wrapped_handler(event);
@@ -345,8 +344,8 @@ test("listen calls does not save event if handler fails", async (t) => {
 
   await es.listen(namespc, evtype, handler);
 
-  t.deepEqual(subscribe.secondCall.args[0], `${namespc}.${evtype}`);
-  const wrapped_handler = subscribe.secondCall.args[1];
+  t.deepEqual(subscribe.secondCall.args.slice(0, 2), [namespc, evtype]);
+  const wrapped_handler = subscribe.secondCall.args[2];
 
   const event = createEvent("test", "event", {});
   await wrapped_handler(event);
@@ -378,8 +377,8 @@ test("listen does not call handler if event already exists and does not save eve
 
   await es.listen(namespc, evtype, handler);
 
-  t.deepEqual(subscribe.secondCall.args[0], `${namespc}.${evtype}`);
-  const wrapped_handler = subscribe.secondCall.args[1];
+  t.deepEqual(subscribe.secondCall.args.slice(0, 2), [namespc, evtype]);
+  const wrapped_handler = subscribe.secondCall.args[2];
 
   const event = createEvent("test", "event", {});
   await wrapped_handler(event);

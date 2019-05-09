@@ -13,7 +13,6 @@ import { isEventData, isEventType } from "./helpers";
 // This test does nothing, but will fail to compile if Typescript finds errors, so should be left in
 test("typechecks createEvent", (t: any) => {
   interface TestEvent extends EventData {
-    type: "foobar.Baz";
     event_namespace: "foobar";
     event_type: "Baz";
     foo: string;
@@ -34,7 +33,6 @@ test("creates an event with default fields filled", (t: any) => {
   const expected = {
     id,
     data: {
-      type: "ns.Type",
       event_type: "Type",
       event_namespace: "ns",
       foo: "bar",
@@ -65,7 +63,6 @@ test("creates an event with a given context", (t: any) => {
   const expected = {
     id,
     data: {
-      type: "ns.Type",
       event_type: "Type",
       event_namespace: "ns",
       foo: "bar",
@@ -126,8 +123,6 @@ test("isEventData supports new style events", (t: any) => {
     data: {
       event_namespace: "some_ns",
       event_type: "SomeType",
-      // New fields should override this
-      type: "ignoreme.IgnoreMe",
     },
     context: {},
   };
@@ -141,30 +136,12 @@ test("isEventData supports new style events", (t: any) => {
   );
 });
 
-test("isEventData supports old style events", (t: any) => {
-  const fakeEvent: any = {
-    id: "...",
-    data: {
-      type: "oldstyle.OldStyle",
-    },
-    context: {},
-  };
-
-  t.truthy(
-    isEventData(
-      fakeEvent.data,
-      (data: any): data is any => data.type === "oldstyle.OldStyle",
-    ),
-  );
-});
-
 test("isEventType checks a complete new event", (t: any) => {
   const fakeEvent: any = {
     id: "...",
     data: {
       event_namespace: "some_ns",
       event_type: "SomeType",
-      type: "ignoreme.IgnoreMe",
     },
     context: { time: 't' },
   };
@@ -172,7 +149,7 @@ test("isEventType checks a complete new event", (t: any) => {
   t.truthy(isEventType('some_ns', 'SomeType')(fakeEvent));
 });
 
-test("isEventType checks a complete old event", (t: any) => {
+test("isEventType ignores an old event", (t: any) => {
   const fakeEvent: any = {
     id: "...",
     data: {
@@ -181,5 +158,5 @@ test("isEventType checks a complete old event", (t: any) => {
     context: { time: 't' },
   };
 
-  t.truthy(isEventType('ignoreme', 'IgnoreMe')(fakeEvent));
+  t.falsy(isEventType('ignoreme', 'IgnoreMe')(fakeEvent));
 });
