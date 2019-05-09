@@ -125,24 +125,3 @@ export interface Logger {
   warn(...args: any[]): void;
   error(...args: any[]): void;
 }
-
-/**
-__Deprecated:__ Use `EventStore::new()` instead.
-
-Create a new event store from a provided store, cache and event emitter adapter implementation
-
-@deprecated
-*/
-export async function newEventStore<Q>(
-  store: StoreAdapter<Q>,
-  _options?: EventStoreOptions,
-): Promise<EventStore<Q>> {
-  const options = _options || {};
-  const { logger = console } = options;
-  logger.warn(`
-    DEPRECATED:
-    The newEventStore function is deprecated and will be removed in a future version of the store.
-    Use the EventStore class instead.
-  `);
-  return new EventStore(store, _options);
-}
