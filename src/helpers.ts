@@ -206,33 +206,6 @@ export function isEventContext<S, C extends EventContext<S>>(
 }
 
 /**
-Check that an object is a complete event
-
-Use this to wrap event matching functions to reduce boilerplate
-
-@param isData - Checks that the object contains a valid event payload. This should have
-{@link isEventData} passed to it.
-
-@param isContext - Check that the object contains a valid event context.
-For aggregations, this will usually be omitted.
-*/
-export function isEvent<D extends EventData, C extends EventContext<any>>(
-  isData: (o: any) => o is D,
-  isContext?: (o: any) => o is C,
-): (o: any) => o is Event<D, C> {
-  return function(o: any): o is Event<D, C> {
-    return (
-      o &&
-      typeof o.id === "string" &&
-      o.data &&
-      isEventData(o.data, isData) &&
-      o.context &&
-      isEventContext(o.context, isContext)
-    );
-  };
-}
-
-/**
 Match a complete event object against a given namespace and type
 
 A function is returned which can then be passed to aggregators.

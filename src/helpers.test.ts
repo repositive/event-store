@@ -6,7 +6,6 @@ import {
   EventData,
   EventContext,
   Event,
-  isEvent,
 } from ".";
 import { isEventData, isEventType } from "./helpers";
 
@@ -114,7 +113,7 @@ test("creates a context with subject and an action", (t: any) => {
 test("createEvent passes is Event", (t: any) => {
   const ev = createEvent("ns", "Type", {});
 
-  t.truthy(isEvent((o: any): o is any => !!o)(ev));
+  t.truthy(isEventType("ns", "Type")(ev));
 });
 
 test("isEventData supports new style events", (t: any) => {

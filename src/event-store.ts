@@ -145,7 +145,7 @@ export class EventStore<Q> {
   @example
 
   ```typescript
-  import { EventStore, PgQuery, Aggregate, isEvent } from '@repositive/event-store';
+  import { EventStore, PgQuery, Aggregate, isEventType } from '@repositive/event-store';
   import {
     isThingCreated,
     isThingUpdated,
@@ -171,6 +171,9 @@ export class EventStore<Q> {
     // ...
   };
 
+  const isThingCreated = isEventType<ThingCreated>('thing', 'ThingCreated');
+  const isThingUpdated = isEventType<ThingUpdated>('thing', 'ThingUpdated');
+
   export function prepareThingById(
     store: EventStore<PgQuery>
   ): Aggregate<[string], Thing> {
@@ -180,8 +183,8 @@ export class EventStore<Q> {
         text: `select * from events where data->>'thing_id' = $1`
       },
       [
-        [isEvent(isThingCreated), onThingCreated],
-        [isEvent(isThingUpdated), onThingUpdated]
+        [isThingCreated, onThingCreated],
+        [isThingUpdated, onThingUpdated]
       ]
     );
   }

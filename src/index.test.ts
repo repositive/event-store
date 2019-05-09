@@ -2,7 +2,7 @@ import test from "ava";
 import {
   reduce,
   DuplicateError,
-  newEventStore,
+  EventStore,
   AggregateMatches,
   Event,
   EventContext,
@@ -102,7 +102,7 @@ test("createAggregate returns none when no cache and no events", async (t) => {
 
   readStub.returns(toAsyncIter([]));
 
-  const es = await newEventStore(store, { logger });
+  const es = new EventStore(store, { logger });
 
   const matches: any = [[() => true, () => "test"]];
   const agg = es.createAggregate("Test", "*", matches);
@@ -117,7 +117,7 @@ test("createAggregate throws when the internal aggregate crashes", async (t) => 
 
   readStub.returns(toAsyncIter([1]));
 
-  const es = await newEventStore(store, { logger });
+  const es = new EventStore(store, { logger });
 
   const scrochedAggregation = () => {
     throw new Error("Scronched");
@@ -147,7 +147,7 @@ test("save emits if everything is fine", async (t) => {
   emitStub.resolves();
   const emitter: any = { emit: emitStub, subscribe: () => Promise.resolve() };
 
-  const es = await newEventStore(store, { logger, emitter });
+  const es = new EventStore(store, { logger, emitter });
 
   await es.save(createEvent("test_namespace", "EventTestType", {}));
 
@@ -166,7 +166,7 @@ test("save does not emit on errors", async (t) => {
   emitStub.resolves();
   const emitter: any = { emit: emitStub, subscribe: () => Promise.resolve() };
 
-  const es = await newEventStore(store, { logger, emitter });
+  const es = new EventStore(store, { logger, emitter });
 
   try {
     await es.save(createEvent("test_namespace", "EventTestType", {}));
@@ -192,7 +192,7 @@ test("save does not emit on duplicates", async (t) => {
   emitStub.resolves();
   const emitter: any = { emit: emitStub, subscribe: () => Promise.resolve() };
 
-  const es = await newEventStore(store, { logger, emitter });
+  const es = new EventStore(store, { logger, emitter });
 
   await es.save(createEvent("test_namespace", "EventTestType", {}));
   t.deepEqual(writeStub.callCount, 1);
@@ -212,7 +212,7 @@ test("listen calls handler", async (t) => {
     subscribe: subscribe as any,
   } as EmitterAdapter;
 
-  const es = await newEventStore(store, { logger, emitter });
+  const es = new EventStore(store, { logger, emitter });
 
   const namespc = "t";
   const evtype = "event_type";
@@ -243,7 +243,7 @@ test("listen type checks its string arguments", async (t) => {
   const emitStub = stub().resolves();
   const emitter: any = { emit: emitStub, subscribe: () => Promise.resolve() };
 
-  const es = await newEventStore(store, { logger, emitter });
+  const es = new EventStore(store, { logger, emitter });
 
   es.listen<DummyEvent>("foo", "Bar", () => Promise.resolve() as any);
 
