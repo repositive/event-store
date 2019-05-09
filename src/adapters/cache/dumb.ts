@@ -2,9 +2,7 @@ import { Option, None } from "funfix";
 import { CacheAdapter, CacheEntry, CacheKey } from "../../";
 
 export function createDumbCacheAdapter(): CacheAdapter {
-  async function get<T extends CacheEntry<any>>(
-    _id: CacheKey,
-  ): Promise<Option<T>> {
+  async function get<T extends CacheEntry<any>>(_id: CacheKey): Promise<Option<T>> {
     return None;
   }
 

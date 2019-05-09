@@ -1,18 +1,17 @@
-import test from 'ava';
-import { stub } from 'sinon';
-import {EventStore, EventData, Event} from '.';
+import test from "ava";
+import { stub } from "sinon";
+import { EventStore, EventData, Event } from ".";
 
 // Noop test, but will fail to compile if something doesn't work
 test("listen type checks its string arguments", async (t) => {
-
   interface BarEvent extends EventData {
     event_namespace: "foo";
     event_type: "Bar";
   }
 
   interface BoomEvent extends EventData {
-    event_namespace: 'foo';
-    event_type: 'Boom';
+    event_namespace: "foo";
+    event_type: "Boom";
   }
 
   const es: EventStore<any> = {

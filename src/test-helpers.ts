@@ -45,10 +45,7 @@ export function getDbConnection(): Pool {
 }
 
 // For integration tests
-export function insertEvent(
-  event: any,
-  pool: any = getDbConnection(),
-): Promise<any> {
+export function insertEvent(event: any, pool: any = getDbConnection()): Promise<any> {
   return pool
     .query(`INSERT INTO events (data, context) VALUES ($1, $2) RETURNING *`, [
       event.data,
@@ -66,10 +63,7 @@ export function truncateAll(pool: any = getDbConnection()): Promise<any> {
 }
 
 // For integration tests
-export async function query(
-  q: string,
-  pool: any = getDbConnection(),
-): Promise<any> {
+export async function query(q: string, pool: any = getDbConnection()): Promise<any> {
   return (await pool.query(q)).rows;
 }
 
@@ -114,9 +108,7 @@ export async function getFakeStoreAdapter({
       const result = readStub(...args);
 
       if (!(result instanceof Array)) {
-        throw new Error(
-          "Read stub must return an array. Are you resolving a promise instead?",
-        );
+        throw new Error("Read stub must return an array. Are you resolving a promise instead?");
       }
 
       return {

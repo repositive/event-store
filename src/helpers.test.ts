@@ -1,10 +1,6 @@
 import test from "ava";
 import { id } from "./test-helpers";
-import {
-  createEvent,
-  createContext,
-  EventData,
-} from ".";
+import { createEvent, createContext, EventData } from ".";
 import { isEventData, isEventType } from "./helpers";
 
 // This test does nothing, but will fail to compile if Typescript finds errors, so should be left in
@@ -43,9 +39,7 @@ test("creates an event with default fields filled", (t: any) => {
   t.deepEqual(evt.data, expected.data);
   t.deepEqual(evt.context.subject, expected.context.subject);
   t.is(typeof evt.context.time, "string");
-  t.true(
-    /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(evt.id),
-  );
+  t.true(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(evt.id));
 });
 
 test("creates an event with a given context", (t: any) => {
@@ -54,7 +48,7 @@ test("creates an event with a given context", (t: any) => {
     "Type",
     { foo: "bar" },
     { subject: { bar: "baz" }, time: "2018-01-02 03-04-05" },
-    () => id,
+    () => id
   );
 
   const expected = {
@@ -74,13 +68,7 @@ test("creates an event with a given context", (t: any) => {
 });
 
 test("creates a context with subject and no action", (t: any) => {
-  const evt = createEvent(
-    "ns",
-    "Type",
-    { foo: "bar" },
-    createContext({ bar: "baz" }),
-    () => id,
-  );
+  const evt = createEvent("ns", "Type", { foo: "bar" }, createContext({ bar: "baz" }), () => id);
 
   t.is(evt.context.action, undefined);
   t.deepEqual(evt.context.subject, { bar: "baz" });
@@ -91,12 +79,8 @@ test("creates a context with subject and an action", (t: any) => {
     "ns",
     "Type",
     { foo: "bar" },
-    createContext(
-      { bar: "baz" },
-      "someRandomAction",
-      () => "2018-01-02 03-04-05",
-    ),
-    () => id,
+    createContext({ bar: "baz" }, "someRandomAction", () => "2018-01-02 03-04-05"),
+    () => id
   );
 
   const expected = {
@@ -128,8 +112,8 @@ test("isEventData supports new style events", (t: any) => {
     isEventData(
       fakeEvent.data,
       (data: any): data is any =>
-        data.event_namespace === "some_ns" && data.event_type === "SomeType",
-    ),
+        data.event_namespace === "some_ns" && data.event_type === "SomeType"
+    )
   );
 });
 
@@ -140,10 +124,10 @@ test("isEventType checks a complete new event", (t: any) => {
       event_namespace: "some_ns",
       event_type: "SomeType",
     },
-    context: { time: 't' },
+    context: { time: "t" },
   };
 
-  t.truthy(isEventType('some_ns', 'SomeType')(fakeEvent));
+  t.truthy(isEventType("some_ns", "SomeType")(fakeEvent));
 });
 
 test("isEventType ignores an old event", (t: any) => {
@@ -152,8 +136,8 @@ test("isEventType ignores an old event", (t: any) => {
     data: {
       type: "ignoreme.IgnoreMe",
     },
-    context: { time: 't' },
+    context: { time: "t" },
   };
 
-  t.falsy(isEventType('ignoreme', 'IgnoreMe')(fakeEvent));
+  t.falsy(isEventType("ignoreme", "IgnoreMe")(fakeEvent));
 });

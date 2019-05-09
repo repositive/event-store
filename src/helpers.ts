@@ -95,7 +95,7 @@ export function createEvent<T extends EventData>(
   event_type: T["event_type"],
   data: Omit<T, "event_namespace" | "event_type">,
   context: EventContext<any> = defaultContext(),
-  _uuid: () => Uuid = v4,
+  _uuid: () => Uuid = v4
 ): Event<T, EventContext<any>> {
   const d = {
     ...data,
@@ -162,7 +162,7 @@ it('Creates an event', () => {
 export function createContext(
   subject: object,
   action?: string,
-  _time: () => IsoDateString = () => new Date().toISOString(),
+  _time: () => IsoDateString = () => new Date().toISOString()
 ): EventContext<any> {
   return {
     action,
@@ -179,17 +179,9 @@ calls `is` which should be a function that checks that `event_namespace` and `ev
 specific values.
 ```
 */
-export function isEventData<D extends EventData>(
-  o: any,
-  is?: (o: any) => o is D,
-): o is D {
+export function isEventData<D extends EventData>(o: any, is?: (o: any) => o is D): o is D {
   const _is = is || ((_: any) => true);
-  return (
-    o &&
-    (typeof o.event_namespace === "string" &&
-      typeof o.event_type === "string") &&
-    _is(o)
-  );
+  return o && (typeof o.event_namespace === "string" && typeof o.event_type === "string") && _is(o);
 }
 
 /**
@@ -199,7 +191,7 @@ An event context must contain *at least* a `time` field.
 */
 export function isEventContext<S, C extends EventContext<S>>(
   o: any,
-  is?: (o: any) => o is C,
+  is?: (o: any) => o is C
 ): o is C {
   const _is = is || ((_: any) => true);
   return o && typeof o.time === "string" && _is(o);
@@ -241,20 +233,16 @@ export function createUserByIdAggregate(
 */
 export function isEventType<E extends EventData>(
   ns: E["event_namespace"],
-  ty: E["event_type"],
+  ty: E["event_type"]
 ): (o: any) => o is Event<E, EventContext<any>> {
   return function(o: any): o is Event<E, EventContext<any>> {
     return (
       o &&
-      typeof o.id === 'string' &&
+      typeof o.id === "string" &&
       o.data &&
-      isEventData(
-        o.data,
-        (d: any): d is E =>
-          (d.event_namespace === ns && d.event_type === ty),
-      ) &&
+      isEventData(o.data, (d: any): d is E => d.event_namespace === ns && d.event_type === ty) &&
       o.context &&
-      o.context.time === 'string'
+      o.context.time === "string"
     );
   };
 }

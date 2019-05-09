@@ -11,25 +11,56 @@ import {
   createDumbEmitterAdapter,
   Aggregator,
   Subscriptions,
-} from '.';
-import { None, Option, Either } from 'funfix';
-import { createHash } from 'crypto';
+} from ".";
+import { None, Option, Either } from "funfix";
+import { createHash } from "crypto";
 
 export type Aggregate<A extends any[], T> = (...args: A) => Promise<Option<T>>;
 export type ValidateF<E extends Event<any, any>> = (o: any) => o is E;
 export type ExecuteF<T, E extends Event<any, any>> = (acc: Option<T>, ev: E) => Promise<Option<T>>;
 export type AggregateMatch<A, T extends Event<any, any>> = [ValidateF<T>, ExecuteF<A, T>];
-export type AggregateMatches<T> = Array<AggregateMatch<T, any>>;
+export type AggregateMatches<T> = AggregateMatch<T, any>[];
 
 export type EventHandler<Q, T extends Event<EventData, EventContext<any>>> = (
   event: T,
-  store: EventStore<Q>,
+  store: EventStore<Q>
 ) => Promise<Either<undefined, undefined>>;
 
 export interface EventStoreOptions {
   cache?: CacheAdapter;
   emitter?: EmitterAdapter;
   logger?: Logger;
+}
+
+/**
+ *  Compose a list of maching functions into an aggregator
+ *
+ */
+export function composeAggregator<T>(matches: AggregateMatches<T>): Aggregator<T> {
+  return async (acc: Option<T>, event: Event<EventData, any>) => {
+    return matches.reduce((matchAcc, [validate, execute]) => {
+      if (validate(event)) {
+        return execute(matchAcc, event);
+      }
+      return matchAcc;
+    }, acc);
+  };
+}
+
+export async function reduce<I, O>(
+  iter: AsyncIterator<I>,
+  acc: O,
+  f: (acc: O, next: I) => Promise<O>
+): Promise<O> {
+  let _acc = acc;
+  while (true) {
+    const _next = await iter.next();
+    if (_next.done) {
+      return _acc;
+    } else {
+      _acc = await f(_acc, _next.value);
+    }
+  }
 }
 
 /**
@@ -99,7 +130,7 @@ export class EventStore<Q> {
 
   @param options - Cache adapter, emitter adapter and (optional) logger to use
   */
-  constructor(store_adapter: StoreAdapter<Q>, options: EventStoreOptions = {}) {
+  public constructor(store_adapter: StoreAdapter<Q>, options: EventStoreOptions = {}) {
     this.store = store_adapter;
     this.cache = options.cache || createDumbCacheAdapter();
     this.emitter = options.emitter || createDumbEmitterAdapter();
@@ -218,22 +249,22 @@ export class EventStore<Q> {
   public createAggregate<A extends any[], T>(
     aggregateName: string,
     query: Q,
-    matches: AggregateMatches<T>,
+    matches: AggregateMatches<T>
   ): Aggregate<A, T> {
     const _impl = async (...args: A): Promise<Option<T>> => {
       const start = Date.now();
 
-      const id = createHash('sha256')
+      const id = createHash("sha256")
         .update(aggregateName + JSON.stringify(query) + JSON.stringify(args))
-        .digest('hex');
+        .digest("hex");
 
       const latestSnapshot = await this.cache.get<T>(id);
 
-      this.logger.trace(latestSnapshot, 'eventStoreCacheSnapshot');
+      this.logger.trace(latestSnapshot, "eventStoreCacheSnapshot");
       const results = this.store.read(
         query,
         latestSnapshot.flatMap((snapshot) => Option.of(snapshot.time)),
-        ...args,
+        ...args
       );
 
       const aggregatedAt = new Date();
@@ -242,28 +273,28 @@ export class EventStore<Q> {
       const aggregatedResult = await reduce<Event<EventData, EventContext<any>>, Option<T>>(
         results,
         latestSnapshot.map((snapshot) => snapshot.data),
-        aggregator,
+        aggregator
       );
 
       this.logger.trace(
         { query, aggregatedResult, time: Date.now() - start },
-        'eventStoreAggregatedResult',
+        "eventStoreAggregatedResult"
       );
 
       await aggregatedResult.map((result) => {
         const snapshotHash = latestSnapshot
           .map((snapshot) => {
-            return createHash('sha256')
+            return createHash("sha256")
               .update(JSON.stringify(snapshot.data))
-              .digest('hex');
+              .digest("hex");
           })
-          .getOrElse('');
+          .getOrElse("");
 
-        const toCacheHash = createHash('sha256')
+        const toCacheHash = createHash("sha256")
           .update(JSON.stringify(result))
-          .digest('hex');
+          .digest("hex");
         if (snapshotHash !== toCacheHash) {
-          this.logger.trace('save to cache', result);
+          this.logger.trace("save to cache", result);
           return this.cache.set(id, {
             data: result,
             time: aggregatedAt.toISOString(),
@@ -279,7 +310,7 @@ export class EventStore<Q> {
           aggregate_time: Date.now() - aggregatedAt.getTime(),
           total_time: Date.now() - start,
         },
-        'eventStoreAggregateLatency',
+        "eventStoreAggregateLatency"
       );
 
       return aggregatedResult;
@@ -327,19 +358,19 @@ export class EventStore<Q> {
   ```
   */
   public async listen<T extends EventData>(
-    event_namespace: T['event_namespace'],
-    event_type: T['event_type'],
-    handler: EventHandler<Q, Event<T, EventContext<any>>>,
+    event_namespace: T["event_namespace"],
+    event_type: T["event_type"],
+    handler: EventHandler<Q, Event<T, EventContext<any>>>
   ): Promise<void> {
     const _handler = async (event: Event<any, any>) => {
       return (await handler(event, this)).getOrElse(Promise.resolve());
     };
 
-    this.logger.trace({ event_namespace, event_type }, 'eventStoreListen');
+    this.logger.trace({ event_namespace, event_type }, "eventStoreListen");
 
     await this.emitter.subscribe(event_namespace, event_type, _handler);
 
-    this.logger.trace({ event_namespace, event_type }, 'eventStoreListenerSubscribed');
+    this.logger.trace({ event_namespace, event_type }, "eventStoreListenerSubscribed");
   }
 
   /**
@@ -347,11 +378,11 @@ export class EventStore<Q> {
   event handler for every event in the database. **Use this method with caution.**
   */
   public async replay_all(): Promise<void> {
-    const query: any = { text: 'select * from events' };
+    const query: any = { text: "select * from events" };
     const handlers: Subscriptions = this.emitter.subscriptions();
     const events = this.store.read(query, None);
 
-    this.logger.debug('eventStoreReplayAll');
+    this.logger.debug("eventStoreReplayAll");
 
     let iteration = 0;
     let handled = 0;
@@ -362,14 +393,13 @@ export class EventStore<Q> {
       if (_next.done) {
         this.logger.debug(
           { totalEvents: iteration, handledEvents: handled },
-          'eventStoreReplayAllComplete',
+          "eventStoreReplayAllComplete"
         );
         return;
       } else {
         const event = _next.value;
 
-        const event_ident =
-          [event.data.event_namespace, event.data.event_type].join('.');
+        const event_ident = [event.data.event_namespace, event.data.event_type].join(".");
 
         const handler = handlers.get(event_ident);
 
@@ -381,7 +411,7 @@ export class EventStore<Q> {
             registered_handlers: [...handlers.keys()],
             iteration,
           },
-          'replayAllEvent',
+          "replayAllEvent"
         );
 
         // Execute handler
@@ -394,35 +424,4 @@ export class EventStore<Q> {
       iteration++;
     }
   }
-}
-
-export async function reduce<I, O>(
-  iter: AsyncIterator<I>,
-  acc: O,
-  f: (acc: O, next: I) => Promise<O>,
-): Promise<O> {
-  let _acc = acc;
-  while (true) {
-    const _next = await iter.next();
-    if (_next.done) {
-      return _acc;
-    } else {
-      _acc = await f(_acc, _next.value);
-    }
-  }
-}
-
-/**
- *  Compose a list of maching functions into an aggregator
- *
- */
-export function composeAggregator<T>(matches: AggregateMatches<T>): Aggregator<T> {
-  return async (acc: Option<T>, event: Event<EventData, any>) => {
-    return matches.reduce((matchAcc, [validate, execute]) => {
-      if (validate(event)) {
-        return execute(matchAcc, event);
-      }
-      return matchAcc;
-    }, acc);
-  };
 }

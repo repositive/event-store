@@ -77,7 +77,7 @@ programmer is not required to save the event in the handler.**
 Functions with this signature should be passed to `Store.subscribe` to handle incoming events.
 */
 export type EmitterHandler<T extends Event<EventData, EventContext<any>>> = (
-  event: T,
+  event: T
 ) => Promise<void>;
 
 /**
@@ -115,7 +115,7 @@ export interface EmitterAdapter {
   subscribe<T extends Event<EventData, EventContext<any>>>(
     ns: T["data"]["event_namespace"],
     ty: T["data"]["event_type"],
-    handler: EmitterHandler<T>,
+    handler: EmitterHandler<T>
   ): void;
 
   /**
@@ -159,9 +159,7 @@ export interface StoreAdapter<Q> {
 
   @param event - The complete {@link Event} to save
   */
-  write(
-    event: Event<EventData, EventContext<any>>,
-  ): Promise<Either<DuplicateError, void>>;
+  write(event: Event<EventData, EventContext<any>>): Promise<Either<DuplicateError, void>>;
 
   /**
   Find the most recent occurrence of an event in the store
@@ -172,10 +170,7 @@ export interface StoreAdapter<Q> {
 
   @returns The most recent found event, or `None` if no event could be found
   */
-  lastEventOf<E extends Event<any, any>>(
-    ns: EventNamespace,
-    ty: EventType,
-  ): Promise<Option<E>>;
+  lastEventOf<E extends Event<any, any>>(ns: EventNamespace, ty: EventType): Promise<Option<E>>;
 
   /**
   Check that an event with a given ID exists
@@ -195,6 +190,6 @@ export interface StoreAdapter<Q> {
   readEventSince(
     ns: EventNamespace,
     ty: EventType,
-    since?: Option<IsoDateString>,
+    since?: Option<IsoDateString>
   ): AsyncIterator<Event<EventData, EventContext<any>>>;
 }

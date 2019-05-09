@@ -42,7 +42,7 @@ test("Test composeAggregator one match", async (t) => {
   t.deepEqual(typeof aggregator, "function");
   t.deepEqual(
     await aggregator(None, createEvent("test_namespace", "EventTestType", {})),
-    Some("test"),
+    Some("test")
   );
 });
 
@@ -51,10 +51,7 @@ test("Test composeAggregator no matches", async (t) => {
 
   const aggregator = composeAggregator(matches);
   t.deepEqual(typeof aggregator, "function");
-  t.deepEqual(
-    await aggregator(None, createEvent("test_namespace", "EventTestType", {})),
-    None,
-  );
+  t.deepEqual(await aggregator(None, createEvent("test_namespace", "EventTestType", {})), None);
 });
 
 test("Test composeAggregator one no matching match", async (t) => {
@@ -66,10 +63,7 @@ test("Test composeAggregator one no matching match", async (t) => {
 
   const aggregator = composeAggregator(matches);
   t.deepEqual(typeof aggregator, "function");
-  t.deepEqual(
-    await aggregator(None, createEvent("test_namespace", "EventTestType", {})),
-    None,
-  );
+  t.deepEqual(await aggregator(None, createEvent("test_namespace", "EventTestType", {})), None);
 });
 
 test("Iter reducer", async (t) => {
@@ -198,15 +192,16 @@ test("save does not emit on duplicates", async (t) => {
 test("listen calls handler", async (t) => {
   const handler = stub();
   handler.resolves(Right(undefined));
-  const emit = spy();
-  const subscribe = spy();
+  const emit = spy() as any;
+  const subscribe = spy() as any;
 
   const store = await getFakeStoreAdapter({});
 
-  const emitter = {
-    emit: emit as any,
-    subscribe: subscribe as any,
-  } as EmitterAdapter;
+  const emitter: EmitterAdapter = {
+    emit,
+    subscribe,
+    subscriptions: new Map() as any,
+  };
 
   const es = new EventStore(store, { logger, emitter });
 

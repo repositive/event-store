@@ -7,11 +7,7 @@ export function createDumbEmitterAdapter(): EmitterAdapter {
     /* I DO NOT DO ANYTHING */
   }
 
-  function subscribe(
-    _ns: EventNamespace,
-    _ty: EventType,
-    _handler: EmitterHandler<any>,
-  ) {
+  function subscribe(_ns: EventNamespace, _ty: EventType, _handler: EmitterHandler<any>) {
     /* I DO NOT DO ANYTHING */
   }
 

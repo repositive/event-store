@@ -26,10 +26,7 @@ const eventsTable = `
   );
 `;
 
-export function createPgStoreAdapter(
-  pool: Pool,
-  logger: Logger = console,
-): StoreAdapter<PgQuery> {
+export function createPgStoreAdapter(pool: Pool, logger: Logger = console): StoreAdapter<PgQuery> {
   pool.query(eventsTable).catch((error) => {
     throw error;
   });
@@ -42,12 +39,8 @@ export function createPgStoreAdapter(
   ): AsyncIterator<T> {
     const cursorId = `"${v4()}"`;
     const transaction = await pool.connect();
-    const fmtTime = since.map((t: any) =>
-      t instanceof Date ? t.toISOString() : t,
-    );
-    const where_time = fmtTime
-      .map((t) => `WHERE events.context->>'time' > '${t}'`)
-      .getOrElse("");
+    const fmtTime = since.map((t: any) => (t instanceof Date ? t.toISOString() : t));
+    const where_time = fmtTime.map((t) => `WHERE events.context->>'time' > '${t}'`).getOrElse("");
     const cached_query = `
       SELECT * FROM (${query.text}) AS events
       ${where_time}
@@ -74,7 +67,7 @@ export function createPgStoreAdapter(
 
       await transaction.query("COMMIT");
     } catch (error) {
-      logger.error(error, 'eventStoreCursorError');
+      logger.error(error, "eventStoreCursorError");
       throw error;
     } finally {
       transaction.release();
@@ -87,7 +80,7 @@ export function createPgStoreAdapter(
    *
    */
   async function write(
-    event: Event<EventData, EventContext<any>>,
+    event: Event<EventData, EventContext<any>>
   ): Promise<Either<DuplicateError | Error, void>> {
     return pool
       .query("INSERT INTO events(id, data, context) values ($1, $2, $3)", [
@@ -111,44 +104,45 @@ export function createPgStoreAdapter(
 
   async function lastEventOf<E extends Event<any, any>>(
     ns: EventNamespace,
-    ty: EventType,
+    ty: EventType
   ): Promise<Option<E>> {
-    logger.trace({ ns, ty }, 'eventStoreLastEventOf');
+    logger.trace({ ns, ty }, "eventStoreLastEventOf");
 
     const start = Date.now();
 
     return pool
       .query(
-        `select * from events where data->>'event_namespace' = $1 and data->>'event_type' = $2 order by context->>'time' desc limit 1`,
-        [ns, ty],
+        `select * from events
+        where data->>'event_namespace' = $1
+        and data->>'event_type' = $2
+        order by context->>'time' desc limit 1`,
+        [ns, ty]
       )
       .then((results) => {
-        logger.trace({ ns, ty, time: Date.now() - start }, 'eventStoreLastEventOfResult');
+        logger.trace({ ns, ty, time: Date.now() - start }, "eventStoreLastEventOfResult");
 
         return Option.of(results.rows[0]);
       });
   }
 
   async function exists(id: Uuid): Promise<boolean> {
-    logger.trace({ id }, 'eventStoreEventExists');
+    logger.trace({ id }, "eventStoreEventExists");
 
     const start = Date.now();
 
-    return pool
-      .query(`select * from events where id = $1`, [id])
-      .then((results) => {
-        const eventExists = !!results.rows[0];
+    return pool.query(`select * from events where id = $1`, [id]).then((results) => {
+      const eventExists = !!results.rows[0];
 
-        logger.trace({ id, eventExists, time: Date.now() - start }, 'eventStoreEventExistsResponse');
+      logger.trace({ id, eventExists, time: Date.now() - start }, "eventStoreEventExistsResponse");
 
-        return eventExists;
-      });
+      return eventExists;
+    });
   }
 
   function readEventSince(
     ns: EventNamespace,
     ty: EventType,
-    since: Option<IsoDateString> = None,
+    since: Option<IsoDateString> = None
   ): AsyncIterator<Event<any, any>> {
     return read(
       {
@@ -156,7 +150,7 @@ export function createPgStoreAdapter(
       },
       since,
       ns,
-      ty,
+      ty
     );
   }
 

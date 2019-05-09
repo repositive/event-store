@@ -7,11 +7,11 @@ import {
   Logger,
   EventNamespace,
   EventType,
-  Subscriptions
-} from '../../.';
-import { Option, Some, None } from 'funfix';
-import setupIris from '@repositive/iris';
-import { Iris } from '@repositive/iris';
+  Subscriptions,
+} from "../../.";
+import { Option, Some, None } from "funfix";
+import setupIris from "@repositive/iris";
+import { Iris } from "@repositive/iris";
 
 export interface IrisOptions {
   uri?: string;
@@ -19,7 +19,7 @@ export interface IrisOptions {
 }
 
 export function wait(n: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, n));
+  return new Promise((resolve) => setTimeout(resolve, n));
 }
 
 function wrapHandler(handler: EmitterHandler<any>) {
@@ -36,7 +36,7 @@ export function createAQMPEmitterAdapter(
   const subs: Subscriptions = new Map();
 
   setupIris({ ...irisOpts, logger })
-    .map(_iris => {
+    .map((_iris) => {
       iris = Some(_iris);
       for (const [pattern, handler] of subs.entries()) {
         _iris.register({ pattern, handler: wrapHandler(handler) });
@@ -46,10 +46,10 @@ export function createAQMPEmitterAdapter(
 
   async function emit(event: Event<EventData, EventContext<any>>) {
     await iris
-      .map(i =>
+      .map((i) =>
         i.emit({
           pattern: `${event.data.event_namespace}.${event.data.event_type}`,
-          payload: event
+          payload: event,
         })
       )
       .getOrElseL(() => wait(1000).then(() => emit(event)));
@@ -63,7 +63,7 @@ export function createAQMPEmitterAdapter(
   ): Promise<any> {
     const pattern = `${ns}.${ty}`;
 
-    logger.trace({ ns, ty, pattern, _attempt }, 'amqpSubscribe');
+    logger.trace({ ns, ty, pattern, _attempt }, "amqpSubscribe");
 
     const _handler = wrapHandler(handler);
 
@@ -72,7 +72,7 @@ export function createAQMPEmitterAdapter(
     return iris
       .map(
         (i): Promise<any> => {
-          logger.trace({ pattern, _attempt }, 'amqpSubscribeHasIris');
+          logger.trace({ pattern, _attempt }, "amqpSubscribeHasIris");
 
           return i.register({ pattern, handler: _handler });
         }
@@ -81,11 +81,11 @@ export function createAQMPEmitterAdapter(
         async (): Promise<any> => {
           const waitTime = 1000;
 
-          logger.trace({ pattern, _attempt, waitTime }, 'amqpSubscribeNoIris');
+          logger.trace({ pattern, _attempt, waitTime }, "amqpSubscribeNoIris");
 
           await wait(waitTime);
 
-          logger.trace({ pattern, _attempt, waitTime }, 'amqpSubscribeRetry');
+          logger.trace({ pattern, _attempt, waitTime }, "amqpSubscribeRetry");
 
           subscribe(ns, ty, handler, _attempt + 1);
         }
@@ -99,6 +99,6 @@ export function createAQMPEmitterAdapter(
   return {
     emit,
     subscribe,
-    subscriptions
+    subscriptions,
   };
 }

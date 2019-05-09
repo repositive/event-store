@@ -50,10 +50,7 @@ return value of the previous aggregate application, which may also return `None`
 
 @param event - The event to process
 */
-export type Aggregator<T> = (
-  acc: Option<T>,
-  event: Event<EventData, any>,
-) => Promise<Option<T>>;
+export type Aggregator<T> = (acc: Option<T>, event: Event<EventData, any>) => Promise<Option<T>>;
 
 /**
 The data payload of an event
