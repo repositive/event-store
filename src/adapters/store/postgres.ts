@@ -6,8 +6,8 @@ import {
   Event,
   EventData,
   EventContext,
-  EventNamespaceAndType,
-  Uuid,
+  EventNamespace,
+  EventType,
 } from "../../.";
 import { Option, None, Either, Left, Right } from "funfix";
 import { Logger, IsoDateString } from "../../.";
@@ -25,10 +25,7 @@ const eventsTable = `
   );
 `;
 
-export function createPgStoreAdapter(
-  pool: Pool,
-  logger: Logger = console,
-): StoreAdapter<PgQuery> {
+export function createPgStoreAdapter(pool: Pool, logger: Logger = console): StoreAdapter<PgQuery> {
   pool.query(eventsTable).catch((error) => {
     throw error;
   });
@@ -41,12 +38,8 @@ export function createPgStoreAdapter(
   ): AsyncIterator<T> {
     const cursorId = `"${v4()}"`;
     const transaction = await pool.connect();
-    const fmtTime = since.map((t: any) =>
-      t instanceof Date ? t.toISOString() : t,
-    );
-    const where_time = fmtTime
-      .map((t) => `WHERE events.context->>'time' > '${t}'`)
-      .getOrElse("");
+    const fmtTime = since.map((t: any) => (t instanceof Date ? t.toISOString() : t));
+    const where_time = fmtTime.map((t) => `WHERE events.context->>'time' > '${t}'`).getOrElse("");
     const cached_query = `
       SELECT * FROM (${query.text}) AS events
       ${where_time}
@@ -73,7 +66,7 @@ export function createPgStoreAdapter(
 
       await transaction.query("COMMIT");
     } catch (error) {
-      logger.error(error, 'eventStoreCursorError');
+      logger.error(error, "eventStoreCursorError");
       throw error;
     } finally {
       transaction.release();
@@ -86,7 +79,7 @@ export function createPgStoreAdapter(
    *
    */
   async function write(
-    event: Event<EventData, EventContext<any>>,
+    event: Event<EventData, EventContext<any>>
   ): Promise<Either<DuplicateError | Error, void>> {
     return pool
       .query("INSERT INTO events(id, data, context) values ($1, $2, $3)", [
@@ -109,50 +102,43 @@ export function createPgStoreAdapter(
   }
 
   async function lastEventOf<E extends Event<any, any>>(
-    eventType: EventNamespaceAndType,
+    event_namespace: EventNamespace,
+    event_type: EventType
   ): Promise<Option<E>> {
-    logger.trace({ eventType }, 'eventStoreLastEventOfResult');
+    logger.trace({ event_namespace, event_type }, "eventStoreLastEventOf");
 
     const start = Date.now();
 
     return pool
       .query(
-        `select * from events where data->>'type' = $1 order by context->>'time' desc limit 1`,
-        [eventType],
+        `select * from events
+        where data->>'event_namespace' = $1
+        and data->>'event_type' = $2
+        order by context->>'time' desc limit 1`,
+        [event_namespace, event_type]
       )
       .then((results) => {
-        logger.trace({ eventType, time: Date.now() - start }, 'eventStoreLastEventOfResult');
+        logger.trace(
+          { event_namespace, event_type, time: Date.now() - start },
+          "eventStoreLastEventOfResult"
+        );
 
         return Option.of(results.rows[0]);
       });
   }
 
-  async function exists(id: Uuid): Promise<boolean> {
-    logger.trace({ id }, 'eventStoreEventExists');
-
-    const start = Date.now();
-
-    return pool
-      .query(`select * from events where id = $1`, [id])
-      .then((results) => {
-        const eventExists = !!results.rows[0];
-
-        logger.trace({ id, eventExists, time: Date.now() - start }, 'eventStoreEventExistsResponse');
-
-        return eventExists;
-      });
-  }
-
   function readEventSince(
-    eventType: EventNamespaceAndType,
-    since: Option<IsoDateString> = None,
+    event_namespace: EventNamespace,
+    event_type: EventType,
+    since: Option<IsoDateString> = None
   ): AsyncIterator<Event<any, any>> {
     return read(
       {
-        text: `select * from events where data->>'type' = $1`,
+        text: `select * from events where data->>'event_namespace' = $1 and data->>'event_type' = $2`,
       },
       since,
-      eventType,
+      event_namespace,
+      event_type
     );
   }
 
@@ -161,6 +147,5 @@ export function createPgStoreAdapter(
     write,
     lastEventOf,
     readEventSince,
-    exists,
   };
 }

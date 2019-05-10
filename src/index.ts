@@ -1,12 +1,7 @@
-import { Pool } from "pg";
-import * as R from "ramda";
-import { StoreAdapter } from "./adapters";
-import { Future, Option, None, Either, Left, Right } from "funfix";
-import { EventStore, EventStoreOptions } from "./event-store";
-export { isEvent, createEvent, createContext, isEventType } from "./helpers";
+import { Option } from "funfix";
+export { createEvent, createContext, isEventType } from "./helpers";
 export * from "./event-store";
 export * from "./adapters";
-import { createDumbCacheAdapter, createDumbEmitterAdapter } from "./adapters";
 
 /**
 A UUID
@@ -22,16 +17,6 @@ export type Uuid = string;
 ISO8601 formatted date string
 */
 export type IsoDateString = string;
-
-/**
-An event's joined {@link EventNamespace} and {@link EventType}
-
-This is the union of {@link EventNamespace}, a `.` character and {@link EventType}
-
-@example `accounts.ProfileUpdated`
-@example `organisations.InviteAccepted`
-*/
-export type EventNamespaceAndType = string;
 
 /**
 An event's namespace
@@ -65,24 +50,17 @@ return value of the previous aggregate application, which may also return `None`
 
 @param event - The event to process
 */
-export type Aggregator<T> = (
-  acc: Option<T>,
-  event: Event<EventData, any>,
-) => Promise<Option<T>>;
+export type Aggregator<T> = (acc: Option<T>, event: Event<EventData, any>) => Promise<Option<T>>;
 
 /**
 The data payload of an event
 
 A complete event is defined by the {@link Event} type. This interface defines that the event type
-be present in the data payload, defined by `type`, `event_type` and `event_namespace`. Domain event
+be present in the data payload, defined by `event_type` and `event_namespace`. Domain event
 definitions __should not__ override the fields defined in this interface. The event store assumes
 ownership of these fields and will usually overwrite any fields with the same name in user data.
-
-Note that the `type` field is deprecated, but **should** be kept for compatibility with legacy
-versions of this library. It is the concatenation of `event_namespace`, `.` and `event_type`.
 */
 export interface EventData {
-  type: EventNamespaceAndType;
   event_namespace: EventNamespace;
   event_type: EventType;
 }
@@ -138,25 +116,4 @@ export interface Logger {
   info(...args: any[]): void;
   warn(...args: any[]): void;
   error(...args: any[]): void;
-}
-
-/**
-__Deprecated:__ Use `EventStore::new()` instead.
-
-Create a new event store from a provided store, cache and event emitter adapter implementation
-
-@deprecated
-*/
-export async function newEventStore<Q>(
-  store: StoreAdapter<Q>,
-  _options?: EventStoreOptions,
-): Promise<EventStore<Q>> {
-  const options = _options || {};
-  const { logger = console } = options;
-  logger.warn(`
-    DEPRECATED:
-    The newEventStore function is deprecated and will be removed in a future version of the store.
-    Use the EventStore class instead.
-  `);
-  return new EventStore(store, _options);
 }

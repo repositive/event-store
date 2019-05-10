@@ -10,25 +10,20 @@ import {
   createDumbCacheAdapter,
   createDumbEmitterAdapter,
   Aggregator,
-  IsoDateString,
-  EventType,
-  EventNamespace,
   Subscriptions,
-} from '.';
-import { None, Some, Option, Either } from 'funfix';
-import { v4 } from 'uuid';
-import { createHash } from 'crypto';
-import { createEvent } from './helpers';
+} from ".";
+import { None, Option, Either } from "funfix";
+import { createHash } from "crypto";
 
 export type Aggregate<A extends any[], T> = (...args: A) => Promise<Option<T>>;
 export type ValidateF<E extends Event<any, any>> = (o: any) => o is E;
 export type ExecuteF<T, E extends Event<any, any>> = (acc: Option<T>, ev: E) => Promise<Option<T>>;
 export type AggregateMatch<A, T extends Event<any, any>> = [ValidateF<T>, ExecuteF<A, T>];
-export type AggregateMatches<T> = Array<AggregateMatch<T, any>>;
+export type AggregateMatches<T> = AggregateMatch<T, any>[];
 
 export type EventHandler<Q, T extends Event<EventData, EventContext<any>>> = (
   event: T,
-  store: EventStore<Q>,
+  store: EventStore<Q>
 ) => Promise<Either<undefined, undefined>>;
 
 export interface EventStoreOptions {
@@ -37,15 +32,36 @@ export interface EventStoreOptions {
   logger?: Logger;
 }
 
-export interface ListenOptions {
-  executeHandlerIfEventExists?: boolean;
-  requestReplay?: boolean;
+/**
+ *  Compose a list of maching functions into an aggregator
+ *
+ */
+export function composeAggregator<T>(matches: AggregateMatches<T>): Aggregator<T> {
+  return async (acc: Option<T>, event: Event<EventData, any>) => {
+    return matches.reduce((matchAcc, [validate, execute]) => {
+      if (validate(event)) {
+        return execute(matchAcc, event);
+      }
+      return matchAcc;
+    }, acc);
+  };
 }
 
-const defaultListenOptions: ListenOptions = {
-  executeHandlerIfEventExists: false,
-  requestReplay: true,
-};
+export async function reduce<I, O>(
+  iter: AsyncIterator<I>,
+  acc: O,
+  f: (acc: O, next: I) => Promise<O>
+): Promise<O> {
+  let _acc = acc;
+  while (true) {
+    const _next = await iter.next();
+    if (_next.done) {
+      return _acc;
+    } else {
+      _acc = await f(_acc, _next.value);
+    }
+  }
+}
 
 /**
 Main event store class
@@ -114,16 +130,11 @@ export class EventStore<Q> {
 
   @param options - Cache adapter, emitter adapter and (optional) logger to use
   */
-  constructor(store_adapter: StoreAdapter<Q>, options: EventStoreOptions = {}) {
+  public constructor(store_adapter: StoreAdapter<Q>, options: EventStoreOptions = {}) {
     this.store = store_adapter;
     this.cache = options.cache || createDumbCacheAdapter();
     this.emitter = options.emitter || createDumbEmitterAdapter();
     this.logger = options.logger || console;
-
-    this.emitter.subscribe<Event<EventReplayRequested, any>>(
-      '_eventstore.EventReplayRequested',
-      createEventReplayHandler({ store: this.store, emitter: this.emitter }),
-    );
   }
 
   /**
@@ -160,7 +171,7 @@ export class EventStore<Q> {
   @example
 
   ```typescript
-  import { EventStore, PgQuery, Aggregate, isEvent } from '@repositive/event-store';
+  import { EventStore, PgQuery, Aggregate, isEventType } from '@repositive/event-store';
   import {
     isThingCreated,
     isThingUpdated,
@@ -186,6 +197,9 @@ export class EventStore<Q> {
     // ...
   };
 
+  const isThingCreated = isEventType<ThingCreated>('thing', 'ThingCreated');
+  const isThingUpdated = isEventType<ThingUpdated>('thing', 'ThingUpdated');
+
   export function prepareThingById(
     store: EventStore<PgQuery>
   ): Aggregate<[string], Thing> {
@@ -195,8 +209,8 @@ export class EventStore<Q> {
         text: `select * from events where data->>'thing_id' = $1`
       },
       [
-        [isEvent(isThingCreated), onThingCreated],
-        [isEvent(isThingUpdated), onThingUpdated]
+        [isThingCreated, onThingCreated],
+        [isThingUpdated, onThingUpdated]
       ]
     );
   }
@@ -221,13 +235,13 @@ export class EventStore<Q> {
   first match from top to bottom being called for that event. This defines the relationship between
   events and their handlers.
 
-  The {@link isEvent} helper can be used to reduce boilerplate. An example `isThingCreated` function
-  may look like this:
+  The {@link isEventType} helper can be used to reduce boilerplate. An example `isThingCreated`
+  function may look like this:
 
   ```typescript
-  export function isThingCreated(o: any): o is ThingUpdated {
-    return o && o.type === 'thingdomain.ThingUpdated';
-  }
+  import { isEventType } from "@repositive/event-store";
+
+  export const isThingCreated = isEventType<ThingUpdated>('thingdomain', 'ThingUpdated');
   ```
 
   @returns Result of aggregation over queried events
@@ -235,22 +249,22 @@ export class EventStore<Q> {
   public createAggregate<A extends any[], T>(
     aggregateName: string,
     query: Q,
-    matches: AggregateMatches<T>,
+    matches: AggregateMatches<T>
   ): Aggregate<A, T> {
     const _impl = async (...args: A): Promise<Option<T>> => {
       const start = Date.now();
 
-      const id = createHash('sha256')
+      const id = createHash("sha256")
         .update(aggregateName + JSON.stringify(query) + JSON.stringify(args))
-        .digest('hex');
+        .digest("hex");
 
       const latestSnapshot = await this.cache.get<T>(id);
 
-      this.logger.trace(latestSnapshot, 'eventStoreCacheSnapshot');
+      this.logger.trace(latestSnapshot, "eventStoreCacheSnapshot");
       const results = this.store.read(
         query,
         latestSnapshot.flatMap((snapshot) => Option.of(snapshot.time)),
-        ...args,
+        ...args
       );
 
       const aggregatedAt = new Date();
@@ -259,28 +273,28 @@ export class EventStore<Q> {
       const aggregatedResult = await reduce<Event<EventData, EventContext<any>>, Option<T>>(
         results,
         latestSnapshot.map((snapshot) => snapshot.data),
-        aggregator,
+        aggregator
       );
 
       this.logger.trace(
         { query, aggregatedResult, time: Date.now() - start },
-        'eventStoreAggregatedResult',
+        "eventStoreAggregatedResult"
       );
 
       await aggregatedResult.map((result) => {
         const snapshotHash = latestSnapshot
           .map((snapshot) => {
-            return createHash('sha256')
+            return createHash("sha256")
               .update(JSON.stringify(snapshot.data))
-              .digest('hex');
+              .digest("hex");
           })
-          .getOrElse('');
+          .getOrElse("");
 
-        const toCacheHash = createHash('sha256')
+        const toCacheHash = createHash("sha256")
           .update(JSON.stringify(result))
-          .digest('hex');
+          .digest("hex");
         if (snapshotHash !== toCacheHash) {
-          this.logger.trace('save to cache', result);
+          this.logger.trace("save to cache", result);
           return this.cache.set(id, {
             data: result,
             time: aggregatedAt.toISOString(),
@@ -296,7 +310,7 @@ export class EventStore<Q> {
           aggregate_time: Date.now() - aggregatedAt.getTime(),
           total_time: Date.now() - start,
         },
-        'eventStoreAggregateLatency',
+        "eventStoreAggregateLatency"
       );
 
       return aggregatedResult;
@@ -306,61 +320,17 @@ export class EventStore<Q> {
   }
 
   /**
-  Listen for events emitted by other event stores
-
-  When this method is called, a subscription is initialised and an {@link EventReplayRequested}
-  event is emitted. This allows this store to receive events it may have missed due to save errors,
-  downtime or deployments.
+  Listen for events emitted by other event stores. The event __will__ exist in the backing store
+  before the handler is called, so can be aggregated on safely.
 
   @param event_namespace - The remote namespace to listen to
 
   @param event_type - The event type to listen for
 
-  @param handler - Handler function called for every received event. If the event is already present
-  in the database, the handler function will **not** be called.
+  @param handler - Handler function called for every received event.
 
   The handler must return an `Either<undefined, undefined>`. To mark an event as successfully
-  handled, return `Right(undefined)`. If processing failed and the event should **not** be saved,
-  return `Left(undefined)`. This allows the handler to be re-run when the event is ingested again by
-  a replay.
-
-  _Important:_ The received event is not saved to the backing store before the handler
-  function is called. If the handler function uses an aggregate, the event must be manually folded
-  into the result of that aggregate during handling of the event, otherwise it won't be picked up.
-  For example:
-
-  ```typescript
-  // src/handlers/some_event.ts
-
-  import { Either, Left, Right, Some } from 'funfix';
-  import { Event } from '@repositive/event-store';
-
-  import { onSomeEvent } from '../aggregates';
-  import { SomeEvent } from '../events';
-  import { myEntityById } from '../somewhere';
-
-  export async function handle_some_event(
-    event: Event<SomeEvent, any>,
-    store: Store
-  ): Either<undefined, undefined> {
-    try {
-      // Does not aggregate the current `event` being handled
-      const my_entity_base: Option<MyEntity> = await myEntityById(event.data.entity_id);
-
-      // Add current event to aggregation. May fail if `onSomeEvent` requires `Some()`
-      const my_entity: Option<MyEntity> = await onSomeEvent(my_entity_base, event);
-
-      // ...
-
-      // Event was handled successfully
-      return Right(undefined);
-    } catch(e) {
-      // Something went wrong
-      // Event will not be persisted to backing store
-      return Left(undefined);
-    }
-  }
-  ```
+  handled, return `Right(undefined)`.
 
   @example Handle the `SomeEvent` event.
 
@@ -381,7 +351,6 @@ export class EventStore<Q> {
               return Right(undefined);
           } catch (e) {
               // Something went wrong
-              // Event will not be persisted to backing store
               return Left(undefined);
           }
       }
@@ -389,47 +358,19 @@ export class EventStore<Q> {
   ```
   */
   public async listen<T extends EventData>(
-    event_namespace: T['event_namespace'],
-    event_type: T['event_type'],
-    handler: EventHandler<Q, Event<T, EventContext<any>>>,
-    options?: ListenOptions,
+    event_namespace: T["event_namespace"],
+    event_type: T["event_type"],
+    handler: EventHandler<Q, Event<T, EventContext<any>>>
   ): Promise<void> {
-    const { executeHandlerIfEventExists, requestReplay } =
-      { ...defaultListenOptions, ...options } || defaultListenOptions;
-    const pattern = [event_namespace, event_type].join('.');
-
     const _handler = async (event: Event<any, any>) => {
-      if (executeHandlerIfEventExists || !(await this.store.exists(event.id))) {
-        const result = await handler(event, this);
-        await result
-          .map(() => {
-            return this.store.write(event);
-          })
-          .getOrElse(Promise.resolve());
-      }
+      return (await handler(event, this)).getOrElse(Promise.resolve());
     };
 
-    this.logger.trace({ pattern }, 'eventStoreListen');
+    this.logger.trace({ event_namespace, event_type }, "eventStoreListen");
 
-    await this.emitter.subscribe(pattern, _handler);
+    await this.emitter.subscribe(event_namespace, event_type, _handler);
 
-    this.logger.trace({ pattern }, 'eventStoreListenerSubscribed');
-
-    if (requestReplay) {
-      const last = await this.store.lastEventOf(pattern);
-
-      const replay = createEvent<EventReplayRequested>('_eventstore', 'EventReplayRequested', {
-        requested_event_namespace: event_namespace,
-        requested_event_type: event_type,
-        since: last.map((l) => l.context.time).getOrElse(new Date(0).toISOString()),
-      });
-
-      this.logger.trace({ event_namespace, event_type, replay }, 'eventStoreReplayRequested');
-
-      await this.emitter.emit(replay);
-    } else {
-      this.logger.trace({ event_namespace, event_type }, 'eventStoreReplayNotRequested');
-    }
+    this.logger.trace({ event_namespace, event_type }, "eventStoreListenerSubscribed");
   }
 
   /**
@@ -437,11 +378,11 @@ export class EventStore<Q> {
   event handler for every event in the database. **Use this method with caution.**
   */
   public async replay_all(): Promise<void> {
-    const query: any = { text: 'select * from events' };
+    const query: any = { text: "select * from events" };
     const handlers: Subscriptions = this.emitter.subscriptions();
     const events = this.store.read(query, None);
 
-    this.logger.debug('eventStoreReplayAll');
+    this.logger.debug("eventStoreReplayAll");
 
     let iteration = 0;
     let handled = 0;
@@ -452,14 +393,13 @@ export class EventStore<Q> {
       if (_next.done) {
         this.logger.debug(
           { totalEvents: iteration, handledEvents: handled },
-          'eventStoreReplayAllComplete',
+          "eventStoreReplayAllComplete"
         );
         return;
       } else {
         const event = _next.value;
 
-        const event_ident =
-          [event.data.event_namespace, event.data.event_type].join('.') || event.data.type;
+        const event_ident = [event.data.event_namespace, event.data.event_type].join(".");
 
         const handler = handlers.get(event_ident);
 
@@ -471,7 +411,7 @@ export class EventStore<Q> {
             registered_handlers: [...handlers.keys()],
             iteration,
           },
-          'replayAllEvent',
+          "replayAllEvent"
         );
 
         // Execute handler
@@ -484,69 +424,4 @@ export class EventStore<Q> {
       iteration++;
     }
   }
-}
-
-/**
-An event used to request a replay from remote event stores. It uses the `requested_event_type` and
-`requested_event_namespace` fields to specify which type of event should be replayed.
-*/
-export interface EventReplayRequested extends EventData {
-  type: '_eventstore.EventReplayRequested';
-  event_namespace: '_eventstore';
-  event_type: 'EventReplayRequested';
-  requested_event_type: EventType;
-  requested_event_namespace: EventNamespace;
-  since: IsoDateString;
-}
-
-export async function reduce<I, O>(
-  iter: AsyncIterator<I>,
-  acc: O,
-  f: (acc: O, next: I) => Promise<O>,
-): Promise<O> {
-  let _acc = acc;
-  while (true) {
-    const _next = await iter.next();
-    if (_next.done) {
-      return _acc;
-    } else {
-      _acc = await f(_acc, _next.value);
-    }
-  }
-}
-
-/**
- *  Compose a list of maching functions into an aggregator
- *
- */
-export function composeAggregator<T>(matches: AggregateMatches<T>): Aggregator<T> {
-  return async (acc: Option<T>, event: Event<EventData, any>) => {
-    return matches.reduce((matchAcc, [validate, execute]) => {
-      if (validate(event)) {
-        return execute(matchAcc, event);
-      }
-      return matchAcc;
-    }, acc);
-  };
-}
-
-export function createEventReplayHandler({
-  store,
-  emitter,
-}: {
-  store: StoreAdapter<any>;
-  emitter: EmitterAdapter;
-}) {
-  return async function handleEventReplay(event: Event<EventReplayRequested, EventContext<any>>) {
-    const events = store.readEventSince(
-      [event.data.requested_event_namespace, event.data.requested_event_type].join('.'),
-      Option.of(event.data.since),
-    );
-
-    // Emit all events;
-    reduce(events, None, async (acc, e) => {
-      await emitter.emit(e);
-      return None;
-    });
-  };
 }

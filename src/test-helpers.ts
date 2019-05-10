@@ -1,4 +1,4 @@
-import { Client, Pool, QueryConfig, QueryResult } from "pg";
+import { Pool, QueryConfig, QueryResult } from "pg";
 import { stub } from "sinon";
 import { Event, EventData, EventContext } from ".";
 import { Right, None } from "funfix";
@@ -37,7 +37,7 @@ export function fakePoolResult(rows: any[] = []): QueryResult {
   };
 }
 
-export const fakeEmitter = (e: any) => undefined;
+export const fakeEmitter = (_e: any) => undefined;
 
 // For integration tests
 export function getDbConnection(): Pool {
@@ -45,10 +45,7 @@ export function getDbConnection(): Pool {
 }
 
 // For integration tests
-export function insertEvent(
-  event: any,
-  pool: any = getDbConnection(),
-): Promise<any> {
+export function insertEvent(event: any, pool: any = getDbConnection()): Promise<any> {
   return pool
     .query(`INSERT INTO events (data, context) VALUES ($1, $2) RETURNING *`, [
       event.data,
@@ -66,10 +63,7 @@ export function truncateAll(pool: any = getDbConnection()): Promise<any> {
 }
 
 // For integration tests
-export async function query(
-  q: string,
-  pool: any = getDbConnection(),
-): Promise<any> {
+export async function query(q: string, pool: any = getDbConnection()): Promise<any> {
   return (await pool.query(q)).rows;
 }
 
@@ -94,29 +88,25 @@ export async function getFakeStoreAdapter({
   readSinceStub,
   saveStub,
   lastEventOf,
-  exists,
 }: {
   readStub?: any;
   readSinceStub?: any;
   saveStub?: (evt: any) => Promise<undefined>;
   lastEventOf?: (pattern: string) => Promise<Event<any, any>>;
-  exists?: (id: string) => Promise<boolean>;
 }): Promise<any> {
   const writer =
     saveStub ||
-    function(evt: any): Promise<undefined> {
+    function(_evt: any): Promise<undefined> {
       return Promise.resolve(undefined);
     };
 
   const storeAdapter = {
-    read: (readQuery: any, time: any, ...args: any[]) => {
+    read: (_readQuery: any, _time: any, ...args: any[]) => {
       let idx = 0;
       const result = readStub(...args);
 
       if (!(result instanceof Array)) {
-        throw new Error(
-          "Read stub must return an array. Are you resolving a promise instead?",
-        );
+        throw new Error("Read stub must return an array. Are you resolving a promise instead?");
       }
 
       return {
@@ -135,7 +125,6 @@ export async function getFakeStoreAdapter({
       return writer(event).then(() => Right(undefined));
     },
     lastEventOf: lastEventOf || ((): any => None),
-    exists: exists || (() => Promise.resolve(true)),
     readEventSince: readSinceStub || (() => createFakeIterator([])),
   };
 

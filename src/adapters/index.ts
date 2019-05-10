@@ -4,8 +4,8 @@ import {
   EventData,
   EventContext,
   IsoDateString,
-  EventNamespaceAndType,
-  Uuid,
+  EventNamespace,
+  EventType,
   Subscriptions,
 } from "..";
 
@@ -15,6 +15,16 @@ export * from "./cache/dumb";
 export * from "./emitter/amqp";
 export * from "./emitter/dumb";
 export * from "./store/postgres";
+
+/**
+An event's joined {@link EventNamespace} and {@link EventType}
+
+This is the union of {@link EventNamespace}, a `.` character and {@link EventType}
+
+@example `accounts.ProfileUpdated`
+@example `organisations.InviteAccepted`
+*/
+type SubscriptionKey = string;
 
 /**
 A cache item key
@@ -66,13 +76,13 @@ programmer is not required to save the event in the handler.**
 Functions with this signature should be passed to `Store.subscribe` to handle incoming events.
 */
 export type EmitterHandler<T extends Event<EventData, EventContext<any>>> = (
-  event: T,
+  event: T
 ) => Promise<void>;
 
 /**
 Event subscriptions
 */
-export type Subscriptions = Map<EventNamespaceAndType, EmitterHandler<any>>;
+export type Subscriptions = Map<SubscriptionKey, EmitterHandler<any>>;
 
 /**
 The interface an emitter/subscriber backing service must implement
@@ -91,16 +101,20 @@ export interface EmitterAdapter {
   /**
   Subscribe to incoming events
 
-  @param name - A string identifying the type of event that this subscription should consume. This
-  should look something like `accounts.ProfileUpdated`, `organisations.MembershipUpdated` or similar
+  @param event_namespace - A string identifying the **namespace** of the event that this subscription
+  should consume. This should look something like `accounts` or `organisations`.
+
+  @param event_type - A string identifying the **type** of the event that this subscription should
+  consume. This should look something like `LoggedIn` or `OrganisationUpdated`.
 
   @param handler - An {@link EmitterHandler} function called when the incoming event has been saved
   successfully. Any domain-specific logic like sending a notification or triggering some data
   processing should be performed here.
   */
   subscribe<T extends Event<EventData, EventContext<any>>>(
-    name: T["data"]["type"],
-    handler: EmitterHandler<T>,
+    event_namespace: T["data"]["event_namespace"],
+    event_type: T["data"]["event_type"],
+    handler: EmitterHandler<T>
   ): void;
 
   /**
@@ -144,38 +158,39 @@ export interface StoreAdapter<Q> {
 
   @param event - The complete {@link Event} to save
   */
-  write(
-    event: Event<EventData, EventContext<any>>,
-  ): Promise<Either<DuplicateError, void>>;
+  write(event: Event<EventData, EventContext<any>>): Promise<Either<DuplicateError, void>>;
 
   /**
   Find the most recent occurrence of an event in the store
 
-  @param eventType - The type of event to filter for. This should be a string like
-  `accounts.ProfileUpdated`
+  @param event_namespace - The namespace of the event to filter for. This should be a string like
+  `accounts`
+
+  @param event_type - The type of the event to filter for. This should be a string like
+  `ProfileUpdated`
 
   @returns The most recent found event, or `None` if no event could be found
   */
   lastEventOf<E extends Event<any, any>>(
-    eventType: EventNamespaceAndType,
+    event_namespace: EventNamespace,
+    event_type: EventType
   ): Promise<Option<E>>;
-
-  /**
-  Check that an event with a given ID exists
-  */
-  exists(id: Uuid): Promise<boolean>;
 
   /**
   Read all events created at or after a given time
 
-  @param eventType - The type of event to search for. This should be a string like
-  `accounts.ProfileUpdated`
+  @param event_namespace - The namespace of the event to filter for. This should be a string like
+  `accounts`
+
+  @param event_type - The type of the event to filter for. This should be a string like
+  `ProfileUpdated`
 
   @param since - ISO8601 date string specifying when to read events from. If passed as `None` or
   omitted, all events matching `eventType` should be returned
   */
   readEventSince(
-    eventTpe: EventNamespaceAndType,
-    since?: Option<IsoDateString>,
+    event_namespace: EventNamespace,
+    event_type: EventType,
+    since?: Option<IsoDateString>
   ): AsyncIterator<Event<EventData, EventContext<any>>>;
 }
