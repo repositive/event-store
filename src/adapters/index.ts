@@ -101,19 +101,19 @@ export interface EmitterAdapter {
   /**
   Subscribe to incoming events
 
-  @param ns - A string identifying the **namespace** of the event that this subscription should
-  consume. This should look something like `accounts` or `organisations`.
+  @param event_namespace - A string identifying the **namespace** of the event that this subscription
+  should consume. This should look something like `accounts` or `organisations`.
 
-  @param ty - A string identifying the **type** of the event that this subscription should consume.
-  This should look something like `LoggedIn` or `OrganisationUpdated`.
+  @param event_type - A string identifying the **type** of the event that this subscription should
+  consume. This should look something like `LoggedIn` or `OrganisationUpdated`.
 
   @param handler - An {@link EmitterHandler} function called when the incoming event has been saved
   successfully. Any domain-specific logic like sending a notification or triggering some data
   processing should be performed here.
   */
   subscribe<T extends Event<EventData, EventContext<any>>>(
-    ns: T["data"]["event_namespace"],
-    ty: T["data"]["event_type"],
+    event_namespace: T["data"]["event_namespace"],
+    event_type: T["data"]["event_type"],
     handler: EmitterHandler<T>
   ): void;
 
@@ -163,27 +163,34 @@ export interface StoreAdapter<Q> {
   /**
   Find the most recent occurrence of an event in the store
 
-  @param ns - The namespace of the event to filter for. This should be a string like `accounts`
+  @param event_namespace - The namespace of the event to filter for. This should be a string like
+  `accounts`
 
-  @param ty - The type of the event to filter for. This should be a string like `ProfileUpdated`
+  @param event_type - The type of the event to filter for. This should be a string like
+  `ProfileUpdated`
 
   @returns The most recent found event, or `None` if no event could be found
   */
-  lastEventOf<E extends Event<any, any>>(ns: EventNamespace, ty: EventType): Promise<Option<E>>;
+  lastEventOf<E extends Event<any, any>>(
+    event_namespace: EventNamespace,
+    event_type: EventType
+  ): Promise<Option<E>>;
 
   /**
   Read all events created at or after a given time
 
-  @param ns - The namespace of the event to filter for. This should be a string like `accounts`
+  @param event_namespace - The namespace of the event to filter for. This should be a string like
+  `accounts`
 
-  @param ty - The type of the event to filter for. This should be a string like `ProfileUpdated`
+  @param event_type - The type of the event to filter for. This should be a string like
+  `ProfileUpdated`
 
   @param since - ISO8601 date string specifying when to read events from. If passed as `None` or
   omitted, all events matching `eventType` should be returned
   */
   readEventSince(
-    ns: EventNamespace,
-    ty: EventType,
+    event_namespace: EventNamespace,
+    event_type: EventType,
     since?: Option<IsoDateString>
   ): AsyncIterator<Event<EventData, EventContext<any>>>;
 }

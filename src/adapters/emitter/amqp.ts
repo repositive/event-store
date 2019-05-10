@@ -56,14 +56,14 @@ export function createAQMPEmitterAdapter(
   }
 
   async function subscribe(
-    ns: EventNamespace,
-    ty: EventType,
+    event_namespace: EventNamespace,
+    event_type: EventType,
     handler: EmitterHandler<any>,
     _attempt = 0
   ): Promise<any> {
-    const pattern = `${ns}.${ty}`;
+    const pattern = `${event_namespace}.${event_type}`;
 
-    logger.trace({ ns, ty, pattern, _attempt }, "amqpSubscribe");
+    logger.trace({ event_namespace, event_type, pattern, _attempt }, "amqpSubscribe");
 
     const _handler = wrapHandler(handler);
 
@@ -87,7 +87,7 @@ export function createAQMPEmitterAdapter(
 
           logger.trace({ pattern, _attempt, waitTime }, "amqpSubscribeRetry");
 
-          subscribe(ns, ty, handler, _attempt + 1);
+          subscribe(event_namespace, event_type, handler, _attempt + 1);
         }
       );
   }

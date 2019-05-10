@@ -227,20 +227,23 @@ export function createUserByIdAggregate(
 }
 ```
 
-@param ns - The event namespace to use, like `search` or `accounts`
+@param event_namespace - The event namespace to use, like `search` or `accounts`
 
-@param ty - The event type to use, like `LoggedIn` or `ImageDeleted`
+@param event_type - The event type to use, like `LoggedIn` or `ImageDeleted`
 */
 export function isEventType<E extends EventData>(
-  ns: E["event_namespace"],
-  ty: E["event_type"]
+  event_namespace: E["event_namespace"],
+  event_type: E["event_type"]
 ): (o: any) => o is Event<E, EventContext<any>> {
   return function(o: any): o is Event<E, EventContext<any>> {
     return (
       o &&
       typeof o.id === "string" &&
       o.data &&
-      isEventData(o.data, (d: any): d is E => d.event_namespace === ns && d.event_type === ty) &&
+      isEventData(
+        o.data,
+        (d: any): d is E => d.event_namespace === event_namespace && d.event_type === event_type
+      ) &&
       o.context &&
       typeof o.context.time === "string"
     );

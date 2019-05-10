@@ -102,10 +102,10 @@ export function createPgStoreAdapter(pool: Pool, logger: Logger = console): Stor
   }
 
   async function lastEventOf<E extends Event<any, any>>(
-    ns: EventNamespace,
-    ty: EventType
+    event_namespace: EventNamespace,
+    event_type: EventType
   ): Promise<Option<E>> {
-    logger.trace({ ns, ty }, "eventStoreLastEventOf");
+    logger.trace({ event_namespace, event_type }, "eventStoreLastEventOf");
 
     const start = Date.now();
 
@@ -115,18 +115,21 @@ export function createPgStoreAdapter(pool: Pool, logger: Logger = console): Stor
         where data->>'event_namespace' = $1
         and data->>'event_type' = $2
         order by context->>'time' desc limit 1`,
-        [ns, ty]
+        [event_namespace, event_type]
       )
       .then((results) => {
-        logger.trace({ ns, ty, time: Date.now() - start }, "eventStoreLastEventOfResult");
+        logger.trace(
+          { event_namespace, event_type, time: Date.now() - start },
+          "eventStoreLastEventOfResult"
+        );
 
         return Option.of(results.rows[0]);
       });
   }
 
   function readEventSince(
-    ns: EventNamespace,
-    ty: EventType,
+    event_namespace: EventNamespace,
+    event_type: EventType,
     since: Option<IsoDateString> = None
   ): AsyncIterator<Event<any, any>> {
     return read(
@@ -134,8 +137,8 @@ export function createPgStoreAdapter(pool: Pool, logger: Logger = console): Stor
         text: `select * from events where data->>'event_namespace' = $1 and data->>'event_type' = $2`,
       },
       since,
-      ns,
-      ty
+      event_namespace,
+      event_type
     );
   }
 
