@@ -15,7 +15,8 @@
     "publish": "./post-publish.sh",
     "lint": "eslint --cache 'src/**/*.ts'",
     "prettier": "prettier 'src/**/*.ts'",
-    "fmt": "npm run lint -- --fix && npm run prettier -- --write"
+    "fmt": "npm run lint -- --fix && npm run prettier -- --write",
+    "fmt:check": "npm run lint && npm run prettier -- --check"
   },
   "files": [
     "dist/**"
