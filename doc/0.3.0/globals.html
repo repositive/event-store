@@ -1,0 +1,1865 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Event store 0.3.0</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">Event store 0.3.0</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> Event store 0.3.0</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Classes</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-class"><a href="classes/duplicateerror.html" class="tsd-kind-icon">Duplicate<wbr>Error</a></li>
+								<li class="tsd-kind-class tsd-has-type-parameter"><a href="classes/eventstore.html" class="tsd-kind-icon">Event<wbr>Store</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Interfaces</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-interface"><a href="interfaces/cacheadapter.html" class="tsd-kind-icon">Cache<wbr>Adapter</a></li>
+								<li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/cacheentry.html" class="tsd-kind-icon">Cache<wbr>Entry</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/emitteradapter.html" class="tsd-kind-icon">Emitter<wbr>Adapter</a></li>
+								<li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/event.html" class="tsd-kind-icon">Event</a></li>
+								<li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/eventcontext.html" class="tsd-kind-icon">Event<wbr>Context</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/eventdata.html" class="tsd-kind-icon">Event<wbr>Data</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/eventstoreoptions.html" class="tsd-kind-icon">Event<wbr>Store<wbr>Options</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/irisoptions.html" class="tsd-kind-icon">Iris<wbr>Options</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/logger.html" class="tsd-kind-icon">Logger</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/pgquery.html" class="tsd-kind-icon">Pg<wbr>Query</a></li>
+								<li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/storeadapter.html" class="tsd-kind-icon">Store<wbr>Adapter</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Type aliases</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="globals.html#aggregate" class="tsd-kind-icon">Aggregate</a></li>
+								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="globals.html#aggregatematch" class="tsd-kind-icon">Aggregate<wbr>Match</a></li>
+								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="globals.html#aggregatematches" class="tsd-kind-icon">Aggregate<wbr>Matches</a></li>
+								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="globals.html#aggregator" class="tsd-kind-icon">Aggregator</a></li>
+								<li class="tsd-kind-type-alias"><a href="globals.html#cachekey" class="tsd-kind-icon">Cache<wbr>Key</a></li>
+								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="globals.html#emitterhandler" class="tsd-kind-icon">Emitter<wbr>Handler</a></li>
+								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="globals.html#eventhandler" class="tsd-kind-icon">Event<wbr>Handler</a></li>
+								<li class="tsd-kind-type-alias"><a href="globals.html#eventnamespace" class="tsd-kind-icon">Event<wbr>Namespace</a></li>
+								<li class="tsd-kind-type-alias"><a href="globals.html#eventtype" class="tsd-kind-icon">Event<wbr>Type</a></li>
+								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="globals.html#executef" class="tsd-kind-icon">ExecuteF</a></li>
+								<li class="tsd-kind-type-alias"><a href="globals.html#isodatestring" class="tsd-kind-icon">Iso<wbr>Date<wbr>String</a></li>
+								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="globals.html#omit" class="tsd-kind-icon">Omit</a></li>
+								<li class="tsd-kind-type-alias tsd-is-not-exported"><a href="globals.html#subscriptionkey" class="tsd-kind-icon">Subscription<wbr>Key</a></li>
+								<li class="tsd-kind-type-alias"><a href="globals.html#subscriptions" class="tsd-kind-icon">Subscriptions</a></li>
+								<li class="tsd-kind-type-alias"><a href="globals.html#uuid" class="tsd-kind-icon">Uuid</a></li>
+								<li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="globals.html#validatef" class="tsd-kind-icon">ValidateF</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Variables</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-variable tsd-is-not-exported"><a href="globals.html#aggregatecachetable" class="tsd-kind-icon">aggregate<wbr>Cache<wbr>Table</a></li>
+								<li class="tsd-kind-variable tsd-is-not-exported"><a href="globals.html#cache_endpoint" class="tsd-kind-icon">cache_<wbr>endpoint</a></li>
+								<li class="tsd-kind-variable"><a href="globals.html#cafebabe" class="tsd-kind-icon">cafebabe</a></li>
+								<li class="tsd-kind-variable tsd-is-not-exported"><a href="globals.html#defaultquerystub" class="tsd-kind-icon">default<wbr>Query<wbr>Stub</a></li>
+								<li class="tsd-kind-variable tsd-is-not-exported"><a href="globals.html#eventstable" class="tsd-kind-icon">events<wbr>Table</a></li>
+								<li class="tsd-kind-variable"><a href="globals.html#id" class="tsd-kind-icon">id</a></li>
+								<li class="tsd-kind-variable tsd-is-not-exported"><a href="globals.html#insertaggregatecache" class="tsd-kind-icon">insert<wbr>Aggregate<wbr>Cache</a></li>
+								<li class="tsd-kind-variable tsd-is-not-exported"><a href="globals.html#logger" class="tsd-kind-icon">logger</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Functions</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-has-type-parameter"><a href="globals.html#composeaggregator" class="tsd-kind-icon">compose<wbr>Aggregator</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#createaqmpemitteradapter" class="tsd-kind-icon">createAQMPEmitter<wbr>Adapter</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#createcontext" class="tsd-kind-icon">create<wbr>Context</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#createdumbcacheadapter" class="tsd-kind-icon">create<wbr>Dumb<wbr>Cache<wbr>Adapter</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#createdumbemitteradapter" class="tsd-kind-icon">create<wbr>Dumb<wbr>Emitter<wbr>Adapter</a></li>
+								<li class="tsd-kind-function tsd-has-type-parameter"><a href="globals.html#createevent" class="tsd-kind-icon">create<wbr>Event</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#createfakeiterator" class="tsd-kind-icon">create<wbr>Fake<wbr>Iterator</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#createpgcacheadapter" class="tsd-kind-icon">create<wbr>PgCache<wbr>Adapter</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#createpgstoreadapter" class="tsd-kind-icon">create<wbr>PgStore<wbr>Adapter</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#createrediscacheadapter" class="tsd-kind-icon">create<wbr>Redis<wbr>Cache<wbr>Adapter</a></li>
+								<li class="tsd-kind-function tsd-is-not-exported"><a href="globals.html#defaultcontext" class="tsd-kind-icon">default<wbr>Context</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#fakeemitter" class="tsd-kind-icon">fake<wbr>Emitter</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#fakepoolresult" class="tsd-kind-icon">fake<wbr>Pool<wbr>Result</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#getdbconnection" class="tsd-kind-icon">get<wbr>DbConnection</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#getfakepool" class="tsd-kind-icon">get<wbr>Fake<wbr>Pool</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#getfakestoreadapter" class="tsd-kind-icon">get<wbr>Fake<wbr>Store<wbr>Adapter</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#insertevent" class="tsd-kind-icon">insert<wbr>Event</a></li>
+								<li class="tsd-kind-function tsd-has-type-parameter"><a href="globals.html#iseventcontext" class="tsd-kind-icon">is<wbr>Event<wbr>Context</a></li>
+								<li class="tsd-kind-function tsd-has-type-parameter"><a href="globals.html#iseventdata" class="tsd-kind-icon">is<wbr>Event<wbr>Data</a></li>
+								<li class="tsd-kind-function tsd-has-type-parameter"><a href="globals.html#iseventtype" class="tsd-kind-icon">is<wbr>Event<wbr>Type</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#query" class="tsd-kind-icon">query</a></li>
+								<li class="tsd-kind-function tsd-has-type-parameter"><a href="globals.html#reduce" class="tsd-kind-icon">reduce</a></li>
+								<li class="tsd-kind-function tsd-has-type-parameter tsd-is-not-exported"><a href="globals.html#toasynciter" class="tsd-kind-icon">to<wbr>Async<wbr>Iter</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#truncateall" class="tsd-kind-icon">truncate<wbr>All</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#wait" class="tsd-kind-icon">wait</a></li>
+								<li class="tsd-kind-function tsd-is-not-exported"><a href="globals.html#wraphandler" class="tsd-kind-icon">wrap<wbr>Handler</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Type aliases</h2>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter">
+					<a name="aggregate" class="tsd-anchor"></a>
+					<h3>Aggregate</h3>
+					<div class="tsd-signature tsd-kind-icon">Aggregate<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/event-store.ts#L18">event-store.ts:18</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Option</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">A</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Option</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter">
+					<a name="aggregatematch" class="tsd-anchor"></a>
+					<h3>Aggregate<wbr>Match</h3>
+					<div class="tsd-signature tsd-kind-icon">Aggregate<wbr>Match<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">[</span><a href="globals.html#validatef" class="tsd-signature-type">ValidateF</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">, </span><a href="globals.html#executef" class="tsd-signature-type">ExecuteF</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/event-store.ts#L21">event-store.ts:21</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter">
+					<a name="aggregatematches" class="tsd-anchor"></a>
+					<h3>Aggregate<wbr>Matches</h3>
+					<div class="tsd-signature tsd-kind-icon">Aggregate<wbr>Matches<span class="tsd-signature-symbol">:</span> <a href="globals.html#aggregatematch" class="tsd-signature-type">AggregateMatch</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/event-store.ts#L22">event-store.ts:22</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter">
+					<a name="aggregator" class="tsd-anchor"></a>
+					<h3>Aggregator</h3>
+					<div class="tsd-signature tsd-kind-icon">Aggregator<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/index.ts#L53">index.ts:53</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>An aggregator function for an event</p>
+						</div>
+						<p><strong>Important:</strong> The result of an aggregate is cached, therefore an aggregate&#39;s computation must be
+							idempotent. Computations that use externally changing values like timestamps or other globals should
+						wrap the aggregate in another function so the cache stays valid.</p>
+						<dl class="tsd-comment-tags">
+							<dt>param</dt>
+							<dd><p>The current state of the aggregation. This is <code>None</code> on the first iteration, or the
+								return value of the previous aggregate application, which may also return <code>None</code>.</p>
+							</dd>
+							<dt>param</dt>
+							<dd><p>The event to process</p>
+							</dd>
+						</dl>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>acc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Option</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>, event<span class="tsd-signature-symbol">: </span><a href="interfaces/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><a href="interfaces/eventdata.html" class="tsd-signature-type">EventData</a><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Option</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>acc: <span class="tsd-signature-type">Option</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+											</li>
+											<li>
+												<h5>event: <a href="interfaces/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><a href="interfaces/eventdata.html" class="tsd-signature-type">EventData</a><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Option</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="cachekey" class="tsd-anchor"></a>
+					<h3>Cache<wbr>Key</h3>
+					<div class="tsd-signature tsd-kind-icon">Cache<wbr>Key<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/adapters/index.ts#L36">adapters/index.ts:36</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A cache item key</p>
+						</div>
+						<p>This is a hash generated from the aggregate query and query arguments that produce an aggregate
+							result. This produces cache items that are invalidated when the aggregate query changes, and are
+						also unique to each set of query parameters passed to the aggregator.</p>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter">
+					<a name="emitterhandler" class="tsd-anchor"></a>
+					<h3>Emitter<wbr>Handler</h3>
+					<div class="tsd-signature tsd-kind-icon">Emitter<wbr>Handler<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/adapters/index.ts#L78">adapters/index.ts:78</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Event handler for received events</p>
+						</div>
+						<p>Handler functions are only called when an incoming event has been saved successfully. If the event
+							is already present in the database, or failed to be saved by the <a href="interfaces/storeadapter.html">StoreAdapter</a> backing store,
+							this handler will not be called. <strong>As the event has already been saved by the store internally, the
+						programmer is not required to save the event in the handler.</strong></p>
+						<p>Functions with this signature should be passed to <code>Store.subscribe</code> to handle incoming events.</p>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>event: <span class="tsd-signature-type">T</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter">
+					<a name="eventhandler" class="tsd-anchor"></a>
+					<h3>Event<wbr>Handler</h3>
+					<div class="tsd-signature tsd-kind-icon">Event<wbr>Handler<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/event-store.ts#L24">event-store.ts:24</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span>, store<span class="tsd-signature-symbol">: </span><a href="classes/eventstore.html" class="tsd-signature-type">EventStore</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Q</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Either</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>event: <span class="tsd-signature-type">T</span></h5>
+											</li>
+											<li>
+												<h5>store: <a href="classes/eventstore.html" class="tsd-signature-type">EventStore</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Q</span><span class="tsd-signature-symbol">&gt;</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Either</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="eventnamespace" class="tsd-anchor"></a>
+					<h3>Event<wbr>Namespace</h3>
+					<div class="tsd-signature tsd-kind-icon">Event<wbr>Namespace<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/index.ts#L29">index.ts:29</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>An event&#39;s namespace</p>
+						</div>
+						<p>The lowercase namespace to which an event belongs</p>
+						<dl class="tsd-comment-tags">
+							<dt>example</dt>
+							<dd><p><code>accounts</code></p>
+							</dd>
+							<dt>example</dt>
+							<dd><p><code>organisations</code></p>
+							</dd>
+						</dl>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="eventtype" class="tsd-anchor"></a>
+					<h3>Event<wbr>Type</h3>
+					<div class="tsd-signature tsd-kind-icon">Event<wbr>Type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/index.ts#L39">index.ts:39</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>An event&#39;s type</p>
+						</div>
+						<p>The TitleCase identifier for an event in past tense</p>
+						<dl class="tsd-comment-tags">
+							<dt>example</dt>
+							<dd><p><code>ProfileUpdated</code></p>
+							</dd>
+							<dt>example</dt>
+							<dd><p><code>InviteAccepted</code></p>
+							</dd>
+						</dl>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter">
+					<a name="executef" class="tsd-anchor"></a>
+					<h3>ExecuteF</h3>
+					<div class="tsd-signature tsd-kind-icon">ExecuteF<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/event-store.ts#L20">event-store.ts:20</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>acc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Option</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>, ev<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Option</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>acc: <span class="tsd-signature-type">Option</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+											</li>
+											<li>
+												<h5>ev: <span class="tsd-signature-type">E</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Option</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="isodatestring" class="tsd-anchor"></a>
+					<h3>Iso<wbr>Date<wbr>String</h3>
+					<div class="tsd-signature tsd-kind-icon">Iso<wbr>Date<wbr>String<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/index.ts#L19">index.ts:19</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>ISO8601 formatted date string</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter">
+					<a name="omit" class="tsd-anchor"></a>
+					<h3>Omit</h3>
+					<div class="tsd-signature tsd-kind-icon">Omit<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Pick</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Exclude</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">keyof T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/helpers.ts#L11">helpers.ts:11</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-is-not-exported">
+					<a name="subscriptionkey" class="tsd-anchor"></a>
+					<h3>Subscription<wbr>Key</h3>
+					<div class="tsd-signature tsd-kind-icon">Subscription<wbr>Key<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/adapters/index.ts#L27">adapters/index.ts:27</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>An event&#39;s joined <a href="globals.html#eventnamespace">EventNamespace</a> and <a href="globals.html#eventtype">EventType</a></p>
+						</div>
+						<p>This is the union of <a href="globals.html#eventnamespace">EventNamespace</a>, a <code>.</code> character and <a href="globals.html#eventtype">EventType</a></p>
+						<dl class="tsd-comment-tags">
+							<dt>example</dt>
+							<dd><p><code>accounts.ProfileUpdated</code></p>
+							</dd>
+							<dt>example</dt>
+							<dd><p><code>organisations.InviteAccepted</code></p>
+							</dd>
+						</dl>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="subscriptions" class="tsd-anchor"></a>
+					<h3>Subscriptions</h3>
+					<div class="tsd-signature tsd-kind-icon">Subscriptions<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&lt;</span><a href="globals.html#subscriptionkey" class="tsd-signature-type">SubscriptionKey</a><span class="tsd-signature-symbol">, </span><a href="globals.html#emitterhandler" class="tsd-signature-type">EmitterHandler</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/adapters/index.ts#L85">adapters/index.ts:85</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Event subscriptions</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="uuid" class="tsd-anchor"></a>
+					<h3>Uuid</h3>
+					<div class="tsd-signature tsd-kind-icon">Uuid<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/index.ts#L14">index.ts:14</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A UUID</p>
+						</div>
+						<p>This is a UUID stored without wrapping characters</p>
+						<dl class="tsd-comment-tags">
+							<dt>example</dt>
+							<dd><p><code>cafebabe-cafe-babe-cafe-babecafebabe</code></p>
+							</dd>
+							<dt>example</dt>
+							<dd><p><code>5ec93584-9e86-4aa5-b5d4-7ff84f1b82fa</code></p>
+							</dd>
+						</dl>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter">
+					<a name="validatef" class="tsd-anchor"></a>
+					<h3>ValidateF</h3>
+					<div class="tsd-signature tsd-kind-icon">ValidateF<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/event-store.ts#L19">event-store.ts:19</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>o<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>o: <span class="tsd-signature-type">any</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Variables</h2>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-not-exported">
+					<a name="aggregatecachetable" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> aggregate<wbr>Cache<wbr>Table</h3>
+					<div class="tsd-signature tsd-kind-icon">aggregate<wbr>Cache<wbr>Table<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"CREATE TABLE IF NOT EXISTS aggregate_cache(id VARCHAR(64) NOT NULL,data JSONB NOT NULL,time VARCHAR(24),PRIMARY KEY(id));"</span><span class="tsd-signature-symbol"> =&nbsp;&#x60;CREATE TABLE IF NOT EXISTS aggregate_cache(id VARCHAR(64) NOT NULL,data JSONB NOT NULL,time VARCHAR(24),PRIMARY KEY(id));&#x60;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/adapters/cache/postgres.ts#L12">adapters/cache/postgres.ts:12</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-not-exported">
+					<a name="cache_endpoint" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> cache_<wbr>endpoint</h3>
+					<div class="tsd-signature tsd-kind-icon">cache_<wbr>endpoint<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;process.env.REDIS_URI || &quot;redis://localhost:6380&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/adapters/cache/redis.integration.ts#L9">adapters/cache/redis.integration.ts:9</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable">
+					<a name="cafebabe" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> cafebabe</h3>
+					<div class="tsd-signature tsd-kind-icon">cafebabe<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"cafebabe-cafe-babe-cafe-babecafebabe"</span><span class="tsd-signature-symbol"> =&nbsp;&quot;cafebabe-cafe-babe-cafe-babecafebabe&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/test-helpers.ts#L6">test-helpers.ts:6</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-not-exported">
+					<a name="defaultquerystub" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> default<wbr>Query<wbr>Stub</h3>
+					<div class="tsd-signature tsd-kind-icon">default<wbr>Query<wbr>Stub<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">SinonStub</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;stub().resolves({rows: [],totalCount: 0,})</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/test-helpers.ts#L9">test-helpers.ts:9</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-not-exported">
+					<a name="eventstable" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> events<wbr>Table</h3>
+					<div class="tsd-signature tsd-kind-icon">events<wbr>Table<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"CREATE TABLE IF NOT EXISTS events(id UUID DEFAULT uuid_generate_v4() primary key,data JSONB NOT NULL,context JSONB DEFAULT &#x27;{}&#x27;);"</span><span class="tsd-signature-symbol"> =&nbsp;&#x60;CREATE TABLE IF NOT EXISTS events(id UUID DEFAULT uuid_generate_v4() primary key,data JSONB NOT NULL,context JSONB DEFAULT &#x27;{}&#x27;);&#x60;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/adapters/store/postgres.ts#L20">adapters/store/postgres.ts:20</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable">
+					<a name="id" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> id</h3>
+					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"d00dd00d-d00d-d00d-d00d-d00dd00dd00d"</span><span class="tsd-signature-symbol"> =&nbsp;&quot;d00dd00d-d00d-d00d-d00d-d00dd00dd00d&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/test-helpers.ts#L7">test-helpers.ts:7</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-not-exported">
+					<a name="insertaggregatecache" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> insert<wbr>Aggregate<wbr>Cache</h3>
+					<div class="tsd-signature tsd-kind-icon">insert<wbr>Aggregate<wbr>Cache<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"INSERT INTO aggregate_cache (id, data, time)VALUES ($1, $2, $3)ON CONFLICT (id)DO UPDATE SET data &#x3D; EXCLUDED.data, time &#x3D; EXCLUDED.time;"</span><span class="tsd-signature-symbol"> =&nbsp;&#x60;INSERT INTO aggregate_cache (id, data, time)VALUES ($1, $2, $3)ON CONFLICT (id)DO UPDATE SET data &#x3D; EXCLUDED.data, time &#x3D; EXCLUDED.time;&#x60;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/adapters/cache/postgres.ts#L5">adapters/cache/postgres.ts:5</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-not-exported">
+					<a name="logger" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> logger</h3>
+					<div class="tsd-signature tsd-kind-icon">logger<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">BaseLogger</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> =&nbsp;pino()</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/index.test.ts#L17">index.test.ts:17</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-has-type-parameter">
+					<a name="composeaggregator" class="tsd-anchor"></a>
+					<h3>compose<wbr>Aggregator</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">compose<wbr>Aggregator&lt;T&gt;<span class="tsd-signature-symbol">(</span>matches<span class="tsd-signature-symbol">: </span><a href="globals.html#aggregatematches" class="tsd-signature-type">AggregateMatches</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="globals.html#aggregator" class="tsd-signature-type">Aggregator</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/event-store.ts#L39">event-store.ts:39</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p> Compose a list of maching functions into an aggregator</p>
+								</div>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T</h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>matches: <a href="globals.html#aggregatematches" class="tsd-signature-type">AggregateMatches</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="globals.html#aggregator" class="tsd-signature-type">Aggregator</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="createaqmpemitteradapter" class="tsd-anchor"></a>
+					<h3>createAQMPEmitter<wbr>Adapter</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">createAQMPEmitter<wbr>Adapter<span class="tsd-signature-symbol">(</span>irisOpts<span class="tsd-signature-symbol">: </span><a href="interfaces/irisoptions.html" class="tsd-signature-type">IrisOptions</a>, logger<span class="tsd-signature-symbol">?: </span><a href="interfaces/logger.html" class="tsd-signature-type">Logger</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="interfaces/emitteradapter.html" class="tsd-signature-type">EmitterAdapter</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/adapters/emitter/amqp.ts#L31">adapters/emitter/amqp.ts:31</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>irisOpts: <a href="interfaces/irisoptions.html" class="tsd-signature-type">IrisOptions</a></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> logger: <a href="interfaces/logger.html" class="tsd-signature-type">Logger</a><span class="tsd-signature-symbol"> =&nbsp;console</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="interfaces/emitteradapter.html" class="tsd-signature-type">EmitterAdapter</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="createcontext" class="tsd-anchor"></a>
+					<h3>create<wbr>Context</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Context<span class="tsd-signature-symbol">(</span>subject<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span>, action<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span>, _time<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="interfaces/eventcontext.html" class="tsd-signature-type">EventContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/helpers.ts#L162">helpers.ts:162</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Create a context for an event</p>
+								</div>
+								<p>An event&#39;s context consists of a subject (current user or similar), an optional action specifying
+								what created the event and a creation timestamp.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>subject: <span class="tsd-signature-type">object</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The entity that created this event.
+											This may be the current user of the platform, or information identifying which server or service
+										emitted it.</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> action: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>An identifier describing the source of the event.
+											This is most commonly the name of an operation like <code>login</code> or <code>inviteMemberToOrganisation</code>, but can
+										be any short, clear string.</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> _time: <span class="tsd-signature-type">function</span><span class="tsd-signature-symbol"> =&nbsp;() &#x3D;&gt; new Date().toISOString()</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>An optional function that returns an ISO8601 date string.
+											Defaults to the current time. This <strong>should not</strong> be used in production code, but is very useful
+											when unit testing code that deals with events. Because the time always changes, created events
+											cannot be directly tested against expected cases. When testing, override <code>_time</code> with an argument
+										that returns a static string. For example:</p>
+										<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { createEvent, EventData } <span class="hljs-keyword">from</span> <span class="hljs-string">'@repositive/event-store'</span>;
+
+<span class="hljs-keyword">interface</span> ExampleEvent <span class="hljs-keyword">extends</span> EventData {
+event_namespace: <span class="hljs-string">'docs'</span>;
+event_type: <span class="hljs-string">'ExampleEvent'</span>;
+foo: <span class="hljs-built_in">number</span>;
+bar: <span class="hljs-built_in">number</span>;
+}
+
+it(<span class="hljs-string">'Creates an event'</span>, <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+<span class="hljs-keyword">const</span> time = <span class="hljs-string">'2019-01-01'</span>
+<span class="hljs-keyword">const</span> created = createEvent&lt;ExampleEvent&gt;(
+<span class="hljs-string">'docs'</span>,
+<span class="hljs-string">'ExampleEvent'</span>,
+{ foo: <span class="hljs-number">100</span>, bar: <span class="hljs-number">200</span> },
+<span class="hljs-comment">// Empty subject, no action, overridden time</span>
+createContext({}, <span class="hljs-literal">undefined</span>, <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> time),
+<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-string">'cafebabe-cafe-babe-cafe-babecafebabe'</span>
+);
+
+expect(created).to.deep.equal({
+id: <span class="hljs-string">'cafebabe-cafe-babe-cafe-babecafebabe'</span>,
+data: { ... snip ... },
+context: { subject: {}, action: <span class="hljs-string">''</span>, time }
+});
+});</code></pre>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-siganture">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="globals.html#isodatestring" class="tsd-signature-type">IsoDateString</a></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-returns-title">Returns <a href="globals.html#isodatestring" class="tsd-signature-type">IsoDateString</a></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="interfaces/eventcontext.html" class="tsd-signature-type">EventContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="createdumbcacheadapter" class="tsd-anchor"></a>
+					<h3>create<wbr>Dumb<wbr>Cache<wbr>Adapter</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Dumb<wbr>Cache<wbr>Adapter<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="interfaces/cacheadapter.html" class="tsd-signature-type">CacheAdapter</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/adapters/cache/dumb.ts#L4">adapters/cache/dumb.ts:4</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="interfaces/cacheadapter.html" class="tsd-signature-type">CacheAdapter</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="createdumbemitteradapter" class="tsd-anchor"></a>
+					<h3>create<wbr>Dumb<wbr>Emitter<wbr>Adapter</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Dumb<wbr>Emitter<wbr>Adapter<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="interfaces/emitteradapter.html" class="tsd-signature-type">EmitterAdapter</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/adapters/emitter/dumb.ts#L3">adapters/emitter/dumb.ts:3</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="interfaces/emitteradapter.html" class="tsd-signature-type">EmitterAdapter</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-has-type-parameter">
+					<a name="createevent" class="tsd-anchor"></a>
+					<h3>create<wbr>Event</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Event&lt;T&gt;<span class="tsd-signature-symbol">(</span>event_namespace<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T[&quot;event_namespace&quot;]</span>, event_type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T[&quot;event_type&quot;]</span>, data<span class="tsd-signature-symbol">: </span><a href="globals.html#omit" class="tsd-signature-type">Omit</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">"event_namespace"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"event_type"</span><span class="tsd-signature-symbol">&gt;</span>, context<span class="tsd-signature-symbol">?: </span><a href="interfaces/eventcontext.html" class="tsd-signature-type">EventContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span>, _uuid<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="interfaces/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><a href="interfaces/eventcontext.html" class="tsd-signature-type">EventContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/helpers.ts#L93">helpers.ts:93</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Create an event with optional context</p>
+								</div>
+								<p>This function should be used to create events in code that uses the event store instead of
+									constructing them manually. It builds an event object with the correct shape and adds a minimal
+									event context if one is not provided. Importantly, it also typechecks the given event namespace and
+								type arguments to guard against typos.</p>
+								<p><strong>It is strongly recommended you declare the event type when calling this method.</strong> For example, the
+									following example will fail to compile due to a typo in the event name, and a missing field in the
+								event object:</p>
+								<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { createEvent, EventData } <span class="hljs-keyword">from</span> <span class="hljs-string">'@repositive/event-store'</span>;
+
+<span class="hljs-keyword">interface</span> ExampleEvent <span class="hljs-keyword">extends</span> EventData {
+event_namespace: <span class="hljs-string">'docs'</span>;
+event_Type: <span class="hljs-string">'ExampleEvent'</span>;
+foo: <span class="hljs-built_in">number</span>;
+bar: <span class="hljs-built_in">number</span>;
+}
+
+<span class="hljs-comment">// Note typo: `ExmopleEvent`</span>
+<span class="hljs-keyword">const</span> event = createEvent&lt;ExampleEvent&gt;(<span class="hljs-string">'docs'</span>, <span class="hljs-string">'ExmopleEvent'</span>, {
+foo: <span class="hljs-number">100</span>,
+<span class="hljs-comment">// Note missing field `bar`</span>
+});</code></pre>
+								<p>If the event type is not explicitly given like <code>createEvent&lt;ExampleEvent&gt;(...)</code>, Typescript cannot
+								typecheck the passed arguments, so missing fields and typos are not caught by the compiler.</p>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T<span class="tsd-signature-symbol">: </span><a href="interfaces/eventdata.html" class="tsd-signature-type">EventData</a></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>event_namespace: <span class="tsd-signature-type">T[&quot;event_namespace&quot;]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The namespace or domain this event belongs to, e.g. <code>accounts</code> or <code>search</code>.
+											This can be typechecked against the returned event interface by explicitly providing the event type
+										when calling <code>createEvent</code> like <code>createEvent&lt;ExampleEvent&gt;(...)</code>.</p>
+									</div>
+								</li>
+								<li>
+									<h5>event_type: <span class="tsd-signature-type">T[&quot;event_type&quot;]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The type of event.
+										By convention, this should have the same name as the event interface definition to reduce confusion.</p>
+									</div>
+								</li>
+								<li>
+									<h5>data: <a href="globals.html#omit" class="tsd-signature-type">Omit</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">"event_namespace"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"event_type"</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The event&#39;s data payload.
+											This function will overwrite fields named <code>event_type</code> or <code>event_namespace</code> in the payloadinput with
+										its own values.</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> context: <a href="interfaces/eventcontext.html" class="tsd-signature-type">EventContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;defaultContext()</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The event&#39;s context.
+											If not provided, <code>createEvent()</code> will create a default context with no action, an empty subject
+										(<code>{}</code>) and the current time in ISO8601 format as the event&#39;s creation timestamp.</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> _uuid: <span class="tsd-signature-type">function</span><span class="tsd-signature-symbol"> =&nbsp;v4</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>UUID provider function.
+											<strong>Only for use in tests</strong>. Override this argument to provide a custom UUID provider. This is useful
+										when unit testing so that a consistent static value can be passed. For example:</p>
+										<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { createEvent, EventData } <span class="hljs-keyword">from</span> <span class="hljs-string">'@repositive/event-store'</span>;
+
+<span class="hljs-keyword">interface</span> ExampleEvent <span class="hljs-keyword">extends</span> EventData {
+event_namespace: <span class="hljs-string">'docs'</span>;
+event_Type: <span class="hljs-string">'ExampleEvent'</span>;
+foo: <span class="hljs-built_in">number</span>;
+bar: <span class="hljs-built_in">number</span>;
+}
+
+it(<span class="hljs-string">'Creates an event'</span>, <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+<span class="hljs-keyword">const</span> created = createEvent&lt;ExampleEvent&gt;(
+<span class="hljs-string">'docs'</span>,
+<span class="hljs-string">'ExampleEvent'</span>,
+{ foo: <span class="hljs-number">100</span>, bar: <span class="hljs-number">200</span> },
+<span class="hljs-literal">undefined</span>,
+<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-string">'cafebabe-cafe-babe-cafe-babecafebabe'</span>
+);
+
+expect(created).to.deep.equal({
+id: <span class="hljs-string">'cafebabe-cafe-babe-cafe-babecafebabe'</span>,
+data: { ... snip ... },
+context: { ... snip ... }
+});
+});</code></pre>
+										<p>This makes unit testing much easier to perform.</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-siganture">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="globals.html#uuid" class="tsd-signature-type">Uuid</a></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-returns-title">Returns <a href="globals.html#uuid" class="tsd-signature-type">Uuid</a></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="interfaces/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><a href="interfaces/eventcontext.html" class="tsd-signature-type">EventContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="createfakeiterator" class="tsd-anchor"></a>
+					<h3>create<wbr>Fake<wbr>Iterator</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Fake<wbr>Iterator<span class="tsd-signature-symbol">(</span>result<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/test-helpers.ts#L70">test-helpers.ts:70</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>result: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">object</span></h4>
+							<ul class="tsd-parameters">
+								<li class="tsd-parameter">
+									<h5>next<span class="tsd-signature-symbol">: </span>function</h5>
+									<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-type-literal tsd-is-not-exported">
+										<li class="tsd-signature tsd-kind-icon">next<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
+									</ul>
+									<ul class="tsd-descriptions">
+										<li class="tsd-description">
+											<aside class="tsd-sources">
+												<ul>
+													<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/test-helpers.ts#L74">test-helpers.ts:74</a></li>
+												</ul>
+											</aside>
+											<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
+										</li>
+								</ul>        </li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="createpgcacheadapter" class="tsd-anchor"></a>
+					<h3>create<wbr>PgCache<wbr>Adapter</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>PgCache<wbr>Adapter<span class="tsd-signature-symbol">(</span>pool<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Pool</span>, logger<span class="tsd-signature-symbol">?: </span><a href="interfaces/logger.html" class="tsd-signature-type">Logger</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="interfaces/cacheadapter.html" class="tsd-signature-type">CacheAdapter</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/adapters/cache/postgres.ts#L21">adapters/cache/postgres.ts:21</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>pool: <span class="tsd-signature-type">Pool</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> logger: <a href="interfaces/logger.html" class="tsd-signature-type">Logger</a><span class="tsd-signature-symbol"> =&nbsp;console</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="interfaces/cacheadapter.html" class="tsd-signature-type">CacheAdapter</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="createpgstoreadapter" class="tsd-anchor"></a>
+					<h3>create<wbr>PgStore<wbr>Adapter</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>PgStore<wbr>Adapter<span class="tsd-signature-symbol">(</span>pool<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Pool</span>, logger<span class="tsd-signature-symbol">?: </span><a href="interfaces/logger.html" class="tsd-signature-type">Logger</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="interfaces/storeadapter.html" class="tsd-signature-type">StoreAdapter</a><span class="tsd-signature-symbol">&lt;</span><a href="interfaces/pgquery.html" class="tsd-signature-type">PgQuery</a><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/adapters/store/postgres.ts#L28">adapters/store/postgres.ts:28</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>pool: <span class="tsd-signature-type">Pool</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> logger: <a href="interfaces/logger.html" class="tsd-signature-type">Logger</a><span class="tsd-signature-symbol"> =&nbsp;console</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="interfaces/storeadapter.html" class="tsd-signature-type">StoreAdapter</a><span class="tsd-signature-symbol">&lt;</span><a href="interfaces/pgquery.html" class="tsd-signature-type">PgQuery</a><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="createrediscacheadapter" class="tsd-anchor"></a>
+					<h3>create<wbr>Redis<wbr>Cache<wbr>Adapter</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Redis<wbr>Cache<wbr>Adapter<span class="tsd-signature-symbol">(</span>redis_client<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">RedisClient</span>, logger<span class="tsd-signature-symbol">?: </span><a href="interfaces/logger.html" class="tsd-signature-type">Logger</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="interfaces/cacheadapter.html" class="tsd-signature-type">CacheAdapter</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/adapters/cache/redis.ts#L7">adapters/cache/redis.ts:7</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>redis_client: <span class="tsd-signature-type">RedisClient</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> logger: <a href="interfaces/logger.html" class="tsd-signature-type">Logger</a><span class="tsd-signature-symbol"> =&nbsp;console</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="interfaces/cacheadapter.html" class="tsd-signature-type">CacheAdapter</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-is-not-exported">
+					<a name="defaultcontext" class="tsd-anchor"></a>
+					<h3>default<wbr>Context</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">default<wbr>Context<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="interfaces/eventcontext.html" class="tsd-signature-type">EventContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">__type</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/helpers.ts#L4">helpers.ts:4</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="interfaces/eventcontext.html" class="tsd-signature-type">EventContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">__type</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="fakeemitter" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> fake<wbr>Emitter</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">fake<wbr>Emitter<span class="tsd-signature-symbol">(</span>_e<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/test-helpers.ts#L40">test-helpers.ts:40</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>_e: <span class="tsd-signature-type">any</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="fakepoolresult" class="tsd-anchor"></a>
+					<h3>fake<wbr>Pool<wbr>Result</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">fake<wbr>Pool<wbr>Result<span class="tsd-signature-symbol">(</span>rows<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">QueryResult</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/test-helpers.ts#L30">test-helpers.ts:30</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> rows: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">QueryResult</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="getdbconnection" class="tsd-anchor"></a>
+					<h3>get<wbr>DbConnection</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>DbConnection<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Pool</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/test-helpers.ts#L43">test-helpers.ts:43</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Pool</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="getfakepool" class="tsd-anchor"></a>
+					<h3>get<wbr>Fake<wbr>Pool</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Fake<wbr>Pool<span class="tsd-signature-symbol">(</span>queryStub<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/test-helpers.ts#L14">test-helpers.ts:14</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> queryStub: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;defaultQueryStub</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="getfakestoreadapter" class="tsd-anchor"></a>
+					<h3>get<wbr>Fake<wbr>Store<wbr>Adapter</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Fake<wbr>Store<wbr>Adapter<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/test-helpers.ts#L86">test-helpers.ts:86</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>__namedParameters: <span class="tsd-signature-type">object</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>last<wbr>Event<wbr>Of<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">function</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>read<wbr>Since<wbr>Stub<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>read<wbr>Stub<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>save<wbr>Stub<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">function</span></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="insertevent" class="tsd-anchor"></a>
+					<h3>insert<wbr>Event</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">insert<wbr>Event<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, pool<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/test-helpers.ts#L48">test-helpers.ts:48</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>event: <span class="tsd-signature-type">any</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> pool: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;getDbConnection()</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-has-type-parameter">
+					<a name="iseventcontext" class="tsd-anchor"></a>
+					<h3>is<wbr>Event<wbr>Context</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Event<wbr>Context&lt;S, C&gt;<span class="tsd-signature-symbol">(</span>o<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, is<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/helpers.ts#L192">helpers.ts:192</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Check that a given function is a valid event context</p>
+								</div>
+								<p>An event context must contain <em>at least</em> a <code>time</code> field.</p>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>S</h4>
+								</li>
+								<li>
+									<h4>C<span class="tsd-signature-symbol">: </span><a href="interfaces/eventcontext.html" class="tsd-signature-type">EventContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">S</span><span class="tsd-signature-symbol">&gt;</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>o: <span class="tsd-signature-type">any</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> is: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">function</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-has-type-parameter">
+					<a name="iseventdata" class="tsd-anchor"></a>
+					<h3>is<wbr>Event<wbr>Data</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Event<wbr>Data&lt;D&gt;<span class="tsd-signature-symbol">(</span>o<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, is<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/helpers.ts#L182">helpers.ts:182</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Check that a given object is valid event data for a given type</p>
+								</div>
+								<p>This function checks that <code>event_namespace</code> and <code>event_type</code> all exist and are strings, then
+									calls <code>is</code> which should be a function that checks that <code>event_namespace</code> and <code>event_type</code> contain
+									specific values.
+								<code>`</code></p>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>D<span class="tsd-signature-symbol">: </span><a href="interfaces/eventdata.html" class="tsd-signature-type">EventData</a></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>o: <span class="tsd-signature-type">any</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> is: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">function</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-has-type-parameter">
+					<a name="iseventtype" class="tsd-anchor"></a>
+					<h3>is<wbr>Event<wbr>Type</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Event<wbr>Type&lt;E&gt;<span class="tsd-signature-symbol">(</span>event_namespace<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">E[&quot;event_namespace&quot;]</span>, event_type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">E[&quot;event_type&quot;]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/helpers.ts#L234">helpers.ts:234</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Match a complete event object against a given namespace and type</p>
+								</div>
+								<p>A function is returned which can then be passed to aggregators.</p>
+								<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { isEventType, EventData } <span class="hljs-keyword">from</span> <span class="hljs-string">"@repositive/event-store"</span>;
+
+<span class="hljs-keyword">interface</span> AccountCreated <span class="hljs-keyword">extends</span> EventData { ... };
+<span class="hljs-keyword">interface</span> AccountUpdated <span class="hljs-keyword">extends</span> EventData { ... };
+
+<span class="hljs-keyword">const</span> isAccountCreated = isEventType&lt;AccountCreated&gt;(<span class="hljs-string">"accounts"</span>, <span class="hljs-string">"AccountCreated"</span>);
+<span class="hljs-keyword">const</span> isAccountUpdated = isEventType&lt;AccountUpdated&gt;(<span class="hljs-string">"accounts"</span>, <span class="hljs-string">"AccountUpdated"</span>);
+
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createUserByIdAggregate</span>(<span class="hljs-params">
+store: EventStore&lt;PgQuery&gt;
+</span>): <span class="hljs-title">Aggregate</span>&lt;[<span class="hljs-title">string</span>], <span class="hljs-title">User</span>&gt; </span>{
+<span class="hljs-keyword">return</span> store.createAggregate(
+<span class="hljs-string">"User"</span>,
+{
+text: <span class="hljs-string">`select * from events where data-&gt;&gt;'user_id' = $1`</span>,
+},
+[
+[isAccountCreated, onAccountCreated],
+[isAccountUpdated, onAccountUpdated],
+]
+);
+}</code></pre>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>E<span class="tsd-signature-symbol">: </span><a href="interfaces/eventdata.html" class="tsd-signature-type">EventData</a></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>event_namespace: <span class="tsd-signature-type">E[&quot;event_namespace&quot;]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The event namespace to use, like <code>search</code> or <code>accounts</code></p>
+									</div>
+								</li>
+								<li>
+									<h5>event_type: <span class="tsd-signature-type">E[&quot;event_type&quot;]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The event type to use, like <code>LoggedIn</code> or <code>ImageDeleted</code></p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">function</span></h4>
+							<ul class="tsd-parameters">
+								<li class="tsd-parameter-siganture">
+									<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+										<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>o<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+									</ul>
+									<ul class="tsd-descriptions">
+										<li class="tsd-description">
+											<h4 class="tsd-parameters-title">Parameters</h4>
+											<ul class="tsd-parameters">
+												<li>
+													<h5>o: <span class="tsd-signature-type">any</span></h5>
+												</li>
+											</ul>
+											<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="query" class="tsd-anchor"></a>
+					<h3>query</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">query<span class="tsd-signature-symbol">(</span>q<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, pool<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/test-helpers.ts#L66">test-helpers.ts:66</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>q: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> pool: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;getDbConnection()</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-has-type-parameter">
+					<a name="reduce" class="tsd-anchor"></a>
+					<h3>reduce</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">reduce&lt;I, O&gt;<span class="tsd-signature-symbol">(</span>iter<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">AsyncIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">I</span><span class="tsd-signature-symbol">&gt;</span>, acc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">O</span>, f<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">O</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/event-store.ts#L50">event-store.ts:50</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>I</h4>
+								</li>
+								<li>
+									<h4>O</h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>iter: <span class="tsd-signature-type">AsyncIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">I</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+								<li>
+									<h5>acc: <span class="tsd-signature-type">O</span></h5>
+								</li>
+								<li>
+									<h5>f: <span class="tsd-signature-type">function</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-siganture">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>acc<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">O</span>, next<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">I</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">O</span><span class="tsd-signature-symbol">&gt;</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>acc: <span class="tsd-signature-type">O</span></h5>
+														</li>
+														<li>
+															<h5>next: <span class="tsd-signature-type">I</span></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">O</span><span class="tsd-signature-symbol">&gt;</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">O</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-has-type-parameter tsd-is-not-exported">
+					<a name="toasynciter" class="tsd-anchor"></a>
+					<h3>to<wbr>Async<wbr>Iter</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-has-type-parameter tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Async<wbr>Iter&lt;T&gt;<span class="tsd-signature-symbol">(</span>input<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">AsyncIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/index.test.ts#L20">index.test.ts:20</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T</h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>input: <span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">AsyncIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="truncateall" class="tsd-anchor"></a>
+					<h3>truncate<wbr>All</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">truncate<wbr>All<span class="tsd-signature-symbol">(</span>pool<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/test-helpers.ts#L58">test-helpers.ts:58</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> pool: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;getDbConnection()</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="wait" class="tsd-anchor"></a>
+					<h3>wait</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">wait<span class="tsd-signature-symbol">(</span>n<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/adapters/emitter/amqp.ts#L21">adapters/emitter/amqp.ts:21</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>n: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-is-not-exported">
+					<a name="wraphandler" class="tsd-anchor"></a>
+					<h3>wrap<wbr>Handler</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">wrap<wbr>Handler<span class="tsd-signature-symbol">(</span>handler<span class="tsd-signature-symbol">: </span><a href="globals.html#emitterhandler" class="tsd-signature-type">EmitterHandler</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">(Anonymous function)</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/repositive/event-store/blob/0c96efb/src/adapters/emitter/amqp.ts#L25">adapters/emitter/amqp.ts:25</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>handler: <a href="globals.html#emitterhandler" class="tsd-signature-type">EmitterHandler</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">(Anonymous function)</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals current ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-class">
+						<a href="classes/duplicateerror.html" class="tsd-kind-icon">Duplicate<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter">
+						<a href="classes/eventstore.html" class="tsd-kind-icon">Event<wbr>Store</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/cacheadapter.html" class="tsd-kind-icon">Cache<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/cacheentry.html" class="tsd-kind-icon">Cache<wbr>Entry</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/emitteradapter.html" class="tsd-kind-icon">Emitter<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/event.html" class="tsd-kind-icon">Event</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/eventcontext.html" class="tsd-kind-icon">Event<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/eventdata.html" class="tsd-kind-icon">Event<wbr>Data</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/eventstoreoptions.html" class="tsd-kind-icon">Event<wbr>Store<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/irisoptions.html" class="tsd-kind-icon">Iris<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/logger.html" class="tsd-kind-icon">Logger</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/pgquery.html" class="tsd-kind-icon">Pg<wbr>Query</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/storeadapter.html" class="tsd-kind-icon">Store<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#aggregate" class="tsd-kind-icon">Aggregate</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#aggregatematch" class="tsd-kind-icon">Aggregate<wbr>Match</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#aggregatematches" class="tsd-kind-icon">Aggregate<wbr>Matches</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#aggregator" class="tsd-kind-icon">Aggregator</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#cachekey" class="tsd-kind-icon">Cache<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#emitterhandler" class="tsd-kind-icon">Emitter<wbr>Handler</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#eventhandler" class="tsd-kind-icon">Event<wbr>Handler</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#eventnamespace" class="tsd-kind-icon">Event<wbr>Namespace</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#eventtype" class="tsd-kind-icon">Event<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#executef" class="tsd-kind-icon">ExecuteF</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#isodatestring" class="tsd-kind-icon">Iso<wbr>Date<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#omit" class="tsd-kind-icon">Omit</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-is-not-exported">
+						<a href="globals.html#subscriptionkey" class="tsd-kind-icon">Subscription<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#subscriptions" class="tsd-kind-icon">Subscriptions</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#uuid" class="tsd-kind-icon">Uuid</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#validatef" class="tsd-kind-icon">ValidateF</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#aggregatecachetable" class="tsd-kind-icon">aggregate<wbr>Cache<wbr>Table</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#cache_endpoint" class="tsd-kind-icon">cache_<wbr>endpoint</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#cafebabe" class="tsd-kind-icon">cafebabe</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#defaultquerystub" class="tsd-kind-icon">default<wbr>Query<wbr>Stub</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#eventstable" class="tsd-kind-icon">events<wbr>Table</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#id" class="tsd-kind-icon">id</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#insertaggregatecache" class="tsd-kind-icon">insert<wbr>Aggregate<wbr>Cache</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#logger" class="tsd-kind-icon">logger</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#composeaggregator" class="tsd-kind-icon">compose<wbr>Aggregator</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createaqmpemitteradapter" class="tsd-kind-icon">createAQMPEmitter<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createcontext" class="tsd-kind-icon">create<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createdumbcacheadapter" class="tsd-kind-icon">create<wbr>Dumb<wbr>Cache<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createdumbemitteradapter" class="tsd-kind-icon">create<wbr>Dumb<wbr>Emitter<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#createevent" class="tsd-kind-icon">create<wbr>Event</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createfakeiterator" class="tsd-kind-icon">create<wbr>Fake<wbr>Iterator</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createpgcacheadapter" class="tsd-kind-icon">create<wbr>PgCache<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createpgstoreadapter" class="tsd-kind-icon">create<wbr>PgStore<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createrediscacheadapter" class="tsd-kind-icon">create<wbr>Redis<wbr>Cache<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-not-exported">
+						<a href="globals.html#defaultcontext" class="tsd-kind-icon">default<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#fakeemitter" class="tsd-kind-icon">fake<wbr>Emitter</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#fakepoolresult" class="tsd-kind-icon">fake<wbr>Pool<wbr>Result</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getdbconnection" class="tsd-kind-icon">get<wbr>DbConnection</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getfakepool" class="tsd-kind-icon">get<wbr>Fake<wbr>Pool</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getfakestoreadapter" class="tsd-kind-icon">get<wbr>Fake<wbr>Store<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#insertevent" class="tsd-kind-icon">insert<wbr>Event</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#iseventcontext" class="tsd-kind-icon">is<wbr>Event<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#iseventdata" class="tsd-kind-icon">is<wbr>Event<wbr>Data</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#iseventtype" class="tsd-kind-icon">is<wbr>Event<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#query" class="tsd-kind-icon">query</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#reduce" class="tsd-kind-icon">reduce</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-not-exported">
+						<a href="globals.html#toasynciter" class="tsd-kind-icon">to<wbr>Async<wbr>Iter</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#truncateall" class="tsd-kind-icon">truncate<wbr>All</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#wait" class="tsd-kind-icon">wait</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-not-exported">
+						<a href="globals.html#wraphandler" class="tsd-kind-icon">wrap<wbr>Handler</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
