@@ -88,13 +88,11 @@ export async function getFakeStoreAdapter({
   readSinceStub,
   saveStub,
   lastEventOf,
-  exists,
 }: {
   readStub?: any;
   readSinceStub?: any;
   saveStub?: (evt: any) => Promise<undefined>;
   lastEventOf?: (pattern: string) => Promise<Event<any, any>>;
-  exists?: (id: string) => Promise<boolean>;
 }): Promise<any> {
   const writer =
     saveStub ||
@@ -127,7 +125,6 @@ export async function getFakeStoreAdapter({
       return writer(event).then(() => Right(undefined));
     },
     lastEventOf: lastEventOf || ((): any => None),
-    exists: exists || (() => Promise.resolve(true)),
     readEventSince: readSinceStub || (() => createFakeIterator([])),
   };
 

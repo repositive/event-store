@@ -8,7 +8,6 @@ import {
   EventContext,
   EventNamespace,
   EventType,
-  Uuid,
 } from "../../.";
 import { Option, None, Either, Left, Right } from "funfix";
 import { Logger, IsoDateString } from "../../.";
@@ -125,20 +124,6 @@ export function createPgStoreAdapter(pool: Pool, logger: Logger = console): Stor
       });
   }
 
-  async function exists(id: Uuid): Promise<boolean> {
-    logger.trace({ id }, "eventStoreEventExists");
-
-    const start = Date.now();
-
-    return pool.query(`select * from events where id = $1`, [id]).then((results) => {
-      const eventExists = !!results.rows[0];
-
-      logger.trace({ id, eventExists, time: Date.now() - start }, "eventStoreEventExistsResponse");
-
-      return eventExists;
-    });
-  }
-
   function readEventSince(
     ns: EventNamespace,
     ty: EventType,
@@ -159,6 +144,5 @@ export function createPgStoreAdapter(pool: Pool, logger: Logger = console): Stor
     write,
     lastEventOf,
     readEventSince,
-    exists,
   };
 }

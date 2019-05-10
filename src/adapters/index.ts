@@ -6,7 +6,6 @@ import {
   IsoDateString,
   EventNamespace,
   EventType,
-  Uuid,
   Subscriptions,
 } from "..";
 
@@ -171,11 +170,6 @@ export interface StoreAdapter<Q> {
   @returns The most recent found event, or `None` if no event could be found
   */
   lastEventOf<E extends Event<any, any>>(ns: EventNamespace, ty: EventType): Promise<Option<E>>;
-
-  /**
-  Check that an event with a given ID exists
-  */
-  exists(id: Uuid): Promise<boolean>;
 
   /**
   Read all events created at or after a given time
