@@ -159,8 +159,8 @@ it('Creates an event', () => {
 });
 ```
 */
-export function createContext(
-  subject: object,
+export function createContext<S = object>(
+  subject: S,
   action?: string,
   _time: () => IsoDateString = () => new Date().toISOString()
 ): EventContext<any> {

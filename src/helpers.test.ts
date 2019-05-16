@@ -75,11 +75,15 @@ test("creates a context with subject and no action", (t: any) => {
 });
 
 test("creates a context with subject and an action", (t: any) => {
+  interface Subj {
+    bar: string;
+  }
+
   const evt = createEvent(
     "ns",
     "Type",
     { foo: "bar" },
-    createContext({ bar: "baz" }, "someRandomAction", () => "2018-01-02 03-04-05"),
+    createContext<Subj>({ bar: "baz" }, "someRandomAction", () => "2018-01-02 03-04-05"),
     () => id
   );
 
