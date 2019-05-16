@@ -3,6 +3,7 @@
   "version": "0.3.0",
   "description": "Event store implementation",
   "main": "dist/index.js",
+  "browser": "dist/browser.js",
   "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
   "repository": "https://github.com/repositive/event-store",
