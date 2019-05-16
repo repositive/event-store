@@ -3,10 +3,12 @@
   "version": "0.3.0",
   "description": "Event store implementation",
   "main": "dist/index.js",
+  "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
   "repository": "https://github.com/repositive/event-store",
   "scripts": {
-    "compile": "rm -fr dist && tsc",
+    "compile": "rm -fr dist && tsc && npm run compile:esm",
+    "compile:esm": "tsc -m es2015 --outDir dist/esm",
     "test": "nyc --all --reporter lcov ava-ts --verbose",
     "testIntegration": "nyc --reporter lcov ava-ts --verbose ./src/integrationsetup.ts ./src/**/*.integration.ts",
     "testDev": "nyc --reporter lcov ava-ts --watch",
